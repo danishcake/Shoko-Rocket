@@ -123,6 +123,8 @@ void ItemBrowserWidget::PrevPage(Widget* _widget)
 int ItemBrowserWidget::GetPageCount()
 {
 	int max_number_items = grid_size_.x * grid_size_.y - 2;
+	if(items_.size() == 0)
+		return 1;
 	return ((items_.size() - 1) / max_number_items) + 1;
 }
 

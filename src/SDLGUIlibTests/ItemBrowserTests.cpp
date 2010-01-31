@@ -86,6 +86,19 @@ TEST_FIXTURE(SDL_fixture, ItemBrowerPages)
 	
 }
 
+TEST_FIXTURE(SDL_fixture, ItemBrowserEmpty)
+{
+	UNITTEST_TIME_CONSTRAINT(50);
+
+	CHECK(SDL_init_ok);
+	if(SDL_init_ok)
+	{
+		vector<string> files;
+		ItemBrowserWidget* ibw = new ItemBrowserWidget(files, Vector2i(3, 2), Vector2i(36, 27));
+		CHECK_EQUAL(1, ibw->GetPageCount());
+	}
+}
+
 namespace
 {
 	int item_click_count = 0;
