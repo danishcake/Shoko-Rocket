@@ -557,19 +557,19 @@ void GameStateMachine::PuzzleScrollRightClick(Widget* _widget)
 /* Editor methods */
 void GameStateMachine::SetupEditor()
 {
-	Widget* scroll_down = new Widget(new BlittableRect(Vector2i(12 * Settings::GetGridSize().x + 1, 10)));
+	Widget* scroll_down = new Widget("ScrollDown.png");
 	scroll_down->SetPosition(Vector2i(138, 9 * Settings::GetGridSize().y + 11));
 	scroll_down->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollDownClick, this, _1));
 
-	Widget* scroll_up = new Widget(new BlittableRect(Vector2i(12 * Settings::GetGridSize().x + 1, 10)));
+	Widget* scroll_up = new Widget("ScrollUp.png");
 	scroll_up->SetPosition(Vector2i(138, 0));
 	scroll_up->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollUpClick, this, _1));
 
-	Widget* scroll_left = new Widget(new BlittableRect(Vector2i(10, 9 * Settings::GetGridSize().y + 1)));
+	Widget* scroll_left = new Widget("ScrollLeft.png");
 	scroll_left->SetPosition(Vector2i(128, 10));
 	scroll_left->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollLeftClick, this, _1));
 
-	Widget* scroll_right = new Widget(new BlittableRect(Vector2i(10, 9 * Settings::GetGridSize().y + 1)));
+	Widget* scroll_right = new Widget("ScrollRight.png");
 	scroll_right->SetPosition(Vector2i(12 * Settings::GetGridSize().x + 138 + 1, 10));
 	scroll_right->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollRightClick, this, _1));
 

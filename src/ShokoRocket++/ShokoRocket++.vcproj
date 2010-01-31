@@ -455,6 +455,22 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Sprites\GUI\ScrollDown.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\ScrollLeft.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\ScrollRight.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\ScrollUp.png"
+					>
+				</File>
+				<File
 					RelativePath=".\Sprites\GUI\Tick.png"
 					>
 				</File>
