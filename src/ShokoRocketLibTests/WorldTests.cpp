@@ -467,7 +467,8 @@ TEST(CloseCatsMiss)
 
 TEST(MouseFromBehind)
 { //Mouse walks into the back of a cat from behind
-  //Collision distance is 0.1
+  //Collision distance is 0.33
+  //Effectively solving x = t, y = 3 + 2t/3 for t.
 	World* pWorld = new World("MouseFromBehind.Level");
 	WorldState::Enum e;
 	float total_time = 0;
@@ -476,7 +477,7 @@ TEST(MouseFromBehind)
 		total_time += 0.01f;
 	}
 	CHECK_EQUAL(WorldState::Defeat, e);
-	CHECK_CLOSE(8.7f, total_time, 0.01f);
+	CHECK_CLOSE(8.0f, total_time, 0.01f);
 	delete pWorld;
 }
 

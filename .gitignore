@@ -1,4 +1,6 @@
 ShokoRocket++.ncb
+ShokoRocket++.suo
+*.vcproj.*.*.user
 bin/
 lib/
 obj/
