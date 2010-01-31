@@ -1,0 +1,22 @@
+<AnimationSet>
+  <Animation Name="North">
+    <Frame Width="32" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+    <Frame Width="64" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+    <Frame Width="96" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+    <Frame Width="128" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="South">
+    <Frame Width="32" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+    <Frame Width="64" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+    <Frame Width="96" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+    <Frame Width="128" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="East">
+    <Frame Width="32" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+    <Frame Width="64" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="West">
+    <Frame Width="96" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+    <Frame Width="128" Height="32" Top="0" Left="0" File="Sprites.png" Time="0.5"/>
+  </Animation> 
+</AnimationSet>

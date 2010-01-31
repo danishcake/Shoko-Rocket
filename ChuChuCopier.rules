@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioToolFile
+	Name="ShokoRocket resource copier"
+	Version="8.00"
+	>
+	<Rules>
+		<CustomBuildRule
+			Name="Level copier"
+			DisplayName="Level Deployer"
+			CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\Levels\$(InputFileName)&quot;"
+			Outputs="$(OutDir)\Levels\$(InputFileName)"
+			FileExtensions="*.Level"
+			ExecutionDescription="Copying level $(InputFileName)"
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="Animation xml copier"
+			DisplayName="Animation xml Deployer"
+			CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\Animations\$(InputFileName)&quot;"
+			Outputs="$(OutDir)\Animations\$(InputFileName)"
+			FileExtensions="*.Animation"
+			ExecutionDescription="Copying animation xml $(InputFileName)"
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="Animation png copier"
+			DisplayName="Animation png Deployer"
+			CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\Animations\$(InputFileName)&quot;"
+			Outputs="$(OutDir)\Animations\$(InputFileName)"
+			FileExtensions="*.png"
+			ExecutionDescription="Copying animation png $(InputFileName)"
+			>
+			<Properties>
+			</Properties>
+		</CustomBuildRule>
+	</Rules>
+</VisualStudioToolFile>

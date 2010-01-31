@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Level>
+  <Name>Wrap around</Name>
+  <Size x="4" y="4"/>
+  <V x="0" y="0"/>
+  <V x="0" y="1"/>
+  <V x="0" y="2"/>
+  <H x="0" y="0"/>
+  <H x="2" y="0"/>
+  <H x="3" y="0"/>
+  
+  <H x="1" y="3"/>
+  <V x="1" y="2"/>
+  <V x="1" y="3"/>
+  <Mouse x="3" y="2" d="West"/>
+  <Rocket x="0" y="0"/>
+</Level>

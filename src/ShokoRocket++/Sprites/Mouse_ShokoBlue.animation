@@ -1,0 +1,29 @@
+<AnimationSet>
+  <Animation Name="North">
+    <Frame Width="32" Height="32" Top="96" Left="0" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="96" Left="32" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="96" Left="64" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="96" Left="96" File="Mouse_ShokoBlue.png" Time="0.2"/>
+  </Animation>
+  <Animation Name="South">
+    <Frame Width="32" Height="32" Top="64" Left="0" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="64" Left="32" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="64" Left="64" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="64" Left="96" File="Mouse_ShokoBlue.png" Time="0.2"/>
+  </Animation>
+  <Animation Name="East">
+    <Frame Width="32" Height="32" Top="0" Left="0" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="0" Left="32" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="0" Left="64" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="0" Left="96" File="Mouse_ShokoBlue.png" Time="0.2"/>
+  </Animation>
+  <Animation Name="West">
+    <Frame Width="32" Height="32" Top="32" Left="0" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="32" Left="32" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="32" Left="64" File="Mouse_ShokoBlue.png" Time="0.2"/>
+    <Frame Width="32" Height="32" Top="32" Left="96" File="Mouse_ShokoBlue.png" Time="0.2"/>
+  </Animation>
+  <Animation Name="Stopped">
+    <Frame Width="32" Height="32" Top="0" Left="0" File="Mouse_ShokoBlue.png" Time="0.2"/>
+  </Animation>
+</AnimationSet>

@@ -1,0 +1,5 @@
+<AnimationSet>
+  <Animation Name="All">
+    <Frame Width="384" Height="64" Top="0" Left="0" File="ArrowsArea.png" Time="0.3"/>
+  </Animation>
+</AnimationSet>

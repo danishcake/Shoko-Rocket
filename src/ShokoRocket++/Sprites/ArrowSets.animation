@@ -1,0 +1,41 @@
+<AnimationSet>
+  <Animation Name="South">
+    <Frame Width="48" Height="32" Top="0" Left="0" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="0" Left="48" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="0" Left="96" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="0" Left="144" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="0" Left="192" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="0" Left="240" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="0" Left="288" File="ArrowSets.png" Time="1"/>
+  </Animation>
+  <Animation Name="West">
+    <Frame Width="48" Height="32" Top="32" Left="0" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="32" Left="48" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="32" Left="96" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="32" Left="144" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="32" Left="192" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="32" Left="240" File="ArrowSets.png" Time="1"/>  
+	<Frame Width="48" Height="32" Top="32" Left="288" File="ArrowSets.png" Time="1"/>
+  </Animation>
+  <Animation Name="East">
+    <Frame Width="48" Height="32" Top="64" Left="0" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="64" Left="48" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="64" Left="96" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="64" Left="144" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="64" Left="192" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="64" Left="240" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="64" Left="288" File="ArrowSets.png" Time="1"/>
+  </Animation>
+  <Animation Name="North">
+	<Frame Width="48" Height="32" Top="96" Left="0" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="96" Left="48" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="96" Left="96" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="96" Left="144" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="96" Left="192" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="96" Left="240" File="ArrowSets.png" Time="1"/>
+	<Frame Width="48" Height="32" Top="96" Left="288" File="ArrowSets.png" Time="1"/>
+  </Animation>
+  <Animation Name="Stopped">
+	<Frame Width="1" Height="1" Top="0" Left="0" File="ArrowSets.png" Time="1"/>
+  </Animation>
+</AnimationSet>

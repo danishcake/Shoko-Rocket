@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Level>
+  <Name>Mouse from behind</Name>
+  <Size x="4" y="4"/>
+  <V x="0" y="0"/>
+  <V x="0" y="1"/>
+  <V x="0" y="2"/>
+  <V x="0" y="3"/>
+  <H x="0" y="0"/>
+  <H x="1" y="0"/>
+  <H x="2" y="0"/>
+  <H x="3" y="0"/>
+  <Mouse x="3" y="3" d="West"/>
+  <Cat x="0" y="3" d="North"/>
+</Level>

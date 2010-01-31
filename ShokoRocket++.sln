@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShokoRocket++lib", "src\ShokoRocket++lib\ShokoRocket++lib.vcproj", "{F72D3423-4080-4902-A23C-0374ED4EFDD9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShokoRocketLibTests", "src\ShokoRocketLibTests\ShokoRocketLibTests.vcproj", "{2D1BDC94-96A6-4857-B9B1-120A5C75854B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F72D3423-4080-4902-A23C-0374ED4EFDD9} = {F72D3423-4080-4902-A23C-0374ED4EFDD9}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShokoRocket++", "src\ShokoRocket++\ShokoRocket++.vcproj", "{E63CFF72-3339-408A-BABC-8BB4C9C79828}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F72D3423-4080-4902-A23C-0374ED4EFDD9} = {F72D3423-4080-4902-A23C-0374ED4EFDD9}
+		{A5A988D6-0ECB-4951-A1E3-D04A301B8580} = {A5A988D6-0ECB-4951-A1E3-D04A301B8580}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDLGUIlib", "src\SDLGUIlib\SDLGUIlib.vcproj", "{A5A988D6-0ECB-4951-A1E3-D04A301B8580}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDLGUIlibTests", "src\SDLGUIlibTests\SDLGUIlibTests.vcproj", "{69BD7092-20E2-44CD-B1F8-5E8EFEFB7BEC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A5A988D6-0ECB-4951-A1E3-D04A301B8580} = {A5A988D6-0ECB-4951-A1E3-D04A301B8580}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lrip", "src\Lrip\Lrip.vcproj", "{7F2DEC09-5F0C-44BC-9822-566D4D210E99}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F72D3423-4080-4902-A23C-0374ED4EFDD9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F72D3423-4080-4902-A23C-0374ED4EFDD9}.Debug|Win32.Build.0 = Debug|Win32
+		{F72D3423-4080-4902-A23C-0374ED4EFDD9}.Release|Win32.ActiveCfg = Release|Win32
+		{F72D3423-4080-4902-A23C-0374ED4EFDD9}.Release|Win32.Build.0 = Release|Win32
+		{2D1BDC94-96A6-4857-B9B1-120A5C75854B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2D1BDC94-96A6-4857-B9B1-120A5C75854B}.Debug|Win32.Build.0 = Debug|Win32
+		{2D1BDC94-96A6-4857-B9B1-120A5C75854B}.Release|Win32.ActiveCfg = Release|Win32
+		{2D1BDC94-96A6-4857-B9B1-120A5C75854B}.Release|Win32.Build.0 = Release|Win32
+		{E63CFF72-3339-408A-BABC-8BB4C9C79828}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E63CFF72-3339-408A-BABC-8BB4C9C79828}.Debug|Win32.Build.0 = Debug|Win32
+		{E63CFF72-3339-408A-BABC-8BB4C9C79828}.Release|Win32.ActiveCfg = Release|Win32
+		{E63CFF72-3339-408A-BABC-8BB4C9C79828}.Release|Win32.Build.0 = Release|Win32
+		{A5A988D6-0ECB-4951-A1E3-D04A301B8580}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A5A988D6-0ECB-4951-A1E3-D04A301B8580}.Debug|Win32.Build.0 = Debug|Win32
+		{A5A988D6-0ECB-4951-A1E3-D04A301B8580}.Release|Win32.ActiveCfg = Release|Win32
+		{A5A988D6-0ECB-4951-A1E3-D04A301B8580}.Release|Win32.Build.0 = Release|Win32
+		{69BD7092-20E2-44CD-B1F8-5E8EFEFB7BEC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{69BD7092-20E2-44CD-B1F8-5E8EFEFB7BEC}.Debug|Win32.Build.0 = Debug|Win32
+		{69BD7092-20E2-44CD-B1F8-5E8EFEFB7BEC}.Release|Win32.ActiveCfg = Release|Win32
+		{69BD7092-20E2-44CD-B1F8-5E8EFEFB7BEC}.Release|Win32.Build.0 = Release|Win32
+		{7F2DEC09-5F0C-44BC-9822-566D4D210E99}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7F2DEC09-5F0C-44BC-9822-566D4D210E99}.Debug|Win32.Build.0 = Debug|Win32
+		{7F2DEC09-5F0C-44BC-9822-566D4D210E99}.Release|Win32.ActiveCfg = Release|Win32
+		{7F2DEC09-5F0C-44BC-9822-566D4D210E99}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
