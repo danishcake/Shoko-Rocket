@@ -937,7 +937,7 @@ void GameStateMachine::Draw(SDL_Surface* _target)
 	
 	BOOST_FOREACH(RenderItem& ri, render_items)
 	{
-		ri.position_ += Vector2f(138, 10);
+		//ri.position_ += Vector2f(138, 10);
 		ri.frame_->Draw(ri.position_);
 	}
 }
