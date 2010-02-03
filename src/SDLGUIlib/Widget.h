@@ -34,6 +34,7 @@ protected:
 	static Widget* widget_with_depression_;
 	static Widget* widget_with_drag_;
 	static Widget* widget_with_modal_;
+	static Widget* widget_with_edit_;
 
 	static DragEventArgs drag_event_args_;
 	static Vector2i drag_start_position_;
@@ -163,9 +164,12 @@ public:
 	void SetModal(bool _modal);
 
 	/* Text edit */
+	static Widget* GetEdittingWidget(){return widget_with_edit_;}
 	bool GetEditable(){return allow_edit_;}
 	void SetEditable(bool _editable){allow_edit_ = _editable;}
 	bool HasEditting();
+	void SetEditting(bool _editting);
+	
 
 	/* Screen fading */
 	static void SetFade(float _fade_amount);

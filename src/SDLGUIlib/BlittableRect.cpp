@@ -61,6 +61,11 @@ namespace
 	
 	void SampleSurface(SDL_Surface* _src, SDL_Surface* _dest)
 	{
+		if(_src == NULL)
+		{
+			Logger::ErrorOut() << "Source is NULL in SampleSurface\n";
+			return;
+		}
 		SDL_LockSurface(_src);
 		SDL_LockSurface(_dest);
 		int bpp = _src->format->BytesPerPixel;
@@ -69,6 +74,7 @@ namespace
 			Logger::ErrorOut() << "Unable to Acquire resource, source data and dest data have different bpp\n";
 			return;
 		}
+
 		for(int y = 0; y < _dest->h; y++)
 		{
 			for(int x = 0; x < _dest->w; x++)

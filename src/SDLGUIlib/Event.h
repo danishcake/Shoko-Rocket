@@ -7,7 +7,7 @@ namespace EventType
 {
 	enum Enum
 	{
-		MouseMove, MouseDown, MouseUp, KeyLeft, KeyRight, KeyUp, KeyDown, KeyEnter, OtherKeypress
+		MouseMove, MouseDown, MouseUp, KeyLeft, KeyRight, KeyUp, KeyDown, KeyEnter, KeyEscape, OtherKeypress
 	};
 }
 

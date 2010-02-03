@@ -8,6 +8,7 @@ Widget* Widget::widget_with_highlight_ = NULL;
 Widget* Widget::widget_with_depression_ = NULL;
 Widget* Widget::widget_with_drag_ = NULL;
 Widget* Widget::widget_with_modal_ = NULL;
+Widget* Widget::widget_with_edit_ = NULL;
 DragEventArgs Widget::drag_event_args_ = DragEventArgs();
 Vector2i Widget::drag_start_position_ = Vector2i(0, 0);
 
@@ -37,8 +38,10 @@ Widget::Widget(void)
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
 	visible_ = true;
+	allow_edit_ = false;
 	root_.push_back(this);
 	all_.push_back(this);
+	
 }
 
 Widget::Widget(std::string _filename)
@@ -63,6 +66,7 @@ Widget::Widget(std::string _filename)
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
 	visible_ = true;
+	allow_edit_ = false;
 	root_.push_back(this);
 	all_.push_back(this);
 }
@@ -89,6 +93,7 @@ Widget::Widget(BlittableRect* _blittable)
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
 	visible_ = true;
+	allow_edit_ = false;
 	root_.push_back(this);
 	all_.push_back(this);
 }
@@ -250,6 +255,17 @@ void Widget::HandleEvent(Event _event)
 					SetDepresssed(false);
 					SetFocus();
 					OnClick(this);
+					if(allow_edit_)
+					{
+						if(HasEditting())
+						{
+							SetEditting(false);
+						} else
+						{
+							SetEditting(true);
+						}
+
+					}
 				}
 			}
 			//All mouse buttons fire mouse click events, but only left gains focus
@@ -335,12 +351,20 @@ void Widget::HandleEvent(Event _event)
 		}
 		OnClick(this);
 	}
+	if(_event.event_type == EventType::KeyEscape)
+	{
+		if(allow_edit_ && HasEditting()) 
+		{
+			SetEditting(false);
+		}
+	}
 
 	if(_event.event_type == EventType::OtherKeypress ||
 		_event.event_type == EventType::KeyUp ||
 		_event.event_type == EventType::KeyDown ||
 		_event.event_type == EventType::KeyLeft ||
 		_event.event_type == EventType::KeyRight ||
+		_event.event_type == EventType::KeyEscape ||
 		_event.event_type == EventType::KeyEnter)
 	{
 		KeyPressEventArgs args;
@@ -533,6 +557,8 @@ void Widget::ClearRoot()
 	widget_with_highlight_ = NULL;
 	widget_with_depression_ = NULL;
 	widget_with_drag_ = NULL;
+	widget_with_modal_ = NULL;
+	widget_with_edit_ = NULL;
 	drag_event_args_ = DragEventArgs();
 
 	//root_.clear(); // The destructors do this automatically
@@ -692,6 +718,7 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		e.event_type == EventType::KeyLeft ||
 		e.event_type == EventType::KeyRight ||
 		e.event_type == EventType::KeyEnter ||
+		e.event_type == EventType::KeyEscape ||
 		e.event_type == EventType::OtherKeypress)
 	{
 		Widget* focus = Widget::GetWidgetWithFocus();
@@ -721,5 +748,13 @@ void Widget::SetFade(float _fade_amount)
 
 bool Widget::HasEditting()
 {
-	return widget_with_modal_ == this && allow_edit_;
+	return widget_with_edit_ == this;
+}
+
+void Widget::SetEditting(bool _editting)
+{
+	if(_editting && allow_edit_)
+		widget_with_edit_ = this;
+	else if(widget_with_edit_ == this)
+		widget_with_edit_ = NULL;
 }
