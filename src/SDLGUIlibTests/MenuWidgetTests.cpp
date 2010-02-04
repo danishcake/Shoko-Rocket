@@ -4,19 +4,19 @@
 namespace
 {
 	int start_count = 0;
-	void start_callback(Widget* _widget)
+	void start_callback(Widget* /*_widget*/)
 	{
 		start_count++;
 	}
 
 	int options_count = 0;
-	void options_callback(Widget* _widget)
+	void options_callback(Widget* /*_widget*/)
 	{
 		options_count++;
 	}
 
 	int exit_count = 0;
-	void exit_callback(Widget* _widget)
+	void exit_callback(Widget* /*_widget*/)
 	{
 		exit_count++;
 	}

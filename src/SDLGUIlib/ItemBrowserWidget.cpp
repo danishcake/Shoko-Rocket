@@ -50,7 +50,7 @@ void ItemBrowserWidget::PerformItemLayout()
 	clickable_items_.clear();
 
 	int max_number_items = grid_size_.x * grid_size_.y - 2;
-	int number_items = items_.size() - page_ * max_number_items;
+	int number_items = static_cast<int>(items_.size()) - page_ * max_number_items;
 	if(number_items > max_number_items)
 		number_items = max_number_items;
 	for(int item = 0; item < number_items; item++)
@@ -84,11 +84,11 @@ void ItemBrowserWidget::PerformItemLayout()
 	Invalidate();
 }
 
-void ItemBrowserWidget::NextPage(Widget* _widget)
+void ItemBrowserWidget::NextPage(Widget* /*_widget*/)
 {
 	int old_page = page_;
 	int max_number_items = grid_size_.x * grid_size_.y - 2;
-	int number_items = items_.size() - page_ * max_number_items;
+	int number_items = static_cast<int>(items_.size()) - page_ * max_number_items;
 	if(number_items > max_number_items)
 		page_++;
 	else
@@ -98,16 +98,15 @@ void ItemBrowserWidget::NextPage(Widget* _widget)
 		OnPageChange(this, old_page, page_);
 }
 
-void ItemBrowserWidget::PrevPage(Widget* _widget)
+void ItemBrowserWidget::PrevPage(Widget* /*_widget*/)
 {
 	int old_page = page_;
 	int max_number_items = grid_size_.x * grid_size_.y - 2;
-	int number_items = items_.size() - page_ * max_number_items;
 	if(page_ > 0)
 		page_--;
 	else
 	{
-		page_ = items_.size() / max_number_items;
+		page_ = static_cast<int>(items_.size()) / max_number_items;
 		if(items_.size() % max_number_items == 0)
 			page_--;
 	}
@@ -125,7 +124,7 @@ int ItemBrowserWidget::GetPageCount()
 	int max_number_items = grid_size_.x * grid_size_.y - 2;
 	if(items_.size() == 0)
 		return 1;
-	return ((items_.size() - 1) / max_number_items) + 1;
+	return ((static_cast<int>(items_.size()) - 1) / max_number_items) + 1;
 }
 
 void ItemBrowserWidget::SetItems(vector<std::string> _items)

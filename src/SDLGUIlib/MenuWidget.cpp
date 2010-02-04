@@ -14,9 +14,9 @@ Widget*  MenuWidget::AddMenuItem(std::string _item)
 {
 	Widget* pMenuItem = new Widget();
 	pMenuItem->SetSize(Vector2i(128, 48));
-	pMenuItem->SetPosition(Vector2i(children_.size() * 8, children_.size() * 40));
+	pMenuItem->SetPosition(Vector2i(static_cast<int>(children_.size()) * 8, static_cast<int>(children_.size()) * 40));
 	pMenuItem->SetText(_item, TextAlignment::Centre);
-	SetSize(Vector2i(128 + children_.size() * 8, 48 + children_.size() * 40));
+	SetSize(Vector2i(128 + static_cast<int>(children_.size()) * 8, 48 + static_cast<int>(children_.size()) * 40));
 	//Link up
 	if(children_.size() == 1)
 	{

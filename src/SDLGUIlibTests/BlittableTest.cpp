@@ -4,7 +4,7 @@
 
 TEST_FIXTURE(SDL_fixture, BlittableLoadsPNG)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
+	UNITTEST_TIME_CONSTRAINT(500);
 
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)

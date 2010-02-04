@@ -54,7 +54,7 @@ void GameGridWidget::GridKeyUp(Widget* _widget, KeyPressEventArgs args)
 	OnGridKeyUp(this, e);
 }
 
-void GameGridWidget::GridDragStart(Widget* _widget, DragEventArgs* _args)
+void GameGridWidget::GridDragStart(Widget* /*_widget*/, DragEventArgs* _args)
 {
 	_args->drag_type = 1;
 }
@@ -66,8 +66,8 @@ void GameGridWidget::GridDragReset(Widget* _widget, DragEventArgs* _args)
 	e.y = _widget->GetPosition().y / _widget->GetSize().y;
 	e.direction = GestureDirection::Center;
 
-	float angle = atan2f(_args->x, -_args->y);
-	float length = Vector2f(_args->x, -_args->y).length();
+	float angle = atan2f(static_cast<float>(_args->x), -static_cast<float>(_args->y));
+	float length = Vector2f(static_cast<float>(_args->x), -static_cast<float>(_args->y)).length();
 
 	if(length > 5)
 	{

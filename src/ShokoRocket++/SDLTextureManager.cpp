@@ -71,10 +71,10 @@ AnimationFrame* SDLTextureManager::AcquireResource(Vector2i _offset, Vector2i _s
 	// Blitting an opaque pixel to a transparent one results in a transparent pixel!
 	sample_count++;
 	SDL_Rect area;
-	area.x = _offset.x;
-	area.y = _offset.y;
-	area.w = _size.x;
-	area.h = _size.y;
+	area.x = static_cast<Sint16>(_offset.x);
+	area.y = static_cast<Sint16>(_offset.y);
+	area.w = static_cast<Uint16>(_size.x);
+	area.h = static_cast<Uint16>(_size.y);
 	BlindBlit(converted_whole_surface, &area, converted_sample);
 	
 	

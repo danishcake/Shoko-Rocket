@@ -19,7 +19,7 @@ SDLAnimationFrame::~SDLAnimationFrame(void)
 void SDLAnimationFrame::Draw(Vector2f _position)
 {
 	SDL_Rect dest_rect;
-	dest_rect.x = static_cast<int>(_position.x - offset_.x);
-	dest_rect.y = static_cast<int>(_position.y - offset_.y);
+	dest_rect.x = static_cast<Sint16>(_position.x - offset_.x);
+	dest_rect.y = static_cast<Sint16>(_position.y - offset_.y);
 	SDL_BlitSurface(surface_, NULL, screen_, &dest_rect);
 }

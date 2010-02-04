@@ -78,7 +78,7 @@ void GameStateMachine::SetupIntro()
 {
 }
 
-void GameStateMachine::ProcessIntro(float _timespan)
+void GameStateMachine::ProcessIntro(float /*_timespan*/)
 {
 }
 
@@ -166,7 +166,7 @@ void GameStateMachine::SetupMenu()
 	sub_mode_timer_ = 1.0f;
 }
 
-void GameStateMachine::ProcessMenu(float _timespan)
+void GameStateMachine::ProcessMenu(float /*_timespan*/)
 {
 	if(reload_due_)
 	{
@@ -204,8 +204,8 @@ void GameStateMachine::ProcessMenu(float _timespan)
 		in_fraction = in_fraction < 0 ? 0: in_fraction > 1.0f ? 1.0f : in_fraction;
 		out_fraction = out_fraction < 0 ? 0: out_fraction > 1.0f ? 1.0f : out_fraction;
 
-		Vector2f in_position = Vector2f(138, 0) - Vector2f(0, SDL_GetVideoSurface()->h + 10) * in_fraction;
-		Vector2f out_position = Vector2f(138, 0) + Vector2f(SDL_GetVideoSurface()->w, SDL_GetVideoSurface()->h + 10) * out_fraction ;
+		Vector2f in_position = Vector2f(138, 0) - Vector2f(0, static_cast<float>(SDL_GetVideoSurface()->h) + 10) * in_fraction;
+		Vector2f out_position = Vector2f(138, 0) + Vector2f(static_cast<float>(SDL_GetVideoSurface()->w), static_cast<float>(SDL_GetVideoSurface()->h) + 10) * out_fraction ;
 
 		if(active_sub_mode_widget)
 			active_sub_mode_widget->SetPosition(out_position);
@@ -225,7 +225,7 @@ void GameStateMachine::TeardownMenu()
 
 /* Menu events */
 
-void GameStateMachine::RenderLevel(Widget* _widget, BlittableRect** _rect, std::string _name)
+void GameStateMachine::RenderLevel(Widget* /*_widget*/, BlittableRect** _rect, std::string _name)
 {
 	if(boost::filesystem::is_directory("Levels" + rel_path_ + "/" + _name))
 	{
@@ -286,7 +286,7 @@ void GameStateMachine::MenuLevelSelect(Widget* _widget, std::string _name)
 			mode_timer_ = 1.0f;
 			FadeInOut(2.0f);
 			page_of_level_ = ((ItemBrowserWidget*)_widget)->GetPage();
-			for(int i = 0; i < puzzle_files_.size(); i++)
+			for(unsigned int i = 0; i < puzzle_files_.size(); i++)
 			{
 				if(_name.compare(puzzle_files_[i]) == 0)
 				{
@@ -297,13 +297,13 @@ void GameStateMachine::MenuLevelSelect(Widget* _widget, std::string _name)
 	}
 }
 
-void GameStateMachine::MenuLevelHighlight(Widget* _widget, std::string _name)
+void GameStateMachine::MenuLevelHighlight(Widget* /*_widget*/, std::string _name)
 {
 	Logger::DiagnosticOut() << _name << "\n";
 	level_name_->SetText(_name, TextAlignment::TopLeft);
 }
 
-void GameStateMachine::MenuExitCallback(Widget* _widget)
+void GameStateMachine::MenuExitCallback(Widget* /*_widget*/)
 {
 	if(pend_mode_ == Mode::Menu &&
 	   mode_ == Mode::Menu)
@@ -314,7 +314,7 @@ void GameStateMachine::MenuExitCallback(Widget* _widget)
 	}
 }
 
-void GameStateMachine::MenuPuzzleCallback(Widget *_widget)
+void GameStateMachine::MenuPuzzleCallback(Widget* /*_widget*/)
 {
 	if(sub_mode_ == pend_sub_mode_)
 	{
@@ -323,7 +323,7 @@ void GameStateMachine::MenuPuzzleCallback(Widget *_widget)
 	}
 }
 
-void GameStateMachine::MenuEditorCallback(Widget *_widget)
+void GameStateMachine::MenuEditorCallback(Widget* /*_widget*/)
 {
 	if(sub_mode_ == pend_sub_mode_)
 	{
@@ -333,7 +333,7 @@ void GameStateMachine::MenuEditorCallback(Widget *_widget)
 	}
 }
 
-void GameStateMachine::MenuOptionsCallback(Widget *_widget)
+void GameStateMachine::MenuOptionsCallback(Widget* /*_widget*/)
 {
 	if(sub_mode_ == pend_sub_mode_)
 	{
@@ -361,7 +361,7 @@ void GameStateMachine::OptionsInputmethodCallback(Widget* _widget)
 	}
 }
 
-void GameStateMachine::MenuLevelBrowerPageChange(Widget* _widget, int _old_page, int _new_page)
+void GameStateMachine::MenuLevelBrowerPageChange(Widget* /*_widget*/, int /*_old_page*/, int /*_new_page*/)
 {
 	level_name_->SetText("Page " + boost::lexical_cast<std::string, int>(levels_widget_->GetPage() + 1) + "/" + boost::lexical_cast<std::string, int>(levels_widget_->GetPageCount()), TextAlignment::TopLeft);
 }
@@ -439,17 +439,17 @@ void GameStateMachine::TeardownPuzzle()
 
 /* Puzzle events */
 
-void GameStateMachine::PuzzleStartClick(Widget* _widget)
+void GameStateMachine::PuzzleStartClick(Widget* /*_widget*/)
 {
 	input_.action = Action::Start;
 }
 
-void GameStateMachine::PuzzleResetClick(Widget* _widget)
+void GameStateMachine::PuzzleResetClick(Widget* /*_widget*/)
 {
 	input_.action = Action::Cancel;
 }
 
-void GameStateMachine::PuzzleQuitClick(Widget* _widget)
+void GameStateMachine::PuzzleQuitClick(Widget* /*_widget*/)
 {
 	if(mode_ == Mode::Puzzle && pend_mode_ == Mode::Puzzle)
 	{
@@ -459,7 +459,7 @@ void GameStateMachine::PuzzleQuitClick(Widget* _widget)
 	}
 }
 
-void GameStateMachine::PuzzleNextClick(Widget* _widget)
+void GameStateMachine::PuzzleNextClick(Widget* /*_widget*/)
 {
 	puzzle_index_++;
 	puzzle_index_ %= puzzle_files_.size();
@@ -469,7 +469,7 @@ void GameStateMachine::PuzzleNextClick(Widget* _widget)
 	level_completed_ = false;
 }
 
-void GameStateMachine::PuzzleGridClick(Widget* _widget, MouseEventArgs _args)
+void GameStateMachine::PuzzleGridClick(Widget* /*_widget*/, MouseEventArgs _args)
 {
 	if(input_method_ == InputMethod::MouseClicks)
 	{
@@ -509,7 +509,7 @@ void GameStateMachine::PuzzleGridClick(Widget* _widget, MouseEventArgs _args)
 	input_.position = Vector2i(_args.x, _args.y);
 }
 
-void GameStateMachine::PuzzleGridGesture(Widget* _widget, GridGestureEventArgs _args)
+void GameStateMachine::PuzzleGridGesture(Widget* /*_widget*/, GridGestureEventArgs _args)
 {
 	if(input_method_ != InputMethod::MouseDrags)
 		return;
@@ -534,22 +534,22 @@ void GameStateMachine::PuzzleGridGesture(Widget* _widget, GridGestureEventArgs _
 	Logger::DiagnosticOut() << "Gesture " << input_.action << "\n";
 }
 
-void GameStateMachine::PuzzleScrollDownClick(Widget* _widget)
+void GameStateMachine::PuzzleScrollDownClick(Widget* /*_widget*/)
 {
 	input_.action = Action::ScrollSouth;
 }
 
-void GameStateMachine::PuzzleScrollUpClick(Widget* _widget)
+void GameStateMachine::PuzzleScrollUpClick(Widget* /*_widget*/)
 {
 	input_.action = Action::ScrollNorth;
 }
 
-void GameStateMachine::PuzzleScrollLeftClick(Widget* _widget)
+void GameStateMachine::PuzzleScrollLeftClick(Widget* /*_widget*/)
 {
 	input_.action = Action::ScrollWest;
 }
 
-void GameStateMachine::PuzzleScrollRightClick(Widget* _widget)
+void GameStateMachine::PuzzleScrollRightClick(Widget* /*_widget*/)
 {
 	input_.action = Action::ScrollEast;
 }
@@ -727,7 +727,7 @@ void GameStateMachine::ProcessEditor(float _timespan)
 
 /* Editor event handling */
 
-void GameStateMachine::EditorReturnClick(Widget *_widget)
+void GameStateMachine::EditorReturnClick(Widget* /*_widget*/)
 {
 	if(sub_mode_ == pend_sub_mode_)
 	{
@@ -737,35 +737,35 @@ void GameStateMachine::EditorReturnClick(Widget *_widget)
 	}
 }
 
-void GameStateMachine::EditorSizePPXClick(Widget* _widget)
+void GameStateMachine::EditorSizePPXClick(Widget* /*_widget*/)
 {
 	size_.x++;
 	size_.x = size_.x < 3 ? 3 : size_.x > 50 ? 50 : size_.x;
 	sizex->SetText(boost::lexical_cast<std::string, int>(size_.x), TextAlignment::Centre);
 }
 
-void GameStateMachine::EditorSizeMMXClick(Widget* _widget)
+void GameStateMachine::EditorSizeMMXClick(Widget* /*_widget*/)
 {
 	size_.x--;
 	size_.x = size_.x < 3 ? 3 : size_.x > 50 ? 50 : size_.x;
 	sizex->SetText(boost::lexical_cast<std::string, int>(size_.x), TextAlignment::Centre);
 }
 
-void GameStateMachine::EditorSizePPYClick(Widget* _widget)
+void GameStateMachine::EditorSizePPYClick(Widget* /*_widget*/)
 {
 	size_.y++;
 	size_.y = size_.y < 3 ? 3 : size_.y > 50 ? 50 : size_.y;
 	sizey->SetText(boost::lexical_cast<std::string, int>(size_.y), TextAlignment::Centre);
 }
 
-void GameStateMachine::EditorSizeMMYClick(Widget* _widget)
+void GameStateMachine::EditorSizeMMYClick(Widget* /*_widget*/)
 {
 	size_.y--;
 	size_.y = size_.y < 3 ? 3 : size_.y > 50 ? 50 : size_.y;
 	sizey->SetText(boost::lexical_cast<std::string, int>(size_.y), TextAlignment::Centre);
 }
 
-void GameStateMachine::EditorCreateClick(Widget* _widget)
+void GameStateMachine::EditorCreateClick(Widget* /*_widget*/)
 {
 	editor_level_ = boost::shared_ptr<EditLevel>(new EditLevel(size_, Settings::GetGridSize()));
 	new_level_widget_->SetVisibility(false);
@@ -773,54 +773,54 @@ void GameStateMachine::EditorCreateClick(Widget* _widget)
 	new_level_widget_->SetPosition(Vector2i(-500, -500));
 }
 
-void GameStateMachine::EditorWallMode(Widget* _widget)
+void GameStateMachine::EditorWallMode(Widget* /*_widget*/)
 {
 	editor_level_->SetEditMode(EditMode::EditWalls);
 }
 
-void GameStateMachine::EditorMouseMode(Widget* _widget)
+void GameStateMachine::EditorMouseMode(Widget* /*_widget*/)
 {
 	editor_level_->SetEditMode(EditMode::EditMice);
 }
 
-void GameStateMachine::EditorCatMode(Widget* _widget)
+void GameStateMachine::EditorCatMode(Widget* /*_widget*/)
 {
 	editor_level_->SetEditMode(EditMode::EditCats);
 }
 
-void GameStateMachine::EditorHoleMode(Widget* _widget)
+void GameStateMachine::EditorHoleMode(Widget* /*_widget*/)
 {
 	editor_level_->SetEditMode(EditMode::EditHoles);
 }
 
-void GameStateMachine::EditorRocketMode(Widget* _widget)
+void GameStateMachine::EditorRocketMode(Widget* /*_widget*/)
 {
 	editor_level_->SetEditMode(EditMode::EditRockets);
 }
 
-void GameStateMachine::EditorArrowMode(Widget* _widget)
+void GameStateMachine::EditorArrowMode(Widget* /*_widget*/)
 {
 	editor_level_->SetEditMode(EditMode::EditArrows);
 }
 
-void GameStateMachine::EditorNewClick(Widget* _widget)
+void GameStateMachine::EditorNewClick(Widget* /*_widget*/)
 {
 	new_level_widget_->SetVisibility(true);
 	new_level_widget_->SetModal(true);
 	new_level_widget_->SetPosition(Vector2i(128, 48));
 }
 
-void GameStateMachine::EditorStartClick(Widget* _widget)
+void GameStateMachine::EditorStartClick(Widget* /*_widget*/)
 {
 	input_.action = Action::Start;
 }
 
-void GameStateMachine::EditorResetClick(Widget* _widget)
+void GameStateMachine::EditorResetClick(Widget* /*_widget*/)
 {
 	input_.action = Action::Cancel;
 }
 
-void GameStateMachine::EditorSaveClick(Widget* _widget)
+void GameStateMachine::EditorSaveClick(Widget* /*_widget*/)
 {
 	editor_level_->Save("Editor.Level");
 }
@@ -933,7 +933,6 @@ void GameStateMachine::Draw(SDL_Surface* _target)
 	//Sort front to back to prevent overlay issues
 	std::sort(render_items.begin(), render_items.end(), RenderItem::DepthSort<RenderItem>());
 	SDLAnimationFrame::screen_ = _target;
-	int frame = 0;
 	
 	BOOST_FOREACH(RenderItem& ri, render_items)
 	{

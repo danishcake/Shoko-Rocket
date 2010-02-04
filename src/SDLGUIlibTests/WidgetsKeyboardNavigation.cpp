@@ -5,7 +5,7 @@
 namespace
 {
 	int widgetevent_callback_count = 0;
-	void widgetevent_callback(Widget* _widget)
+	void widgetevent_callback(Widget* /*_widget*/)
 	{
 		widgetevent_callback_count++;
 	}

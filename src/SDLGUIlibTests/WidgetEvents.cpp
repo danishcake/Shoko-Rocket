@@ -5,13 +5,13 @@
 namespace
 {
 	int parent_click_count = 0;
-	void parent_callback(Widget* _widget)
+	void parent_callback(Widget* /*_widget*/)
 	{
 		parent_click_count++;
 	}
 
 	int child_click_count = 0;
-	void child_callback(Widget* _widget)
+	void child_callback(Widget* /*_widget*/)
 	{
 		child_click_count++;
 	}

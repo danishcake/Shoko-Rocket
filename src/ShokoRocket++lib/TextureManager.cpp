@@ -132,7 +132,7 @@ Animation* TextureManager::GetAnimation(std::string _xml_animation)
 }
 
 
-AnimationFrame* TextureManager::AcquireResource(Vector2i _offset, Vector2i _size, string _filename, float _time, Vector2i _frame_offset)
+AnimationFrame* TextureManager::AcquireResource(Vector2i /*_offset*/, Vector2i /*_size*/, string _filename, float _time, Vector2i _frame_offset)
 {
 	//Nothing done, override in SDL/OpenGL implementations
 	return new AnimationFrame(-1, _time, _frame_offset);

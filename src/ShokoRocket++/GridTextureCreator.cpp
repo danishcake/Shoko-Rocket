@@ -38,10 +38,10 @@ Animation* CreateGridTexture(boost::shared_ptr<World> _world, Vector2i _grid_siz
 		for(int x = 0; x < _world->GetSize().x; x++)
 		{
 			SDL_Rect area;
-			area.x = x * _grid_size.x;
-			area.y = y * _grid_size.y;
-			area.w = _grid_size.x;
-			area.h = _grid_size.y;
+			area.x = static_cast<Sint16>(x * _grid_size.x);
+			area.y = static_cast<Sint16>(y * _grid_size.y);
+			area.w = static_cast<Uint16>(_grid_size.x);
+			area.h = static_cast<Uint16>(_grid_size.y);
 			if(fill)
 				SDL_FillRect(p_checkerboard, &area, SDL_MapRGB(p_checkerboard->format, Settings::GetGridColorA().r, Settings::GetGridColorA().g, Settings::GetGridColorA().b));
 			else
@@ -57,28 +57,28 @@ Animation* CreateGridTexture(boost::shared_ptr<World> _world, Vector2i _grid_siz
 			if(_world->GetGridSquare(Vector2i(x,y)).GetNorth())
 			{
 				SDL_Rect area;
-				area.x = x * _grid_size.x - 1;
-				area.y = y * _grid_size.y - 1;
-				area.w = _grid_size.x + 2;
+				area.x = static_cast<Sint16>(x * _grid_size.x - 1);
+				area.y = static_cast<Sint16>(y * _grid_size.y - 1);
+				area.w = static_cast<Uint16>(_grid_size.x + 2);
 				area.h = 2;
 				SDL_FillRect(p_checkerboard, &area, SDL_MapRGB(p_checkerboard->format, 255, 0, 0));
 				if(y == 0)
 				{
-					area.y = _grid_size.y * _world->GetSize().y;
+					area.y = static_cast<Sint16>(_grid_size.y * _world->GetSize().y);
 					SDL_FillRect(p_checkerboard, &area, SDL_MapRGB(p_checkerboard->format, 255, 0, 0));
 				}
 			}
 			if(_world->GetGridSquare(Vector2i(x,y)).GetWest())
 			{
 				SDL_Rect area;
-				area.x = x * _grid_size.x - 1;
-				area.y = y * _grid_size.y - 1;
+				area.x = static_cast<Sint16>(x * _grid_size.x - 1);
+				area.y = static_cast<Sint16>(y * _grid_size.y - 1);
 				area.w = 2;
-				area.h = _grid_size.y + 2;
+				area.h = static_cast<Uint16>(_grid_size.y + 2);
 				SDL_FillRect(p_checkerboard, &area, SDL_MapRGB(p_checkerboard->format, 255, 0, 0));
 				if(x == 0)
 				{
-					area.x = _grid_size.x * _world->GetSize().x;
+					area.x = static_cast<Sint16>(_grid_size.x * _world->GetSize().x);
 					SDL_FillRect(p_checkerboard, &area, SDL_MapRGB(p_checkerboard->format, 255, 0, 0));
 				}
 			}

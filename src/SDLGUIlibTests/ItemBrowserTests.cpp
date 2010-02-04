@@ -103,7 +103,7 @@ namespace
 {
 	int item_click_count = 0;
 	std::string last_item_clicked;
-	void ItemClickHandler(Widget* _widget, std::string _item)
+	void ItemClickHandler(Widget* /*_widget*/, std::string _item)
 	{
 		item_click_count++;
 		last_item_clicked = _item;
@@ -111,7 +111,7 @@ namespace
 
 	int item_selected_change_count  = 0;
 	std::string last_item_selected;
-	void ItemSelectionHandler(Widget* _widget, std::string _item)
+	void ItemSelectionHandler(Widget* /*_widget*/, std::string _item)
 	{
 		item_selected_change_count++;
 		last_item_selected = _item;
@@ -119,7 +119,7 @@ namespace
 
 	int item_focus_click_count  = 0;
 	std::string last_focus_item;
-	void ItemFocusedClickHandler(Widget* _widget, std::string _item)
+	void ItemFocusedClickHandler(Widget* /*_widget*/, std::string _item)
 	{
 		item_focus_click_count++;
 		last_focus_item = _item;

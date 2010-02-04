@@ -51,13 +51,13 @@ TEST_FIXTURE(SDL_fixture, ModelWidgetSelection)
 namespace
 {
 	int click_a_count = 0;
-	void click_a(Widget* _widget)
+	void click_a(Widget* /*_widget*/)
 	{
 		click_a_count++;
 	}
 
 	int click_b_count = 0;
-	void click_b(Widget* _widget)
+	void click_b(Widget* /*_widget*/)
 	{
 		click_b_count++;
 	}
@@ -80,7 +80,7 @@ TEST_FIXTURE(SDL_fixture, ModelEvents)
 
 		Event e;
 		e.event_type = EventType::MouseUp;
-		e.event.mouse_event.btns == MouseButton::Left;
+		e.event.mouse_event.btns = MouseButton::Left;
 		e.event.mouse_event.x = p_widgetA->GetSize().x / 2;
 		e.event.mouse_event.y = p_widgetA->GetSize().y / 2;
 		CHECK_EQUAL(0, click_a_count);

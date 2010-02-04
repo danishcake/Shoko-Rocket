@@ -279,7 +279,6 @@ void Widget::HandleEvent(Event _event)
 		}
 
 	}
-
 	/* Keyboard navigation */
 	Widget* parent_link = NULL;
 	if(_event.event_type == EventType::KeyLeft)
@@ -288,7 +287,7 @@ void Widget::HandleEvent(Event _event)
 			left_inner_link_->SetFocus();
 		else if(left_link_)
 			left_link_->SetFocus();
-		else if(parent_link = GetLeftParentLink())
+		else if((parent_link = GetLeftParentLink()) != NULL)
 			parent_link->SetFocus();
 		else if(parent_)
 			parent_->SetFocus();
@@ -299,7 +298,7 @@ void Widget::HandleEvent(Event _event)
 			right_inner_link_->SetFocus();
 		else if(right_link_)
 			right_link_->SetFocus();
-		else if(parent_link = GetRightParentLink())
+		else if((parent_link = GetRightParentLink()) != NULL)
 			parent_link->SetFocus();
 		else if(parent_)
 			parent_->SetFocus();
@@ -310,7 +309,7 @@ void Widget::HandleEvent(Event _event)
 			up_inner_link_->SetFocus();
 		else if(up_link_)
 			up_link_->SetFocus();
-		else if(parent_link = GetUpParentLink())
+		else if((parent_link = GetUpParentLink()) != NULL)
 			parent_link->SetFocus();
 		else if(parent_)
 			parent_->SetFocus();
@@ -321,7 +320,7 @@ void Widget::HandleEvent(Event _event)
 			down_inner_link_->SetFocus();
 		else if(down_link_)
 			down_link_->SetFocus();
-		else if(parent_link = GetDownParentLink())
+		else if((parent_link = GetDownParentLink()) != NULL)
 			parent_link->SetFocus();
 		else if(parent_)
 			parent_->SetFocus();
@@ -553,7 +552,7 @@ void Widget::RenderRoot(BlittableRect* _screen)
 	{
 		delete screen_fade_rect_;
 		screen_fade_rect_ = new BlittableRect(_screen->GetSize());
-		screen_fade_rect_->Fill(screen_fade_ * 255, 0, 0, 0);	
+		screen_fade_rect_->Fill(static_cast<unsigned char>(screen_fade_ * 255), 0, 0, 0);	
 	}
 
 	if(screen_fade_ > 0)
@@ -716,7 +715,7 @@ void Widget::SetFade(float _fade_amount)
 	_fade_amount = _fade_amount < 0.0f ? 0.0f : _fade_amount > 1.0f ? 1.0f : _fade_amount;
 	screen_fade_ = _fade_amount;
 	if(screen_fade_rect_)
-		screen_fade_rect_->Fill(screen_fade_ * 255, 0, 0, 0);	
+		screen_fade_rect_->Fill(static_cast<unsigned char>(screen_fade_ * 255), 0, 0, 0);	
 }
 
 bool Widget::HasEditting()

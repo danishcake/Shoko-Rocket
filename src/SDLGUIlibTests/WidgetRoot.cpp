@@ -17,7 +17,7 @@ TEST_FIXTURE(SDL_fixture, WidgetRoot)
 namespace
 {
 	int click_count = 0;
-	void GetClick(Widget* _widget)
+	void GetClick(Widget* /*_widget*/)
 	{
 		click_count++;
 	}

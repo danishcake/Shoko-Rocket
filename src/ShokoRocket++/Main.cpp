@@ -104,7 +104,7 @@ void Draw()
 	SDL_Flip(p_screen);
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
 {
 	bool bFinished = false;
 	p_screen = SDL_init();

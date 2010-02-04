@@ -95,7 +95,7 @@ void PuzzleLevel::Tick(float _time, Input _input)
 	case PuzzleMode::Victory:
 		//Fall through
 	case PuzzleMode::Defeat:
-		WorldState::Enum result = world_->Tick(_time * 5.0f);
+		world_->Tick(_time * 5.0f);
 		if(timer_ > 2.5f)
 		{
 			puzzle_state_ = PuzzleMode::Puzzle;
@@ -128,7 +128,7 @@ vector<RenderItem> PuzzleLevel::Draw()
 			if(arrow_count[arrow_dir] > 9)
 				index = 7;
 			RenderItem ri;
-			ri.position_ = Vector2i(arrow_id, world_->GetSize().y + 1);
+			ri.position_ = Vector2f(arrow_id, static_cast<float>(world_->GetSize().y) + 1);
 			ri.frame_ = StandardTextures::arrow_sets[arrow_dir]->GetFrameByIndex(index);
 			ri.depth = above;
 			arrow_id += 2;
@@ -138,7 +138,7 @@ vector<RenderItem> PuzzleLevel::Draw()
 			for(int i = 0; i < arrow_count[arrow_dir]; i++)
 			{
 				RenderItem ri;
-				ri.position_ = Vector2i(arrow_id, world_->GetSize().y + 1);
+				ri.position_ = Vector2f(arrow_id, static_cast<float>(world_->GetSize().y) + 1);
 				ri.frame_ = StandardTextures::arrows[arrow_dir]->GetCurrentFrame();
 				ri.depth = above;
 				arrow_id++;

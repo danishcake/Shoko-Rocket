@@ -5,7 +5,7 @@ namespace
 {
 	int click_count = 0;
 	Vector2i last_click_coord;
-	void grid_callback(Widget* _widget, MouseEventArgs _event)
+	void grid_callback(Widget* /*_widget*/, MouseEventArgs _event)
 	{
 		click_count ++;
 		last_click_coord.x = _event.x;
@@ -13,7 +13,7 @@ namespace
 	}
 
 	int last_keycode = 0;
-	void wasd_callback(Widget* _widget, KeyPressEventArgs _event)
+	void wasd_callback(Widget* /*_widget*/, KeyPressEventArgs _event)
 	{
 		last_keycode = _event.key_code;
 	}

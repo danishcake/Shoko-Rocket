@@ -5,7 +5,7 @@
 namespace
 {
 	int drag_start_count = 0;
-	void WidgetDragStart(Widget* _widget, DragEventArgs* _args)
+	void WidgetDragStart(Widget* /*_widget*/, DragEventArgs* _args)
 	{
 		drag_start_count++;
 		_args->drag_type = 1; //Important - ignored if zero
@@ -13,24 +13,24 @@ namespace
 
 	int drag_reset_count = 0;
 	Vector2i drag_reset_position;
-	void WidgetDragReset(Widget* _widget, DragEventArgs* _args)
+	void WidgetDragReset(Widget* /*_widget*/, DragEventArgs* _args)
 	{
 		drag_reset_count++;
 		drag_reset_position = Vector2i(_args->x, _args->y);
 	}
 
-	void WidgetDragEnterRejected(Widget* _widget, DragEventArgs* _args)
+	void WidgetDragEnterRejected(Widget* /*_widget*/, DragEventArgs* _args)
 	{
 		_args->drag_accepted = false;
 	}
 
-	void WidgetDragEnterAccepted(Widget* _widget, DragEventArgs* _args)
+	void WidgetDragEnterAccepted(Widget* /*_widget*/, DragEventArgs* _args)
 	{
 		_args->drag_accepted = true;
 	}
 
 	int sucessful_landings = 0;
-	void WidgetDragLand(Widget* _widget, DragEventArgs* _args)
+	void WidgetDragLand(Widget* /*_widget*/, DragEventArgs* _args)
 	{
 		if(_args->drag_type == 1)
 			sucessful_landings++;

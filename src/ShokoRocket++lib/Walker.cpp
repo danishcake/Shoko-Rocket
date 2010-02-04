@@ -44,7 +44,7 @@ bool Walker::DoTurns()
 
 		Direction::Enum old_direction = direction_;
 		pWorld_->WalkerReachNewSquare(this);
-		GridSquare gs = pWorld_->GetGridSquare(Vector2i(position_.x, position_.y));
+		GridSquare gs = pWorld_->GetGridSquare(Vector2i(static_cast<int>(position_.x), static_cast<int>(position_.y)));
 		direction_ = gs.GetTurnDirection(direction_);
 		return old_direction != direction_;
 	}

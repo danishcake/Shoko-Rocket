@@ -98,9 +98,9 @@ Settings::Settings(void)
 			Logger::DiagnosticOut() << "Unable to find or parse GridColorA\n";
 		else
 		{
-			grid_color_a.r = r;
-			grid_color_a.g = g;
-			grid_color_a.b = b;
+			grid_color_a.r = static_cast<unsigned char>(r);
+			grid_color_a.g = static_cast<unsigned char>(g);
+			grid_color_a.b = static_cast<unsigned char>(b);
 		}
 
 		r = 172;
@@ -113,9 +113,9 @@ Settings::Settings(void)
 			Logger::DiagnosticOut() << "Unable to find or parse GridColorB\n";
 		else
 		{
-			grid_color_b.r = r;
-			grid_color_b.g = g;
-			grid_color_b.b = b;
+			grid_color_b.r = static_cast<unsigned char>(r);
+			grid_color_b.g = static_cast<unsigned char>(g);
+			grid_color_b.b = static_cast<unsigned char>(b);
 		}
 
 		if(!use_gestures_el || use_gestures_el->QueryValueAttribute("Use", &use_gestures_) != TIXML_SUCCESS)

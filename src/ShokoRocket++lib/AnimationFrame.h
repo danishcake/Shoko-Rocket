@@ -15,6 +15,6 @@ public:
 	int GetFrameID(){return frame_id_;}
 	float GetTime(){return time_to_next_;}
 	Vector2i GetOffset(){return offset_;}
-	virtual void Draw(Vector2f _position){} //To be overridden
+	virtual void Draw(Vector2f /*_position*/){} //To be overridden
 	
 };

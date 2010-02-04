@@ -683,8 +683,8 @@ void World::SaveAs(string _filename)
 	for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
 	{
 		TiXmlElement* pMouse = new TiXmlElement("Mouse");
-		pMouse->SetAttribute("x", (*it)->GetPosition().x);
-		pMouse->SetAttribute("y", (*it)->GetPosition().y);
+		pMouse->SetAttribute("x", static_cast<int>((*it)->GetPosition().x));
+		pMouse->SetAttribute("y", static_cast<int>((*it)->GetPosition().y));
 		pMouse->SetAttribute("d", Direction::ToString((*it)->GetDirection()));
 		pLevel->LinkEndChild(pMouse);
 		
@@ -693,8 +693,8 @@ void World::SaveAs(string _filename)
 	for(vector<Walker*>::iterator it = cats_.begin(); it != cats_.end(); ++it)
 	{
 		TiXmlElement* pCat = new TiXmlElement("Cat");
-		pCat->SetAttribute("x", (*it)->GetPosition().x);
-		pCat->SetAttribute("y", (*it)->GetPosition().y);
+		pCat->SetAttribute("x", static_cast<int>((*it)->GetPosition().x));
+		pCat->SetAttribute("y", static_cast<int>((*it)->GetPosition().y));
 		pCat->SetAttribute("d", Direction::ToString((*it)->GetDirection()));
 		pLevel->LinkEndChild(pCat);
 		
@@ -765,7 +765,7 @@ void World::Reset()
 void World::WalkerReachNewSquare(Walker* _walker)
 {
 	//This method will be called multiple times, so it's important not to add an item to 'just_dead...' twice
-	Vector2i position_grid = Vector2i(floor(_walker->GetPosition().x + 0.5f), floor(_walker->GetPosition().y + 0.5f));
+	Vector2i position_grid = Vector2i(static_cast<int>(floor(_walker->GetPosition().x + 0.5f)), static_cast<int>(floor(_walker->GetPosition().y + 0.5f)));
 	SquareType::Enum square_type = special_squares_[position_grid.x][position_grid.y];
 	switch(_walker->GetWalkerType())
 	{
