@@ -350,13 +350,13 @@ void Widget::HandleEvent(Event _event)
 			OnFocusedClick(this);
 		}
 		OnClick(this);
+		if(HasEditting())
+			SetEditting(false);
 	}
 	if(_event.event_type == EventType::KeyEscape)
 	{
-		if(allow_edit_ && HasEditting()) 
-		{
+		if(HasEditting()) 
 			SetEditting(false);
-		}
 	}
 
 	if(_event.event_type == EventType::OtherKeypress ||
@@ -370,6 +370,26 @@ void Widget::HandleEvent(Event _event)
 		KeyPressEventArgs args;
 		args.key_code = _event.event.key_event.key_code;
 		OnKeyUp(this, args);
+	}
+
+	if(_event.event_type == EventType::OtherKeypress && HasEditting())
+	{
+		//Expecting ascii
+		if(_event.event.key_event.key_code >= 32 && 
+		   _event.event.key_event.key_code <= 127)
+		{
+			char nc = _event.event.key_event.key_code;
+			if(_event.event.key_event.key_code >= 65 && _event.event.key_event.key_code <= 90)
+				nc = _event.event.key_event.key_code + ((!_event.event.key_event.shift) ? 32 : 0);
+			if(_event.event.key_event.key_code >= 97 && _event.event.key_event.key_code <= 122)
+				nc = _event.event.key_event.key_code + (_event.event.key_event.shift ? -32 : 0);
+			widget_text_.text = widget_text_.text + nc;
+		}
+		if(_event.event.key_event.key_code == 8) //Backspace
+		{
+			if(widget_text_.text.length() > 0)
+				widget_text_.text = widget_text_.text.substr(0, widget_text_.text.length() - 1);
+		}
 	}
 }
 
@@ -428,6 +448,11 @@ void Widget::SetFocus()
 		{
 			pOldWidgetWithFocus->OnLostFocus(this);
 			pOldWidgetWithFocus->Invalidate();
+		}
+
+		if(Widget::widget_with_edit_ != this)
+		{
+			widget_with_edit_ = NULL;
 		}
 	}
 	
@@ -638,11 +663,17 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 			e.event_type = EventType::KeyEnter;
 			e.event.key_event.key_code = event->key.keysym.sym;
 		}
+		else if(event->key.keysym.sym == SDLK_ESCAPE)
+		{
+			e.event_type = EventType::KeyEscape;
+			e.event.key_event.key_code = event->key.keysym.sym;
+		}
 		else
 		{
 			e.event_type = EventType::OtherKeypress;
 			e.event.key_event.key_code = event->key.keysym.sym;
 		}
+		e.event.key_event.shift = SDL_GetModState() & (KMOD_RSHIFT | KMOD_LSHIFT);
 	} else if(event->type == SDL_MOUSEMOTION)
 	{
 		e.event_type = EventType::MouseMove;

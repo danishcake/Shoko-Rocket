@@ -169,6 +169,7 @@ public:
 	void SetEditable(bool _editable){allow_edit_ = _editable;}
 	bool HasEditting();
 	void SetEditting(bool _editting);
+	std::string GetText(){return widget_text_.text;}
 	
 
 	/* Screen fading */

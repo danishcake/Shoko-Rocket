@@ -29,6 +29,7 @@ struct MouseEventArgs
 struct KeyPressEventArgs
 {
 	int key_code;
+	bool shift;
 };
 
 struct DragEventArgs

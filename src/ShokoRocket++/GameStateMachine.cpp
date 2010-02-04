@@ -934,11 +934,19 @@ void GameStateMachine::Draw(SDL_Surface* _target)
 	std::sort(render_items.begin(), render_items.end(), RenderItem::DepthSort<RenderItem>());
 	SDLAnimationFrame::screen_ = _target;
 	int frame = 0;
-	
+
+
 	BOOST_FOREACH(RenderItem& ri, render_items)
 	{
-		//ri.position_ += Vector2f(138, 10);
 		ri.frame_->Draw(ri.position_);
+		if(ri.position_.x < 0)
+			ri.frame_->Draw(ri.position_ + Vector2f(Settings::GetGridSize().x * size_.x, 0));
+		if(ri.position_.x > Settings::GetGridSize().x * size_.x - Settings::GetGridSize().x)
+			ri.frame_->Draw(Vector2f(ri.position_.x - Settings::GetGridSize().x * size_.x, ri.position_.y));
+		if(ri.position_.y < 0)
+			ri.frame_->Draw(ri.position_ + Vector2f(0, Settings::GetGridSize().y * size_.y));
+		if(ri.position_.y > Settings::GetGridSize().y * size_.y - Settings::GetGridSize().y)
+			ri.frame_->Draw(Vector2f(ri.position_.x, ri.position_.y - Settings::GetGridSize().y * size_.y));
 	}
 }
 
