@@ -629,6 +629,7 @@ void GameStateMachine::SetupEditor()
 	Widget* level_name = new Widget("Blank364x32.png");
 	level_name->SetText("Unnamed", TextAlignment::Centre);
 	level_name->SetPosition(Vector2i(10, 94));
+	level_name->SetEditable(true);
 
 	Widget* create_level = new Widget("Blank128x32.png");
 	create_level->SetText("Create!", TextAlignment::Centre);

@@ -384,11 +384,15 @@ void Widget::HandleEvent(Event _event)
 			if(_event.event.key_event.key_code >= 97 && _event.event.key_event.key_code <= 122)
 				nc = _event.event.key_event.key_code + (_event.event.key_event.shift ? -32 : 0);
 			widget_text_.text = widget_text_.text + nc;
+			Invalidate();
 		}
 		if(_event.event.key_event.key_code == 8) //Backspace
 		{
 			if(widget_text_.text.length() > 0)
+			{
 				widget_text_.text = widget_text_.text.substr(0, widget_text_.text.length() - 1);
+				Invalidate();
+			}
 		}
 	}
 }
