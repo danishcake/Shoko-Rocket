@@ -29,6 +29,7 @@ public:
 	void Fade(float _degree, unsigned char r, unsigned char g, unsigned char b);
 	void SetAlpha(unsigned char a);
 	void BlitText(std::string _string, TextAlignment::Enum _alignment);
+	void MeasureText(std::string _string, TextAlignment::Enum _alignment, Vector2i& top_left, Vector2i& bottom_right);
 	void Fill(unsigned char a, unsigned char r, unsigned char g, unsigned char b);
 	void Save(std::string _filename);
 	

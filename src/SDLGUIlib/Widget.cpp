@@ -16,6 +16,8 @@ vector<Widget*> Widget::root_ = vector<Widget*>();
 vector<Widget*> Widget::all_ = vector<Widget*>();
 float Widget::screen_fade_ = 0.0f;
 BlittableRect* Widget::screen_fade_rect_ = NULL;
+BlittableRect* Widget::edit_cursor_rect_ = NULL;
+double Widget::sum_time_ = 0;
 
 Widget::Widget(void)
 {
@@ -610,11 +612,26 @@ void Widget::RenderRoot(BlittableRect* _screen)
 		screen_fade_rect_ = new BlittableRect(_screen->GetSize());
 		screen_fade_rect_->Fill(screen_fade_ * 255, 0, 0, 0);	
 	}
-
 	if(screen_fade_ > 0)
 	{
 		screen_fade_rect_->Blit(Vector2i(0, 0), _screen);
 	}
+
+	if(edit_cursor_rect_ == NULL)
+	{
+		edit_cursor_rect_ = new BlittableRect("TextCursor.png");
+	}
+	if(widget_with_edit_)
+	{
+		if(fmod(sum_time_, 0.5) < 0.25)
+		{
+			Vector2i top_left, bottom_right;
+			widget_with_edit_->blit_rect_->MeasureText(widget_with_edit_->widget_text_.text, widget_with_edit_->widget_text_.alignment, top_left, bottom_right);
+			edit_cursor_rect_->Blit(widget_with_edit_->GetGlobalPosition() + Vector2i(bottom_right.x, bottom_right.y), _screen);
+		}
+		
+	}
+
 }
 
 void Widget::DistributeSDLEvents(SDL_Event* event)
@@ -672,7 +689,13 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 			e.event_type = EventType::KeyEscape;
 			e.event.key_event.key_code = event->key.keysym.sym;
 		}
-		else
+		e.event.key_event.shift = SDL_GetModState() & (KMOD_RSHIFT | KMOD_LSHIFT);
+	} else if(event->type == SDL_KEYDOWN)
+	{
+		
+		if(event->key.keysym.sym != SDLK_LEFT   && event->key.keysym.sym != SDLK_RIGHT &&
+		   event->key.keysym.sym != SDLK_UP     && event->key.keysym.sym != SDLK_DOWN  &&
+		   event->key.keysym.sym != SDLK_RETURN && event->key.keysym.sym != SDLK_ESCAPE)
 		{
 			e.event_type = EventType::OtherKeypress;
 			e.event.key_event.key_code = event->key.keysym.sym;

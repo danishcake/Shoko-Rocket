@@ -54,6 +54,9 @@ protected:
 
 	static float screen_fade_;
 	static BlittableRect* screen_fade_rect_;
+	static BlittableRect* edit_cursor_rect_;
+
+	static double sum_time_;
 
 public:
 	/* Typedefs etc */
@@ -155,6 +158,7 @@ public:
 	static vector<Widget*> GetRoot(){return root_;}
 	static void RenderRoot(BlittableRect* _screen);
 	static void DistributeSDLEvents(SDL_Event* event);
+	static void Tick(float _dt){sum_time_ += _dt;};
 
 	/* Modal widget */
 	static Widget* GetModalWidget(){return widget_with_modal_;}
