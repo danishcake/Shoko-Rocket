@@ -90,6 +90,7 @@ bool GameTick()
 		overrun = 0;
 	}
 	StandardTextures::TickAnimations(dt);
+	Widget::Tick(dt);
 	return gsm.Tick(dt);	
 }
 

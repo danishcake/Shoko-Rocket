@@ -34,6 +34,7 @@ protected:
 	static Widget* widget_with_depression_;
 	static Widget* widget_with_drag_;
 	static Widget* widget_with_modal_;
+	static Widget* widget_with_edit_;
 
 	static DragEventArgs drag_event_args_;
 	static Vector2i drag_start_position_;
@@ -53,6 +54,9 @@ protected:
 
 	static float screen_fade_;
 	static BlittableRect* screen_fade_rect_;
+	static BlittableRect* edit_cursor_rect_;
+
+	static double sum_time_;
 
 public:
 	/* Typedefs etc */
@@ -154,6 +158,7 @@ public:
 	static vector<Widget*> GetRoot(){return root_;}
 	static void RenderRoot(BlittableRect* _screen);
 	static void DistributeSDLEvents(SDL_Event* event);
+	static void Tick(float _dt){sum_time_ += _dt;};
 
 	/* Modal widget */
 	static Widget* GetModalWidget(){return widget_with_modal_;}
@@ -163,9 +168,13 @@ public:
 	void SetModal(bool _modal);
 
 	/* Text edit */
+	static Widget* GetEdittingWidget(){return widget_with_edit_;}
 	bool GetEditable(){return allow_edit_;}
 	void SetEditable(bool _editable){allow_edit_ = _editable;}
 	bool HasEditting();
+	void SetEditting(bool _editting);
+	std::string GetText(){return widget_text_.text;}
+	
 
 	/* Screen fading */
 	static void SetFade(float _fade_amount);

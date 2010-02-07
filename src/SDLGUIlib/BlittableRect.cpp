@@ -61,6 +61,11 @@ namespace
 	
 	void SampleSurface(SDL_Surface* _src, SDL_Surface* _dest)
 	{
+		if(_src == NULL)
+		{
+			Logger::ErrorOut() << "Source is NULL in SampleSurface\n";
+			return;
+		}
 		SDL_LockSurface(_src);
 		SDL_LockSurface(_dest);
 		int bpp = _src->format->BytesPerPixel;
@@ -69,6 +74,7 @@ namespace
 			Logger::ErrorOut() << "Unable to Acquire resource, source data and dest data have different bpp\n";
 			return;
 		}
+
 		for(int y = 0; y < _dest->h; y++)
 		{
 			for(int x = 0; x < _dest->w; x++)
@@ -235,6 +241,62 @@ void BlittableRect::Fade(float _degree, unsigned char r, unsigned char g, unsign
 void BlittableRect::Fill(unsigned char a, unsigned char r, unsigned char g, unsigned char b)
 {
 	SDL_FillRect(surface_, NULL, SDL_MapRGBA(surface_->format, r, g, b, a));
+}
+
+void BlittableRect::MeasureText(std::string _text, TextAlignment::Enum _alignment, Vector2i& top_left, Vector2i& bottom_right)
+{
+	int out_x = 0;
+	int out_y = 0;
+	const int font_width = 16;
+	const int font_height = 24;
+	switch(_alignment)
+	{
+	case TextAlignment::TopLeft:
+		out_x = 4;
+		out_y = 4;
+		break;
+	case TextAlignment::Top:
+		out_x = (size_.x/2) - _text.length() * (font_width / 2);
+		out_y = 4;
+		break;
+	case TextAlignment::TopRight:
+		out_x = size_.x - _text.length() * font_width - 4;
+		out_y = 4;
+		break;
+	case TextAlignment::Left:
+		out_x = 4;
+		out_y = (size_.y / 2) - (font_height / 2);
+		break;
+	case TextAlignment::Centre:
+		out_x = (size_.x/2) - _text.length() * (font_width / 2);
+		out_y = (size_.y / 2) - (font_height / 2);
+		break;
+	case TextAlignment::Right:
+		out_x = size_.x - _text.length() * font_width - 4;
+		out_y = (size_.y / 2) - (font_height / 2);
+		break;
+	case TextAlignment::BottomLeft:
+		out_x = 4;
+		out_y = size_.y - font_height - 4;
+		break;
+	case TextAlignment::Bottom:
+		out_x = (size_.x/2) - _text.length() * (font_width / 2);
+		out_y = size_.y - font_height - 4;
+		break;
+	case TextAlignment::BottomRight:
+		out_x = size_.x - _text.length() * font_width - 4;
+		out_y = size_.y - font_height - 4;
+		break;
+	}
+	top_left.x = out_x;
+	top_left.y = out_y;
+
+	for(unsigned int i = 0; i < _text.length(); i++)
+	{
+		out_x += 16;
+	}
+	bottom_right.x = out_x;
+	bottom_right.y = out_y;
 }
 
 void BlittableRect::BlitText(std::string _text, TextAlignment::Enum _alignment)

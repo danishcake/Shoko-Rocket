@@ -1,6 +1,7 @@
 #pragma once
 #include <sdl.h>
 #include <iostream>
+#include <Widget.h>
 
 struct SDL_fixture
 {
@@ -36,6 +37,6 @@ struct SDL_fixture
 			SDL_Quit();
 			//std::cout << "Shutting down SDL\n";
 		}
-
+		Widget::ClearRoot();
 	}
 };

@@ -8,6 +8,7 @@ Widget* Widget::widget_with_highlight_ = NULL;
 Widget* Widget::widget_with_depression_ = NULL;
 Widget* Widget::widget_with_drag_ = NULL;
 Widget* Widget::widget_with_modal_ = NULL;
+Widget* Widget::widget_with_edit_ = NULL;
 DragEventArgs Widget::drag_event_args_ = DragEventArgs();
 Vector2i Widget::drag_start_position_ = Vector2i(0, 0);
 
@@ -15,6 +16,8 @@ vector<Widget*> Widget::root_ = vector<Widget*>();
 vector<Widget*> Widget::all_ = vector<Widget*>();
 float Widget::screen_fade_ = 0.0f;
 BlittableRect* Widget::screen_fade_rect_ = NULL;
+BlittableRect* Widget::edit_cursor_rect_ = NULL;
+double Widget::sum_time_ = 0;
 
 Widget::Widget(void)
 {
@@ -37,8 +40,10 @@ Widget::Widget(void)
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
 	visible_ = true;
+	allow_edit_ = false;
 	root_.push_back(this);
 	all_.push_back(this);
+	
 }
 
 Widget::Widget(std::string _filename)
@@ -63,6 +68,7 @@ Widget::Widget(std::string _filename)
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
 	visible_ = true;
+	allow_edit_ = false;
 	root_.push_back(this);
 	all_.push_back(this);
 }
@@ -89,6 +95,7 @@ Widget::Widget(BlittableRect* _blittable)
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
 	visible_ = true;
+	allow_edit_ = false;
 	root_.push_back(this);
 	all_.push_back(this);
 }
@@ -250,6 +257,17 @@ void Widget::HandleEvent(Event _event)
 					SetDepresssed(false);
 					SetFocus();
 					OnClick(this);
+					if(allow_edit_)
+					{
+						if(HasEditting())
+						{
+							SetEditting(false);
+						} else
+						{
+							SetEditting(true);
+						}
+
+					}
 				}
 			}
 			//All mouse buttons fire mouse click events, but only left gains focus
@@ -333,6 +351,13 @@ void Widget::HandleEvent(Event _event)
 			OnFocusedClick(this);
 		}
 		OnClick(this);
+		if(HasEditting())
+			SetEditting(false);
+	}
+	if(_event.event_type == EventType::KeyEscape)
+	{
+		if(HasEditting()) 
+			SetEditting(false);
 	}
 
 	if(_event.event_type == EventType::OtherKeypress ||
@@ -340,11 +365,36 @@ void Widget::HandleEvent(Event _event)
 		_event.event_type == EventType::KeyDown ||
 		_event.event_type == EventType::KeyLeft ||
 		_event.event_type == EventType::KeyRight ||
+		_event.event_type == EventType::KeyEscape ||
 		_event.event_type == EventType::KeyEnter)
 	{
 		KeyPressEventArgs args;
 		args.key_code = _event.event.key_event.key_code;
 		OnKeyUp(this, args);
+	}
+
+	if(_event.event_type == EventType::OtherKeypress && HasEditting())
+	{
+		//Expecting ascii
+		if(_event.event.key_event.key_code >= 32 && 
+		   _event.event.key_event.key_code <= 127)
+		{
+			char nc = _event.event.key_event.key_code;
+			if(_event.event.key_event.key_code >= 65 && _event.event.key_event.key_code <= 90)
+				nc = _event.event.key_event.key_code + ((!_event.event.key_event.shift) ? 32 : 0);
+			if(_event.event.key_event.key_code >= 97 && _event.event.key_event.key_code <= 122)
+				nc = _event.event.key_event.key_code + (_event.event.key_event.shift ? -32 : 0);
+			widget_text_.text = widget_text_.text + nc;
+			Invalidate();
+		}
+		if(_event.event.key_event.key_code == 8) //Backspace
+		{
+			if(widget_text_.text.length() > 0)
+			{
+				widget_text_.text = widget_text_.text.substr(0, widget_text_.text.length() - 1);
+				Invalidate();
+			}
+		}
 	}
 }
 
@@ -403,6 +453,11 @@ void Widget::SetFocus()
 		{
 			pOldWidgetWithFocus->OnLostFocus(this);
 			pOldWidgetWithFocus->Invalidate();
+		}
+
+		if(Widget::widget_with_edit_ != this)
+		{
+			widget_with_edit_ = NULL;
 		}
 	}
 	
@@ -532,6 +587,8 @@ void Widget::ClearRoot()
 	widget_with_highlight_ = NULL;
 	widget_with_depression_ = NULL;
 	widget_with_drag_ = NULL;
+	widget_with_modal_ = NULL;
+	widget_with_edit_ = NULL;
 	drag_event_args_ = DragEventArgs();
 
 	//root_.clear(); // The destructors do this automatically
@@ -554,11 +611,26 @@ void Widget::RenderRoot(BlittableRect* _screen)
 		screen_fade_rect_ = new BlittableRect(_screen->GetSize());
 		screen_fade_rect_->Fill(static_cast<unsigned char>(screen_fade_ * 255), 0, 0, 0);	
 	}
-
 	if(screen_fade_ > 0)
 	{
 		screen_fade_rect_->Blit(Vector2i(0, 0), _screen);
 	}
+
+	if(edit_cursor_rect_ == NULL)
+	{
+		edit_cursor_rect_ = new BlittableRect("TextCursor.png");
+	}
+	if(widget_with_edit_)
+	{
+		if(fmod(sum_time_, 0.5) < 0.25)
+		{
+			Vector2i top_left, bottom_right;
+			widget_with_edit_->blit_rect_->MeasureText(widget_with_edit_->widget_text_.text, widget_with_edit_->widget_text_.alignment, top_left, bottom_right);
+			edit_cursor_rect_->Blit(widget_with_edit_->GetGlobalPosition() + Vector2i(bottom_right.x, bottom_right.y), _screen);
+		}
+		
+	}
+
 }
 
 void Widget::DistributeSDLEvents(SDL_Event* event)
@@ -611,11 +683,23 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 			e.event_type = EventType::KeyEnter;
 			e.event.key_event.key_code = event->key.keysym.sym;
 		}
-		else
+		else if(event->key.keysym.sym == SDLK_ESCAPE)
+		{
+			e.event_type = EventType::KeyEscape;
+			e.event.key_event.key_code = event->key.keysym.sym;
+		}
+		e.event.key_event.shift = SDL_GetModState() & (KMOD_RSHIFT | KMOD_LSHIFT);
+	} else if(event->type == SDL_KEYDOWN)
+	{
+		
+		if(event->key.keysym.sym != SDLK_LEFT   && event->key.keysym.sym != SDLK_RIGHT &&
+		   event->key.keysym.sym != SDLK_UP     && event->key.keysym.sym != SDLK_DOWN  &&
+		   event->key.keysym.sym != SDLK_RETURN && event->key.keysym.sym != SDLK_ESCAPE)
 		{
 			e.event_type = EventType::OtherKeypress;
 			e.event.key_event.key_code = event->key.keysym.sym;
 		}
+		e.event.key_event.shift = SDL_GetModState() & (KMOD_RSHIFT | KMOD_LSHIFT);
 	} else if(event->type == SDL_MOUSEMOTION)
 	{
 		e.event_type = EventType::MouseMove;
@@ -691,6 +775,7 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		e.event_type == EventType::KeyLeft ||
 		e.event_type == EventType::KeyRight ||
 		e.event_type == EventType::KeyEnter ||
+		e.event_type == EventType::KeyEscape ||
 		e.event_type == EventType::OtherKeypress)
 	{
 		Widget* focus = Widget::GetWidgetWithFocus();
@@ -720,5 +805,13 @@ void Widget::SetFade(float _fade_amount)
 
 bool Widget::HasEditting()
 {
-	return widget_with_modal_ == this && allow_edit_;
+	return widget_with_edit_ == this;
+}
+
+void Widget::SetEditting(bool _editting)
+{
+	if(_editting && allow_edit_)
+		widget_with_edit_ = this;
+	else if(widget_with_edit_ == this)
+		widget_with_edit_ = NULL;
 }
