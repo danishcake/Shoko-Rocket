@@ -475,6 +475,8 @@ void GameStateMachine::PuzzleNextClick(Widget* /*_widget*/)
 	puzzle_index_++;
 	puzzle_index_ %= puzzle_files_.size();
 	puzzle_level_ = boost::shared_ptr<PuzzleLevel>(new PuzzleLevel(rel_path_ + "/" + puzzle_files_[puzzle_index_], Settings::GetGridSize()));
+	arrow_stock_widget_->SetPosition(Vector2i(106, puzzle_level_->GetLevelSize().y * Settings::GetGridSize().y + 20));
+	arrow_hash_ = 0;
 	puzzle_complete_widget_->SetModal(false);
 	puzzle_complete_widget_->SetPosition(Vector2i(0, - 300));
 	level_completed_ = false;
@@ -971,7 +973,7 @@ void GameStateMachine::LayoutArrows(std::vector<Direction::Enum> _arrows)
 {
 	arrow_stock_widget_->ClearChildren();
 	int arrow_id = 0;
-	std::string arrow_filenames[5] = {"NorthA1.png", "SouthA1.png", "EastA1.png", "LeftA1.png", "LeftA1.png"};
+	std::string arrow_filenames[5] = {"NorthA1.png", "SouthA1.png", "EastA1.png", "WestA1.png", "WestA1.png"};
 	std::string arrow_set_filenames[8][5] = {{"NorthA3.png", "SouthA3.png", "EastA3.png", "WestA3.png", "WestA1.png"},
 											 {"NorthA4.png", "SouthA4.png", "EastA4.png", "WestA4.png", "WestA1.png"},
 											 {"NorthA5.png", "SouthA5.png", "EastA5.png", "WestA5.png", "WestA1.png"},
