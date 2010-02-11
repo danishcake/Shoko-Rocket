@@ -372,6 +372,7 @@ void GameStateMachine::SetupPuzzle()
 {
 	arrow_stock_widget_ = new Widget("ArrowsArea.png");
 	arrow_stock_widget_->SetPosition(Vector2i(106, puzzle_level_->GetLevelSize().y * Settings::GetGridSize().y + 20));
+	arrow_stock_widget_->SetRejectsFocus(true);
 	arrow_hash_ = 0;
 
 	Widget* start = new Widget("Blank96x32.png");
@@ -949,11 +950,11 @@ void GameStateMachine::Draw(SDL_Surface* _target)
 	{
 		ri.frame_->Draw(ri.position_);
 		if(ri.position_.x < 0)
-			ri.frame_->Draw(ri.position_ + Vector2f(Settings::GetGridSize().x * size_.x, 0));
+			ri.frame_->Draw(ri.position_ + Vector2f(static_cast<float>(Settings::GetGridSize().x * size_.x), 0));
 		if(ri.position_.x > Settings::GetGridSize().x * size_.x - Settings::GetGridSize().x)
 			ri.frame_->Draw(Vector2f(ri.position_.x - Settings::GetGridSize().x * size_.x, ri.position_.y));
 		if(ri.position_.y < 0)
-			ri.frame_->Draw(ri.position_ + Vector2f(0, Settings::GetGridSize().y * size_.y));
+			ri.frame_->Draw(ri.position_ + Vector2f(0, static_cast<float>(Settings::GetGridSize().y * size_.y)));
 		if(ri.position_.y > Settings::GetGridSize().y * size_.y - Settings::GetGridSize().y)
 			ri.frame_->Draw(Vector2f(ri.position_.x, ri.position_.y - Settings::GetGridSize().y * size_.y));
 	}
@@ -968,7 +969,7 @@ void GameStateMachine::FadeInOut(float _total_time)
 void GameStateMachine::LayoutArrows(std::vector<Direction::Enum> _arrows)
 {
 	arrow_stock_widget_->ClearChildren();
-	int arrow_id = 1;
+	int arrow_id = 0;
 	std::string arrow_filenames[5] = {"NorthA1.png", "SouthA1.png", "EastA1.png", "LeftA1.png", "LeftA1.png"};
 	std::string arrow_set_filenames[8][5] = {{"NorthA3.png", "SouthA3.png", "EastA3.png", "WestA3.png", "WestA1.png"},
 											 {"NorthA4.png", "SouthA4.png", "EastA4.png", "WestA4.png", "WestA1.png"},
@@ -992,7 +993,8 @@ void GameStateMachine::LayoutArrows(std::vector<Direction::Enum> _arrows)
 			if(arrow_count[arrow_dir] > 9)
 				index = 7;
 			Widget* arrow_widget = new Widget(arrow_set_filenames[index][arrow_dir]);
-			arrow_widget->SetPosition(Vector2i(4 + arrow_id * Settings::GetGridSize().x, 4));
+			arrow_widget->SetPosition(Vector2i(16 + arrow_id * Settings::GetGridSize().x, 8));
+			arrow_widget->SetRejectsFocus(true);
 			arrow_stock_widget_->AddChild(arrow_widget);
 			arrow_id += 2;
 		} else
@@ -1000,11 +1002,11 @@ void GameStateMachine::LayoutArrows(std::vector<Direction::Enum> _arrows)
 			for(int i = 0; i < arrow_count[arrow_dir]; i++)
 			{
 				Widget* arrow_widget = new Widget(arrow_filenames[arrow_dir]);
-				arrow_widget->SetPosition(Vector2i(4 + arrow_id * Settings::GetGridSize().x, 4));
+				arrow_widget->SetPosition(Vector2i(16 + arrow_id * Settings::GetGridSize().x, 8));
+				arrow_widget->SetRejectsFocus(true);
 				arrow_stock_widget_->AddChild(arrow_widget);
 				arrow_id++;
 			}
 		}
 	}
-
 }
