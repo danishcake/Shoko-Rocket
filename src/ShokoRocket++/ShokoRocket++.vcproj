@@ -706,6 +706,26 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\Levels\Original Easy\Level 1.Level"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
 						RelativePath=".\Levels\Original Easy\Level 15.Level"
 						>
 						<FileConfiguration
@@ -726,7 +746,87 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\Levels\Original Easy\Level 2.Level"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\Levels\Original Easy\Level 3.Level"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\Levels\Original Easy\Level 4.Level"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
 						RelativePath=".\Levels\Original Easy\Level 5.Level"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Original Easy"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\Levels\Original Easy\Level 8.Level"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
