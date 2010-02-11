@@ -370,6 +370,10 @@ void GameStateMachine::MenuLevelBrowerPageChange(Widget* /*_widget*/, int /*_old
 
 void GameStateMachine::SetupPuzzle()
 {
+	arrow_stock_widget_ = new Widget("ArrowsArea.png");
+	arrow_stock_widget_->SetPosition(Vector2i(106, puzzle_level_->GetLevelSize().y * Settings::GetGridSize().y + 20));
+	arrow_hash_ = 0;
+
 	Widget* start = new Widget("Blank96x32.png");
 	start->SetPosition(Vector2i(0,0));
 	start->OnClick.connect(boost::bind(&GameStateMachine::PuzzleStartClick, this, _1));
@@ -427,7 +431,11 @@ void GameStateMachine::ProcessPuzzle(float _timespan)
 		Progress::SetProgress(puzzle_level_->GetFilename(), pr);
 		level_completed_ = true;
 	}
-
+	if(arrow_stock_widget_ && puzzle_level_ && arrow_hash_ != puzzle_level_->ComputeArrowHash())
+	{
+		LayoutArrows(puzzle_level_->GetArrows());
+		arrow_hash_ = puzzle_level_->ComputeArrowHash();
+	}
 	last_puzzle_mode_ = puzzle_level_->GetPuzzleState();
 	input_ = Input();
 }
@@ -435,6 +443,7 @@ void GameStateMachine::ProcessPuzzle(float _timespan)
 void GameStateMachine::TeardownPuzzle()
 {
 	Widget::ClearRoot();
+	arrow_stock_widget_ = NULL;
 }
 
 /* Puzzle events */
@@ -954,4 +963,48 @@ void GameStateMachine::FadeInOut(float _total_time)
 {
 	total_fade_time_ = _total_time;
 	fade_timer_ = _total_time;
+}
+
+void GameStateMachine::LayoutArrows(std::vector<Direction::Enum> _arrows)
+{
+	arrow_stock_widget_->ClearChildren();
+	int arrow_id = 1;
+	std::string arrow_filenames[5] = {"NorthA1.png", "SouthA1.png", "EastA1.png", "LeftA1.png", "LeftA1.png"};
+	std::string arrow_set_filenames[8][5] = {{"NorthA3.png", "SouthA3.png", "EastA3.png", "WestA3.png", "WestA1.png"},
+											 {"NorthA4.png", "SouthA4.png", "EastA4.png", "WestA4.png", "WestA1.png"},
+											 {"NorthA5.png", "SouthA5.png", "EastA5.png", "WestA5.png", "WestA1.png"},
+											 {"NorthA6.png", "SouthA6.png", "EastA6.png", "WestA6.png", "WestA1.png"},
+											 {"NorthA7.png", "SouthA7.png", "EastA7.png", "WestA7.png", "WestA1.png"},
+											 {"NorthA8.png", "SouthA8.png", "EastA8.png", "WestA8.png", "WestA1.png"},
+											 {"NorthA9.png", "SouthA9.png", "EastA9.png", "WestA9.png", "WestA1.png"},
+											 {"NorthAm.png", "SouthAm.png", "EastAm.png", "WestAm.png", "WestA1.png"},};
+
+	int arrow_count[5] = {0, 0, 0, 0, 0};
+	BOOST_FOREACH(Direction::Enum arrow, _arrows)
+	{
+		arrow_count[arrow]++;
+	}
+	for(int arrow_dir = 0; arrow_dir < 5; arrow_dir++)
+	{
+		if(arrow_count[arrow_dir] >= 3)
+		{
+			int index = arrow_count[arrow_dir] - 3;
+			if(arrow_count[arrow_dir] > 9)
+				index = 7;
+			Widget* arrow_widget = new Widget(arrow_set_filenames[index][arrow_dir]);
+			arrow_widget->SetPosition(Vector2i(4 + arrow_id * Settings::GetGridSize().x, 4));
+			arrow_stock_widget_->AddChild(arrow_widget);
+			arrow_id += 2;
+		} else
+		{
+			for(int i = 0; i < arrow_count[arrow_dir]; i++)
+			{
+				Widget* arrow_widget = new Widget(arrow_filenames[arrow_dir]);
+				arrow_widget->SetPosition(Vector2i(4 + arrow_id * Settings::GetGridSize().x, 4));
+				arrow_stock_widget_->AddChild(arrow_widget);
+				arrow_id++;
+			}
+		}
+	}
+
 }

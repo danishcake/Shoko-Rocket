@@ -86,10 +86,15 @@ private:
 	boost::shared_ptr<PuzzleLevel> puzzle_level_;
 	Input input_;
 	Widget* puzzle_complete_widget_;
+	Widget* arrow_stock_widget_;
+	int arrow_hash_;
 	/* Puzzle methods */
 	void SetupPuzzle();
 	void ProcessPuzzle(float _timespan);
 	void TeardownPuzzle();
+	
+	void LayoutArrows(std::vector<Direction::Enum> _arrows);
+
 	/* Puzzle event handling */
 	void PuzzleStartClick(Widget* _widget);
 	void PuzzleResetClick(Widget* _widget);

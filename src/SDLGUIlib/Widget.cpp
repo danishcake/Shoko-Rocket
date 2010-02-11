@@ -141,8 +141,20 @@ void Widget::AddChild(Widget* _widget)
 
 void Widget::RemoveChild(Widget* _widget)
 {
+	//TODO potential bug if widget removed from non parent
 	root_.push_back(_widget);
 	children_.erase(std::remove(children_.begin(), children_.end(), _widget));
+	Invalidate();
+}
+
+void Widget::ClearChildren()
+{
+	std::vector<Widget*> detached = children_;
+	children_.clear();
+	for(std::vector<Widget*>::iterator it = detached.begin(); it != detached.end(); ++it)
+	{
+		delete *it;
+	}
 	Invalidate();
 }
 

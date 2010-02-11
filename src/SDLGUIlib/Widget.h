@@ -83,6 +83,7 @@ public:
 	vector<Widget*>& GetChildren();
 	void AddChild(Widget* _widget);
 	void RemoveChild(Widget* _widget);
+	void ClearChildren();
 	/* Parent members */
 	void SetParent(Widget* _widget){parent_ = _widget;}
 	Widget* GetParent(){return parent_;}

@@ -219,6 +219,8 @@ void BlittableRect::Blit(Vector2i _position, BlittableRect* _dest)
 
 void BlittableRect::RawBlit(Vector2i _position, BlittableRect* _dest)
 {
+	if(!surface_ || !_dest)
+		return;
 	SDL_Rect dst_rect;
 	dst_rect.x = static_cast<Sint16>(_position.x);
 	dst_rect.y = static_cast<Sint16>(_position.y);

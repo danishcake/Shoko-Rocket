@@ -315,42 +315,7 @@ vector<RenderItem> EditLevel::Draw()
 	const float below = -1;
 	const float above = 1;
 	vector<RenderItem> draw_list;
-	draw_list.reserve(world_->GetMice().size() + world_->GetCats().size() + world_->GetArrows().size());
-
-	vector<Direction::Enum> arrows = world_->GetArrows();
-	float arrow_id = 1;
-
-	int arrow_count[5] = {0, 0, 0, 0, 0};
-	BOOST_FOREACH(Direction::Enum arrow, arrows)
-	{
-		arrow_count[arrow]++;
-	}
-	for(int arrow_dir = 0; arrow_dir < 5; arrow_dir++)
-	{
-		if(arrow_count[arrow_dir] >= 3)
-		{
-			int index = arrow_count[arrow_dir] - 3;
-			if(arrow_count[arrow_dir] > 9)
-				index = 7;
-			RenderItem ri;
-			ri.position_ = Vector2f(arrow_id, static_cast<float>(world_->GetSize().y) + 1);
-			ri.frame_ = StandardTextures::arrow_sets[arrow_dir]->GetFrameByIndex(index);
-			ri.depth = above;
-			arrow_id += 2;
-			draw_list.push_back(ri);
-		} else
-		{
-			for(int i = 0; i < arrow_count[arrow_dir]; i++)
-			{
-				RenderItem ri;
-				ri.position_ = Vector2f(arrow_id, static_cast<float>(world_->GetSize().y) + 1);
-				ri.frame_ = StandardTextures::arrows[arrow_dir]->GetCurrentFrame();
-				ri.depth = above;
-				arrow_id++;
-				draw_list.push_back(ri);
-			}
-		}
-	}
+	draw_list.reserve(world_->GetMice().size() + world_->GetCats().size());
 
 	vector<Vector2f> rings = world_->GetProblemPoints();
 	BOOST_FOREACH(Vector2f point, rings)
@@ -479,12 +444,6 @@ vector<RenderItem> EditLevel::Draw()
 	{
 		render_item.position_ -= scroll_offset_;
 	}
-
-	RenderItem arrow_area;
-	arrow_area.position_ = Vector2f(0, 9 + 0.5f);
-	arrow_area.frame_ = StandardTextures::arrows_area->GetCurrentFrame();
-	arrow_area.depth = 2 * below;
-	draw_list.push_back(arrow_area);
 
 	BOOST_FOREACH(RenderItem& render_item, draw_list)
 	{

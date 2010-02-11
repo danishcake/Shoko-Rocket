@@ -33,5 +33,7 @@ public:
 	PuzzleMode::Enum GetPuzzleState(){return puzzle_state_;}
 	Animation* grid_animation_;
 	std::string GetFilename(){return world_->GetFilename();}
-
+	Vector2i GetLevelSize(){return world_->GetSize();}
+	std::vector<Direction::Enum> GetArrows(){return world_->GetArrows();}
+	int PuzzleLevel::ComputeArrowHash();
 };
