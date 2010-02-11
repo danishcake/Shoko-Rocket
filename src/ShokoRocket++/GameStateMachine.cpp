@@ -60,7 +60,8 @@ void GameStateMachine::LoadPuzzleFiles()
 	{
 		if(!boost::filesystem::is_directory(di->status()))
 		{
-			if(di->path().leaf() != "Folder.png")
+			//This would be better if it checked for levels instead
+			if(di->path().leaf() != "Folder.Icon")
 			{
 				puzzle_files_.push_back(di->path().leaf());
 			}
@@ -229,9 +230,9 @@ void GameStateMachine::RenderLevel(Widget* /*_widget*/, BlittableRect** _rect, s
 {
 	if(boost::filesystem::is_directory("Levels" + rel_path_ + "/" + _name))
 	{
-		if(boost::filesystem::exists("Levels" + rel_path_ + "/" + _name + "/Folder.png"))
+		if(boost::filesystem::exists("Levels" + rel_path_ + "/" + _name + "/Folder.icon"))
 		{
-			*_rect = new BlittableRect("Levels" + rel_path_ + "/" + _name + "/Folder.png", true);
+			*_rect = new BlittableRect("Levels" + rel_path_ + "/" + _name + "/Folder.icon", true);
 		} else if(_name == "..")
 		{
 			*_rect = new BlittableRect("FolderUp.png");

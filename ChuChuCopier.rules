@@ -7,12 +7,19 @@
 		<CustomBuildRule
 			Name="Level copier"
 			DisplayName="Level Deployer"
-			CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\Levels\$(InputFileName)&quot;"
-			Outputs="$(OutDir)\Levels\$(InputFileName)"
-			FileExtensions="*.Level"
-			ExecutionDescription="Copying level $(InputFileName)"
+			CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\Levels\[LevelSet]\$(InputFileName)&quot;"
+			Outputs="$(OutDir)\Levels\[LevelSet]\$(InputFileName)"
+			FileExtensions="*.Level;*. *.Icon"
+			ExecutionDescription="Copying level or icon $(InputFileName) to $(OutDir)\Levels\[LevelSet]\$(InputFileName)"
 			>
 			<Properties>
+				<StringProperty
+					Name="Levelset"
+					DisplayName="Levelset"
+					Description="The level pack"
+					Switch="[value]"
+					DefaultValue="Unknown"
+				/>
 			</Properties>
 		</CustomBuildRule>
 		<CustomBuildRule
