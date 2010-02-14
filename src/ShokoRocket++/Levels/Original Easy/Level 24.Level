@@ -1,0 +1,71 @@
+<?xml ?>
+<Level>
+    <Name>Frogger</Name>
+    <Size x="12" y="9" />
+    <V x="0" y="0" />
+    <V x="0" y="2" />
+    <V x="0" y="4" />
+    <V x="0" y="6" />
+    <V x="0" y="8" />
+    <H x="0" y="0" />
+    <H x="0" y="1" />
+    <H x="0" y="4" />
+    <H x="1" y="0" />
+    <H x="2" y="0" />
+    <H x="3" y="0" />
+    <H x="4" y="0" />
+    <H x="5" y="0" />
+    <H x="6" y="0" />
+    <H x="7" y="0" />
+    <H x="8" y="0" />
+    <H x="9" y="0" />
+    <H x="10" y="0" />
+    <H x="11" y="0" />
+    <H x="11" y="1" />
+    <H x="11" y="4" />
+    <Arrow x="0" y="6" d="East" />
+    <Rocket x="0" y="8" />
+    <Rocket x="1" y="8" />
+    <Rocket x="2" y="8" />
+    <Rocket x="3" y="8" />
+    <Rocket x="4" y="8" />
+    <Arrow x="5" y="2" d="South" />
+    <Arrow x="5" y="4" d="West" />
+    <Rocket x="5" y="8" />
+    <Arrow x="6" y="6" d="South" />
+    <Rocket x="6" y="8" />
+    <Rocket x="7" y="8" />
+    <Rocket x="8" y="8" />
+    <Rocket x="9" y="8" />
+    <Arrow x="10" y="0" d="South" />
+    <Arrow x="10" y="2" d="West" />
+    <Rocket x="10" y="8" />
+    <Rocket x="11" y="8" />
+    <Mouse x="0" y="0" d="East" />
+    <Cat x="0" y="1" d="East" />
+    <Cat x="1" y="1" d="East" />
+    <Cat x="2" y="1" d="East" />
+    <Cat x="4" y="1" d="East" />
+    <Cat x="5" y="1" d="East" />
+    <Cat x="7" y="1" d="East" />
+    <Cat x="8" y="1" d="East" />
+    <Cat x="10" y="1" d="East" />
+    <Cat x="10" y="3" d="West" />
+    <Cat x="4" y="3" d="East" />
+    <Cat x="7" y="3" d="West" />
+    <Cat x="2" y="3" d="East" />
+    <Cat x="3" y="5" d="East" />
+    <Cat x="4" y="5" d="East" />
+    <Cat x="9" y="5" d="West" />
+    <Cat x="8" y="5" d="West" />
+    <Cat x="1" y="7" d="West" />
+    <Cat x="0" y="7" d="East" />
+    <Cat x="2" y="7" d="West" />
+    <Cat x="7" y="7" d="East" />
+    <Cat x="8" y="7" d="West" />
+    <Cat x="9" y="7" d="East" />
+    <Cat x="10" y="7" d="West" />
+    <Cat x="5" y="7" d="East" />
+    <Cat x="6" y="7" d="East" />
+    <Cat x="3" y="7" d="West" />
+</Level>
