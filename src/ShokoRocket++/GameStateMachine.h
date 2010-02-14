@@ -111,8 +111,9 @@ private:
 	boost::shared_ptr<EditLevel> editor_level_;
 	Widget* new_level_widget_;
 	Vector2i size_;
-	Widget* sizex;
-	Widget* sizey;
+	Widget* sizex_;
+	Widget* sizey_;
+	Widget* level_name_editor_;
 	/* Editor methods */
 	void SetupEditor();
 	void ProcessEditor(float _timespan);

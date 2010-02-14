@@ -1206,6 +1206,50 @@
 						</FileConfiguration>
 					</File>
 				</Filter>
+				<Filter
+					Name="Miscellanea"
+					>
+					<File
+						RelativePath=".\Levels\Miscellanea\Dildo.Level"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Miscellanea"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Miscellanea"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\Levels\Miscellanea\Folder.Icon"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Miscellanea"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Miscellanea"
+							/>
+						</FileConfiguration>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

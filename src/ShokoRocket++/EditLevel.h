@@ -40,7 +40,8 @@ public:
 	EditMode::Enum GetEditMode(){return edit_mode_;}
 	void SetEditMode(EditMode::Enum _edit_mode);
 	bool GetValidated(){return validated_;}
-	void EditWalls();
+	void SetName(std::string _level_name){world_->SetName(_level_name);}
+	std::string GetName(){return world_->GetName();}
 	void Save(std::string _name);
 	Animation* grid_animation_;
 };

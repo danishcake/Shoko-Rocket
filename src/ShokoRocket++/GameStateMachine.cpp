@@ -614,10 +614,10 @@ void GameStateMachine::SetupEditor()
 	sizemmx->SetPosition(Vector2i(52, 10));
 	sizemmx->OnClick.connect(boost::bind(&GameStateMachine::EditorSizeMMXClick, this, _1));
 
-	sizex = new Widget("Blank96x32.png");
-	sizex->SetText(boost::lexical_cast<std::string, int>(size_.x), TextAlignment::Centre);
-	sizex->SetPosition(Vector2i(94, 10));
-	sizex->SetRejectsFocus(true);
+	sizex_ = new Widget("Blank96x32.png");
+	sizex_->SetText(boost::lexical_cast<std::string, int>(size_.x), TextAlignment::Centre);
+	sizex_->SetPosition(Vector2i(94, 10));
+	sizex_->SetRejectsFocus(true);
 
 	Widget* sizey_desc = new Widget("Blank32x32.png");
 	sizey_desc->SetPosition(Vector2i(10, 52));
@@ -634,15 +634,15 @@ void GameStateMachine::SetupEditor()
 	sizemmy->SetPosition(Vector2i(52, 52));
 	sizemmy->OnClick.connect(boost::bind(&GameStateMachine::EditorSizeMMYClick, this, _1));
 
-	sizey = new Widget("Blank96x32.png");
-	sizey->SetText(boost::lexical_cast<std::string, int>(size_.y), TextAlignment::Centre);
-	sizey->SetPosition(Vector2i(94, 52));
-	sizey->SetRejectsFocus(true);
+	sizey_ = new Widget("Blank96x32.png");
+	sizey_->SetText(boost::lexical_cast<std::string, int>(size_.y), TextAlignment::Centre);
+	sizey_->SetPosition(Vector2i(94, 52));
+	sizey_->SetRejectsFocus(true);
 
-	Widget* level_name = new Widget("Blank364x32.png");
-	level_name->SetText("Unnamed", TextAlignment::Centre);
-	level_name->SetPosition(Vector2i(10, 94));
-	level_name->SetEditable(true);
+	level_name_editor_ = new Widget("Blank364x32.png");
+	level_name_editor_->SetText("Unnamed", TextAlignment::Centre);
+	level_name_editor_->SetPosition(Vector2i(10, 94));
+	level_name_editor_->SetEditable(true);
 
 	Widget* create_level = new Widget("Blank128x32.png");
 	create_level->SetText("Create!", TextAlignment::Centre);
@@ -654,14 +654,14 @@ void GameStateMachine::SetupEditor()
 	new_level_widget_->AddChild(sizex_desc);
 	new_level_widget_->AddChild(sizeppx);
 	new_level_widget_->AddChild(sizemmx);
-	new_level_widget_->AddChild(sizex);
+	new_level_widget_->AddChild(sizex_);
 
 	new_level_widget_->AddChild(sizey_desc);
 	new_level_widget_->AddChild(sizeppy);
 	new_level_widget_->AddChild(sizemmy);
-	new_level_widget_->AddChild(sizey);
+	new_level_widget_->AddChild(sizey_);
 
-	new_level_widget_->AddChild(level_name);
+	new_level_widget_->AddChild(level_name_editor_);
 	new_level_widget_->AddChild(create_level);
 
 
@@ -755,28 +755,28 @@ void GameStateMachine::EditorSizePPXClick(Widget* /*_widget*/)
 {
 	size_.x++;
 	size_.x = size_.x < 3 ? 3 : size_.x > 50 ? 50 : size_.x;
-	sizex->SetText(boost::lexical_cast<std::string, int>(size_.x), TextAlignment::Centre);
+	sizex_->SetText(boost::lexical_cast<std::string, int>(size_.x), TextAlignment::Centre);
 }
 
 void GameStateMachine::EditorSizeMMXClick(Widget* /*_widget*/)
 {
 	size_.x--;
 	size_.x = size_.x < 3 ? 3 : size_.x > 50 ? 50 : size_.x;
-	sizex->SetText(boost::lexical_cast<std::string, int>(size_.x), TextAlignment::Centre);
+	sizex_->SetText(boost::lexical_cast<std::string, int>(size_.x), TextAlignment::Centre);
 }
 
 void GameStateMachine::EditorSizePPYClick(Widget* /*_widget*/)
 {
 	size_.y++;
 	size_.y = size_.y < 3 ? 3 : size_.y > 50 ? 50 : size_.y;
-	sizey->SetText(boost::lexical_cast<std::string, int>(size_.y), TextAlignment::Centre);
+	sizey_->SetText(boost::lexical_cast<std::string, int>(size_.y), TextAlignment::Centre);
 }
 
 void GameStateMachine::EditorSizeMMYClick(Widget* /*_widget*/)
 {
 	size_.y--;
 	size_.y = size_.y < 3 ? 3 : size_.y > 50 ? 50 : size_.y;
-	sizey->SetText(boost::lexical_cast<std::string, int>(size_.y), TextAlignment::Centre);
+	sizey_->SetText(boost::lexical_cast<std::string, int>(size_.y), TextAlignment::Centre);
 }
 
 void GameStateMachine::EditorCreateClick(Widget* /*_widget*/)
@@ -785,6 +785,7 @@ void GameStateMachine::EditorCreateClick(Widget* /*_widget*/)
 	new_level_widget_->SetVisibility(false);
 	new_level_widget_->SetModal(false);
 	new_level_widget_->SetPosition(Vector2i(-500, -500));
+	editor_level_->SetName(level_name_editor_->GetText());
 }
 
 void GameStateMachine::EditorWallMode(Widget* /*_widget*/)
@@ -836,7 +837,7 @@ void GameStateMachine::EditorResetClick(Widget* /*_widget*/)
 
 void GameStateMachine::EditorSaveClick(Widget* /*_widget*/)
 {
-	editor_level_->Save("Editor.Level");
+	editor_level_->Save(std::string("Editor - ") + editor_level_->GetName() + ".Level");
 }
 
 /* Main methods */
