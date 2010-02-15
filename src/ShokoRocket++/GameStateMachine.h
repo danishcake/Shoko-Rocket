@@ -146,6 +146,11 @@ private:
 	float fade_timer_;
 	void FadeInOut(float _total_time);
 
+	/* Common */
+	SDL_Surface* render_area_;
+	void CreateRenderArea(Vector2i _level_size, Mode::Enum);
+	Vector2i scroll_limit_;
+
 public:
 	/* Constructors */
 	GameStateMachine();

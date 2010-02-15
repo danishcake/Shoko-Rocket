@@ -296,7 +296,7 @@ void EditLevel::Tick(float _time, Input _input)
 			scroll_offset_.x--;
 		break;
 	case Action::ScrollEast:
-		if(world_->GetSize().x - 12 - scroll_offset_.x > 0)
+		if(scroll_offset_.x < scroll_limit_.x)
 			scroll_offset_.x++;
 		break;
 	case Action::ScrollNorth:
@@ -304,7 +304,7 @@ void EditLevel::Tick(float _time, Input _input)
 			scroll_offset_.y--;
 		break;
 	case Action::ScrollSouth:
-		if(world_->GetSize().y - 9 - scroll_offset_.y > 0)
+		if(scroll_offset_.y < scroll_limit_.y)
 			scroll_offset_.y++;
 		break;
 	}

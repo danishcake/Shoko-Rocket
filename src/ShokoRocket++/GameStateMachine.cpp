@@ -37,7 +37,7 @@ GameStateMachine::GameStateMachine()
 
 	fade_timer_ = 0.0f;
 	total_fade_time_ = 1.0f;
-	
+	render_area_ = NULL;
 }
 
 GameStateMachine::~GameStateMachine()
@@ -283,6 +283,7 @@ void GameStateMachine::MenuLevelSelect(Widget* _widget, std::string _name)
 		} else
 		{
 			puzzle_level_ = boost::shared_ptr<PuzzleLevel>(new PuzzleLevel(rel_path_ + "/" + _name, Settings::GetGridSize()));
+			CreateRenderArea(puzzle_level_->GetLevelSize(), Mode::Puzzle);
 			pend_mode_ = Mode::Puzzle;
 			mode_timer_ = 1.0f;
 			FadeInOut(2.0f);
@@ -475,6 +476,7 @@ void GameStateMachine::PuzzleNextClick(Widget* /*_widget*/)
 	puzzle_index_++;
 	puzzle_index_ %= puzzle_files_.size();
 	puzzle_level_ = boost::shared_ptr<PuzzleLevel>(new PuzzleLevel(rel_path_ + "/" + puzzle_files_[puzzle_index_], Settings::GetGridSize()));
+	CreateRenderArea(puzzle_level_->GetLevelSize(), Mode::Puzzle);
 	arrow_stock_widget_->SetPosition(Vector2i(106, puzzle_level_->GetLevelSize().y * Settings::GetGridSize().y + 20));
 	arrow_hash_ = 0;
 	puzzle_complete_widget_->SetModal(false);
@@ -782,6 +784,7 @@ void GameStateMachine::EditorSizeMMYClick(Widget* /*_widget*/)
 void GameStateMachine::EditorCreateClick(Widget* /*_widget*/)
 {
 	editor_level_ = boost::shared_ptr<EditLevel>(new EditLevel(size_, Settings::GetGridSize()));
+	CreateRenderArea(editor_level_->GetLevelSize(), Mode::Editor);
 	new_level_widget_->SetVisibility(false);
 	new_level_widget_->SetModal(false);
 	new_level_widget_->SetPosition(Vector2i(-500, -500));
@@ -928,40 +931,47 @@ void GameStateMachine::Draw(SDL_Surface* _target)
 		fade = 0;
 	Widget::SetFade(fade);
 
-	std::vector<RenderItem> render_items;
-	switch(mode_)
+	if(render_area_)
 	{
-	case Mode::Editor:
-		if(editor_level_.get() != NULL)
+		SDL_FillRect(render_area_, NULL, SDL_MapRGBA(render_area_->format, 0, 0, 0, 0));
+		std::vector<RenderItem> render_items;
+		switch(mode_)
 		{
-			render_items = editor_level_->Draw();
+		case Mode::Editor:
+			if(editor_level_.get() != NULL)
+			{
+				render_items = editor_level_->Draw();
+			}
+			break;
+		case Mode::Puzzle:
+			if(puzzle_level_.get() != NULL)
+			{
+				render_items = puzzle_level_->Draw();
+			}
+			break;
 		}
-		break;
-	case Mode::Puzzle:
-		if(puzzle_level_.get() != NULL)
+
+		//Sort front to back to prevent overlay issues
+		std::sort(render_items.begin(), render_items.end(), RenderItem::DepthSort<RenderItem>());
+		SDLAnimationFrame::screen_ = render_area_;
+
+
+		BOOST_FOREACH(RenderItem& ri, render_items)
 		{
-			render_items = puzzle_level_->Draw();
+			ri.frame_->Draw(ri.position_);
+			if(ri.position_.x < 0)
+				ri.frame_->Draw(ri.position_ + Vector2f(static_cast<float>(Settings::GetGridSize().x * size_.x), 0));
+			if(ri.position_.x > Settings::GetGridSize().x * size_.x - Settings::GetGridSize().x)
+				ri.frame_->Draw(Vector2f(ri.position_.x - Settings::GetGridSize().x * size_.x, ri.position_.y));
+			if(ri.position_.y < 0)
+				ri.frame_->Draw(ri.position_ + Vector2f(0, static_cast<float>(Settings::GetGridSize().y * size_.y)));
+			if(ri.position_.y > Settings::GetGridSize().y * size_.y - Settings::GetGridSize().y)
+				ri.frame_->Draw(Vector2f(ri.position_.x, ri.position_.y - Settings::GetGridSize().y * size_.y));
 		}
-		break;
+		SDL_Rect game_area_rect;		game_area_rect.x = 138;		game_area_rect.y = 10;		game_area_rect.w = 0;		game_area_rect.h = 0;
+		SDL_BlitSurface(render_area_, NULL, _target, &game_area_rect);	
 	}
 
-	//Sort front to back to prevent overlay issues
-	std::sort(render_items.begin(), render_items.end(), RenderItem::DepthSort<RenderItem>());
-	SDLAnimationFrame::screen_ = _target;
-
-
-	BOOST_FOREACH(RenderItem& ri, render_items)
-	{
-		ri.frame_->Draw(ri.position_);
-		if(ri.position_.x < 0)
-			ri.frame_->Draw(ri.position_ + Vector2f(static_cast<float>(Settings::GetGridSize().x * size_.x), 0));
-		if(ri.position_.x > Settings::GetGridSize().x * size_.x - Settings::GetGridSize().x)
-			ri.frame_->Draw(Vector2f(ri.position_.x - Settings::GetGridSize().x * size_.x, ri.position_.y));
-		if(ri.position_.y < 0)
-			ri.frame_->Draw(ri.position_ + Vector2f(0, static_cast<float>(Settings::GetGridSize().y * size_.y)));
-		if(ri.position_.y > Settings::GetGridSize().y * size_.y - Settings::GetGridSize().y)
-			ri.frame_->Draw(Vector2f(ri.position_.x, ri.position_.y - Settings::GetGridSize().y * size_.y));
-	}
 }
 
 void GameStateMachine::FadeInOut(float _total_time)
@@ -1013,4 +1023,42 @@ void GameStateMachine::LayoutArrows(std::vector<Direction::Enum> _arrows)
 			}
 		}
 	}
+}
+
+void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_affected)
+{
+	if(render_area_)
+	{
+		SDL_FreeSurface(render_area_);
+	}
+	//Limit to screen size
+	Vector2i render_area_size = _level_size;
+	int max_x = (SDL_GetVideoSurface()->w - 138) / Settings::GetGridSize().x;
+	int max_y = (SDL_GetVideoSurface()->h - 74) / Settings::GetGridSize().y;
+	if(render_area_size.x > max_x)
+		render_area_size.x = max_x;
+	if(render_area_size.y > max_y)
+		render_area_size.y = max_y;
+
+	scroll_limit_ = _level_size - render_area_size;
+	switch(_mode_affected)
+	{
+	case Mode::Puzzle: //TODO puzzle scrolling
+		break;
+	case Mode::Editor:
+		editor_level_->SetScrollLimit(scroll_limit_);
+		break;
+	}
+
+
+	SDL_Surface* tsurface = SDL_CreateRGBSurface(SDL_GetVideoSurface()->flags,
+		Settings::GetGridSize().x * render_area_size.x + 1,
+		Settings::GetGridSize().y * render_area_size.y + 1,
+		SDL_GetVideoSurface()->format->BytesPerPixel * 8,
+		SDL_GetVideoSurface()->format->Rmask, 
+		SDL_GetVideoSurface()->format->Gmask, 
+		SDL_GetVideoSurface()->format->Bmask, 
+		SDL_GetVideoSurface()->format->Amask);
+	render_area_ = SDL_DisplayFormatAlpha(tsurface);
+	SDL_FreeSurface(tsurface);
 }

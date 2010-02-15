@@ -11,28 +11,10 @@
 #include "Widget.h"
 
 SDL_Surface* p_screen = NULL;
-SDL_Surface* p_game_area = NULL;
 BlittableRect* p_screen_rect = NULL;
 BlittableRect* p_background = NULL;
-SDL_Rect game_area_rect;
 GameStateMachine gsm;
 clock_t ltv_time;
-
-namespace
-{
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	Uint32 rmask = 0xff000000;
-	Uint32 gmask = 0x00ff0000;
-	Uint32 bmask = 0x0000ff00;
-	Uint32 amask = 0x000000ff;
-#else
-	Uint32 rmask = 0x000000ff;
-	Uint32 gmask = 0x0000ff00;
-	Uint32 bmask = 0x00ff0000;
-	Uint32 amask = 0xff000000;
-#endif
-}
-
 
 SDL_Surface* SDL_init()
 {
@@ -97,10 +79,8 @@ bool GameTick()
 void Draw()
 {
 	SDL_FillRect(p_screen, NULL, SDL_MapRGB(p_screen->format, 0, 0, 0));
-	SDL_FillRect(p_game_area, NULL, SDL_MapRGBA(p_game_area->format, 0, 0, 0, 0));
 	p_background->Blit(Vector2i(0, 0), p_screen_rect);
-	gsm.Draw(p_game_area);
-	SDL_BlitSurface(p_game_area, NULL, p_screen, &game_area_rect);
+	gsm.Draw(p_screen);
 	Widget::RenderRoot(p_screen_rect);
 	SDL_Flip(p_screen);
 }
@@ -117,17 +97,6 @@ int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
 		SDLAnimationFrame::screen_ = p_screen;
 		bFinished = (AcquireResources() == false);
 		StandardTextures::LoadTextures();
-
-		SDL_Surface* tsurface = SDL_CreateRGBSurface(SDL_HWSURFACE, 
-			Settings::GetGridSize().x * 12 + 1, Settings::GetGridSize().y * 9 + 1, 32, 
-			rmask, gmask, bmask, amask);
-		p_game_area  = SDL_DisplayFormatAlpha(tsurface);
-		SDL_FreeSurface(tsurface);
-
-		game_area_rect.x = 138;
-		game_area_rect.y = 10;
-		game_area_rect.w = 0;
-		game_area_rect.h = 0;
 	}
 	
 	while(!bFinished)

@@ -28,6 +28,7 @@ protected:
 	float timer_;
 	Vector2f grid_size_;
 	Vector2f scroll_offset_;
+	Vector2i scroll_limit_;
 	
 	bool validated_;
 
@@ -44,4 +45,6 @@ public:
 	std::string GetName(){return world_->GetName();}
 	void Save(std::string _name);
 	Animation* grid_animation_;
+	Vector2i GetLevelSize(){return world_->GetSize();}
+	void SetScrollLimit(Vector2i _scroll_limit){scroll_limit_ = _scroll_limit;}
 };
