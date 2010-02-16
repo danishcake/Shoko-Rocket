@@ -38,6 +38,10 @@ GameStateMachine::GameStateMachine()
 	fade_timer_ = 0.0f;
 	total_fade_time_ = 1.0f;
 	render_area_ = NULL;
+	scroll_left_widget_ = NULL;
+	scroll_right_widget_ = NULL;
+	scroll_up_widget_ = NULL;
+	scroll_down_widget_ = NULL;
 }
 
 GameStateMachine::~GameStateMachine()
@@ -372,6 +376,22 @@ void GameStateMachine::MenuLevelBrowerPageChange(Widget* /*_widget*/, int /*_old
 
 void GameStateMachine::SetupPuzzle()
 {
+	Widget* scroll_down = new Widget("ScrollDown.png");
+	scroll_down->SetPosition(Vector2i(138, 9 * Settings::GetGridSize().y + 11));
+	scroll_down->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollDownClick, this, _1));
+
+	Widget* scroll_up = new Widget("ScrollUp.png");
+	scroll_up->SetPosition(Vector2i(138, 0));
+	scroll_up->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollUpClick, this, _1));
+
+	Widget* scroll_left = new Widget("ScrollLeft.png");
+	scroll_left->SetPosition(Vector2i(128, 10));
+	scroll_left->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollLeftClick, this, _1));
+
+	Widget* scroll_right = new Widget("ScrollRight.png");
+	scroll_right->SetPosition(Vector2i(12 * Settings::GetGridSize().x + 138 + 1, 10));
+	scroll_right->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollRightClick, this, _1));
+
 	arrow_stock_widget_ = new Widget("ArrowsArea.png");
 	arrow_stock_widget_->SetPosition(Vector2i(106, puzzle_level_->GetLevelSize().y * Settings::GetGridSize().y + 20));
 	arrow_stock_widget_->SetRejectsFocus(true);
@@ -447,6 +467,11 @@ void GameStateMachine::TeardownPuzzle()
 {
 	Widget::ClearRoot();
 	arrow_stock_widget_ = NULL;
+	//This prevents double freeing
+	scroll_left_widget_ = NULL;
+	scroll_right_widget_ = NULL;
+	scroll_up_widget_ = NULL;
+	scroll_down_widget_ = NULL;
 }
 
 /* Puzzle events */
@@ -572,27 +597,10 @@ void GameStateMachine::PuzzleScrollRightClick(Widget* /*_widget*/)
 /* Editor methods */
 void GameStateMachine::SetupEditor()
 {
-	Widget* scroll_down = new Widget("ScrollDown.png");
-	scroll_down->SetPosition(Vector2i(138, 9 * Settings::GetGridSize().y + 11));
-	scroll_down->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollDownClick, this, _1));
-
-	Widget* scroll_up = new Widget("ScrollUp.png");
-	scroll_up->SetPosition(Vector2i(138, 0));
-	scroll_up->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollUpClick, this, _1));
-
-	Widget* scroll_left = new Widget("ScrollLeft.png");
-	scroll_left->SetPosition(Vector2i(128, 10));
-	scroll_left->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollLeftClick, this, _1));
-
-	Widget* scroll_right = new Widget("ScrollRight.png");
-	scroll_right->SetPosition(Vector2i(12 * Settings::GetGridSize().x + 138 + 1, 10));
-	scroll_right->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollRightClick, this, _1));
-
 	GameGridWidget* grid_widget = new GameGridWidget(Vector2i(12, 9), Vector2i(32, 32));
 	grid_widget->SetPosition(Vector2i(138, 10));
 	grid_widget->OnGridClick.connect(boost::bind(&GameStateMachine::PuzzleGridClick, this, _1, _2));
 	grid_widget->OnGridGesture.connect(boost::bind(&GameStateMachine::PuzzleGridGesture, this, _1, _2));
-
 
 	size_ = Vector2i(12, 9);
 	new_level_widget_ = new Widget("Blank384x384.png");
@@ -732,6 +740,11 @@ void GameStateMachine::SetupEditor()
 void GameStateMachine::TeardownEditor()
 {
 	Widget::ClearRoot();
+	//This prevents double freeing
+	scroll_left_widget_ = NULL;
+	scroll_right_widget_ = NULL;
+	scroll_up_widget_ = NULL;
+	scroll_down_widget_ = NULL;
 }
 
 void GameStateMachine::ProcessEditor(float _timespan)
@@ -844,6 +857,65 @@ void GameStateMachine::EditorSaveClick(Widget* /*_widget*/)
 }
 
 /* Main methods */
+void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_affected)
+{
+	if(render_area_)
+	{
+		SDL_FreeSurface(render_area_);
+	}
+	//Limit to screen size
+	Vector2i render_area_size = _level_size;
+	int max_x = (SDL_GetVideoSurface()->w - 138) / Settings::GetGridSize().x;
+	int max_y = (SDL_GetVideoSurface()->h - 74) / Settings::GetGridSize().y;
+	if(render_area_size.x > max_x)
+		render_area_size.x = max_x;
+	if(render_area_size.y > max_y)
+		render_area_size.y = max_y;
+
+	scroll_limit_ = _level_size - render_area_size;
+	switch(_mode_affected)
+	{
+	case Mode::Puzzle: //TODO puzzle scrolling
+		break;
+	case Mode::Editor:
+		editor_level_->SetScrollLimit(scroll_limit_);
+		break;
+	}
+
+
+	SDL_Surface* tsurface = SDL_CreateRGBSurface(SDL_GetVideoSurface()->flags,
+		Settings::GetGridSize().x * render_area_size.x + 1,
+		Settings::GetGridSize().y * render_area_size.y + 1,
+		SDL_GetVideoSurface()->format->BytesPerPixel * 8,
+		SDL_GetVideoSurface()->format->Rmask, 
+		SDL_GetVideoSurface()->format->Gmask, 
+		SDL_GetVideoSurface()->format->Bmask, 
+		SDL_GetVideoSurface()->format->Amask);
+	render_area_ = SDL_DisplayFormatAlpha(tsurface);
+	SDL_FreeSurface(tsurface);
+
+	if(scroll_left_widget_)
+		delete scroll_left_widget_;
+	if(scroll_right_widget_)
+		delete scroll_right_widget_;
+	if(scroll_up_widget_)
+		delete scroll_up_widget_;
+	if(scroll_down_widget_)
+		delete scroll_down_widget_;
+	scroll_left_widget_ = new Widget(VerticalTile("Scroll_LeftTop.png", "Scroll_LeftCentre.png", "Scroll_LeftBottom.png"), Settings::GetGridSize().y * render_area_size.y);
+	scroll_left_widget_->SetPosition(Vector2i(128, 10));
+	scroll_left_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollLeftClick, this, _1));
+	scroll_right_widget_ = new Widget(VerticalTile("Scroll_RightTop.png", "Scroll_RightCentre.png", "Scroll_RightBottom.png"), Settings::GetGridSize().y * render_area_size.y);
+	scroll_right_widget_->SetPosition(Vector2i(render_area_size.x * Settings::GetGridSize().x + 138 + 1, 10));
+	scroll_right_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollRightClick, this, _1));
+	scroll_down_widget_ = new Widget(HorizontalTile("Scroll_DownLeft.png", "ScrollDownCentre.png", "ScrollDownRight.png"), Settings::GetGridSize().x * render_area_size.x);
+	scroll_down_widget_->SetPosition(Vector2i(138, render_area_size.y * Settings::GetGridSize().y + 11));
+	scroll_down_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollDownClick, this, _1));
+	scroll_up_widget_ = new Widget(HorizontalTile("Scroll_UpLeft.png", "ScrollUpCentre.png", "ScrollUpRight.png"), Settings::GetGridSize().x * render_area_size.x);
+	scroll_up_widget_->SetPosition(Vector2i(138, 0));
+	scroll_up_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollUpClick, this, _1));
+
+}
 
 bool GameStateMachine::Tick(float _timespan)
 {
@@ -1025,40 +1097,3 @@ void GameStateMachine::LayoutArrows(std::vector<Direction::Enum> _arrows)
 	}
 }
 
-void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_affected)
-{
-	if(render_area_)
-	{
-		SDL_FreeSurface(render_area_);
-	}
-	//Limit to screen size
-	Vector2i render_area_size = _level_size;
-	int max_x = (SDL_GetVideoSurface()->w - 138) / Settings::GetGridSize().x;
-	int max_y = (SDL_GetVideoSurface()->h - 74) / Settings::GetGridSize().y;
-	if(render_area_size.x > max_x)
-		render_area_size.x = max_x;
-	if(render_area_size.y > max_y)
-		render_area_size.y = max_y;
-
-	scroll_limit_ = _level_size - render_area_size;
-	switch(_mode_affected)
-	{
-	case Mode::Puzzle: //TODO puzzle scrolling
-		break;
-	case Mode::Editor:
-		editor_level_->SetScrollLimit(scroll_limit_);
-		break;
-	}
-
-
-	SDL_Surface* tsurface = SDL_CreateRGBSurface(SDL_GetVideoSurface()->flags,
-		Settings::GetGridSize().x * render_area_size.x + 1,
-		Settings::GetGridSize().y * render_area_size.y + 1,
-		SDL_GetVideoSurface()->format->BytesPerPixel * 8,
-		SDL_GetVideoSurface()->format->Rmask, 
-		SDL_GetVideoSurface()->format->Gmask, 
-		SDL_GetVideoSurface()->format->Bmask, 
-		SDL_GetVideoSurface()->format->Amask);
-	render_area_ = SDL_DisplayFormatAlpha(tsurface);
-	SDL_FreeSurface(tsurface);
-}

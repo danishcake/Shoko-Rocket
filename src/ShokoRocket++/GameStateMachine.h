@@ -151,6 +151,11 @@ private:
 	void CreateRenderArea(Vector2i _level_size, Mode::Enum);
 	Vector2i scroll_limit_;
 
+	Widget* scroll_left_widget_;
+	Widget* scroll_right_widget_;
+	Widget* scroll_up_widget_;
+	Widget* scroll_down_widget_;
+
 public:
 	/* Constructors */
 	GameStateMachine();

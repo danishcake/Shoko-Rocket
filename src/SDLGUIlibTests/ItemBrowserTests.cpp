@@ -6,8 +6,6 @@ using std::string;
 
 TEST_FIXTURE(SDL_fixture, ItemBrowserTakesListOfFiles)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
  	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -27,8 +25,6 @@ TEST_FIXTURE(SDL_fixture, ItemBrowserTakesListOfFiles)
 
 TEST_FIXTURE(SDL_fixture, ItemBrowserChildren)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -50,8 +46,6 @@ TEST_FIXTURE(SDL_fixture, ItemBrowserChildren)
 
 TEST_FIXTURE(SDL_fixture, ItemBrowerPages)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -88,8 +82,6 @@ TEST_FIXTURE(SDL_fixture, ItemBrowerPages)
 
 TEST_FIXTURE(SDL_fixture, ItemBrowserEmpty)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -129,8 +121,6 @@ namespace
 
 TEST_FIXTURE(SDL_fixture, ItemBrowserEvents)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{

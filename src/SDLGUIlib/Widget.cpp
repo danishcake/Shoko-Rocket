@@ -43,7 +43,6 @@ Widget::Widget(void)
 	allow_edit_ = false;
 	root_.push_back(this);
 	all_.push_back(this);
-	
 }
 
 Widget::Widget(std::string _filename)
@@ -80,6 +79,88 @@ Widget::Widget(BlittableRect* _blittable)
 	blit_rect_ = new BlittableRect(back_rect_->GetSize());
 	
 	size_ = blit_rect_->GetSize();
+	left_link_ = NULL;
+	right_link_ = NULL;
+	up_link_ = NULL;
+	down_link_ = NULL;
+	left_inner_link_ = NULL;
+	right_inner_link_ = NULL;
+	up_inner_link_ = NULL;
+	down_inner_link_ = NULL;
+	parent_ = NULL;
+	invalidated_ = true;
+	rejects_focus_ = false;
+	allow_drag_ = false;
+	depressed_ = false;
+	ignore_dest_transparency_ = false;
+	visible_ = true;
+	allow_edit_ = false;
+	root_.push_back(this);
+	all_.push_back(this);
+}
+
+Widget::Widget(VerticalTile _tiles, int _height)
+{
+	//Width is taken from top tile
+	BlittableRect toptile(_tiles.top);
+	BlittableRect middletile(_tiles.middle);
+	BlittableRect bottomtile(_tiles.bottom);
+
+	position_ = Vector2i(0, 0);
+	size_ = Vector2i(toptile.GetSize().x, _height);
+	blit_rect_ = new BlittableRect(size_);
+	back_rect_ = new BlittableRect(size_);
+
+	back_rect_->Fill(0, 0, 0, 0);
+	toptile.RawBlit(Vector2i(0,0), back_rect_);
+	int center_reps = ceil(static_cast<double>(back_rect_->GetSize().y - toptile.GetSize().y - bottomtile.GetSize().y) / static_cast<double>(middletile.GetSize().y));
+	for(int i = 0; i < center_reps; i++)
+	{
+		middletile.RawBlit(Vector2i(0, i * middletile.GetSize().y + toptile.GetSize().y), back_rect_);
+	}
+	bottomtile.RawBlit(Vector2i(0, back_rect_->GetSize().y - bottomtile.GetSize().y), back_rect_);
+
+	left_link_ = NULL;
+	right_link_ = NULL;
+	up_link_ = NULL;
+	down_link_ = NULL;
+	left_inner_link_ = NULL;
+	right_inner_link_ = NULL;
+	up_inner_link_ = NULL;
+	down_inner_link_ = NULL;
+	parent_ = NULL;
+	invalidated_ = true;
+	rejects_focus_ = false;
+	allow_drag_ = false;
+	depressed_ = false;
+	ignore_dest_transparency_ = false;
+	visible_ = true;
+	allow_edit_ = false;
+	root_.push_back(this);
+	all_.push_back(this);
+}
+
+Widget::Widget(HorizontalTile _tiles, int _width)
+{
+	//Height is taken from left tile
+	BlittableRect lefttile(_tiles.left);
+	BlittableRect middletile(_tiles.middle);
+	BlittableRect righttile(_tiles.right);
+
+	position_ = Vector2i(0, 0);
+	size_ = Vector2i(_width, lefttile.GetSize().y);
+	blit_rect_ = new BlittableRect(size_);
+	back_rect_ = new BlittableRect(size_);
+
+	back_rect_->Fill(0, 0, 0, 0);
+	lefttile.RawBlit(Vector2i(0,0), back_rect_);
+	int center_reps = ceil(static_cast<double>(back_rect_->GetSize().x - lefttile.GetSize().x - righttile.GetSize().x) / static_cast<double>(middletile.GetSize().x));
+	for(int i = 0; i < center_reps; i++)
+	{
+		middletile.RawBlit(Vector2i(i * middletile.GetSize().x + lefttile.GetSize().x, 0), back_rect_);
+	}
+	righttile.RawBlit(Vector2i(back_rect_->GetSize().x - righttile.GetSize().x, 0), back_rect_);
+
 	left_link_ = NULL;
 	right_link_ = NULL;
 	up_link_ = NULL;

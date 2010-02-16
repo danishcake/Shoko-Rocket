@@ -3,8 +3,6 @@
 
 TEST_FIXTURE(SDL_fixture, WidgetDefaults)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{

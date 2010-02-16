@@ -24,6 +24,8 @@ protected:
 	PuzzleMode::Enum puzzle_state_;
 	float timer_;
 	Vector2f grid_size_;
+	Vector2f scroll_offset_;
+	Vector2i scroll_limit_;
 public:
 	PuzzleLevel(std::string _name, Vector2f _grid_size);
 	~PuzzleLevel(void);
@@ -36,4 +38,5 @@ public:
 	Vector2i GetLevelSize(){return world_->GetSize();}
 	std::vector<Direction::Enum> GetArrows(){return world_->GetArrows();}
 	int PuzzleLevel::ComputeArrowHash();
+	void SetScrollLimit(Vector2i _scroll_limit){scroll_limit_ = _scroll_limit;}
 };

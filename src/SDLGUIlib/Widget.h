@@ -6,6 +6,7 @@
 #include "Event.h"
 #include "TextAlignment.h"
 #include "BlittableRect.h"
+#include "Tiling.h"
 #include <sdl.h>
 
 //Widgets should not be used on the stack - they are tracked automatically!
@@ -69,6 +70,8 @@ public:
 	Widget(void);
 	Widget(std::string _filename);
 	Widget(BlittableRect* _blittable);
+	Widget(VerticalTile _tiles, int _height);
+	Widget(HorizontalTile _tiles, int _width);
 	virtual ~Widget(void);
 	static Widget* GetWidgetWithFocus(){return widget_with_focus_;}
 
@@ -181,5 +184,3 @@ public:
 	static void SetFade(float _fade_amount);
 	static float GetFade(){return screen_fade_;}
 };
-
-

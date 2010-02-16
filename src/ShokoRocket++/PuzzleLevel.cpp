@@ -103,6 +103,26 @@ void PuzzleLevel::Tick(float _time, Input _input)
 		}
 		break;
 	}
+
+	switch(_input.action)
+	{
+	case Action::ScrollWest:
+		if(scroll_offset_.x > 0)
+			scroll_offset_.x--;
+		break;
+	case Action::ScrollEast:
+		if(scroll_offset_.x < scroll_limit_.x)
+			scroll_offset_.x++;
+		break;
+	case Action::ScrollNorth:
+		if(scroll_offset_.y > 0)
+			scroll_offset_.y--;
+		break;
+	case Action::ScrollSouth:
+		if(scroll_offset_.y < scroll_limit_.y)
+			scroll_offset_.y++;
+		break;
+	}
 }
 
 vector<RenderItem> PuzzleLevel::Draw()
@@ -237,6 +257,7 @@ vector<RenderItem> PuzzleLevel::Draw()
 
 	BOOST_FOREACH(RenderItem& render_item, draw_list)
 	{
+		render_item.position_ -= scroll_offset_;
 		render_item.position_ *= grid_size_;
 		render_item.depth *= grid_size_.y;
 	}

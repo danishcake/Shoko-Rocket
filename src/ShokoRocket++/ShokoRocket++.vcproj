@@ -626,6 +626,58 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="Scrollparts"
+					>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_DownCentre.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_DownLeft.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_DownRight.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_LeftBottom.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_LeftCentre.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_LeftTop.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_RightBottom.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_RightCentre.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_RightTop.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_UpCentre.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_UpLeft.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Scroll_UpRight.png"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Arrows"

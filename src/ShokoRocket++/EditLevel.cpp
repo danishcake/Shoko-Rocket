@@ -443,10 +443,6 @@ vector<RenderItem> EditLevel::Draw()
 	BOOST_FOREACH(RenderItem& render_item, draw_list)
 	{
 		render_item.position_ -= scroll_offset_;
-	}
-
-	BOOST_FOREACH(RenderItem& render_item, draw_list)
-	{
 		render_item.position_ *= grid_size_;
 		render_item.depth *= grid_size_.y;
 	}

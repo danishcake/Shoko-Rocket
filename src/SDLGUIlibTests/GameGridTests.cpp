@@ -21,8 +21,6 @@ namespace
 
 TEST_FIXTURE(SDL_fixture, GameGridBasics)
 {
-	UNITTEST_TIME_CONSTRAINT(500);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -39,8 +37,6 @@ TEST_FIXTURE(SDL_fixture, GameGridBasics)
 
 TEST_FIXTURE(SDL_fixture, GameGridEvents)
 {
-	UNITTEST_TIME_CONSTRAINT(500);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -70,7 +66,6 @@ TEST_FIXTURE(SDL_fixture, KeypressEvents)
 	{
 		GameGridWidget* p_widget = NULL;
 		{
-			UNITTEST_TIME_CONSTRAINT(500);
 			p_widget = new GameGridWidget(Vector2i(12, 9), Vector2i(32,32));
 		}
 	
