@@ -9,11 +9,16 @@ Widget* Widget::widget_with_depression_ = NULL;
 Widget* Widget::widget_with_drag_ = NULL;
 Widget* Widget::widget_with_modal_ = NULL;
 Widget* Widget::widget_with_edit_ = NULL;
+bool Widget::event_lock_ = false;
+
 DragEventArgs Widget::drag_event_args_ = DragEventArgs();
 Vector2i Widget::drag_start_position_ = Vector2i(0, 0);
 
 vector<Widget*> Widget::root_ = vector<Widget*>();
 vector<Widget*> Widget::all_ = vector<Widget*>();
+vector<Widget*> Widget::pending_root_ = vector<Widget*>();
+vector<Widget*> Widget::pending_all_ = vector<Widget*>();
+
 float Widget::screen_fade_ = 0.0f;
 BlittableRect* Widget::screen_fade_rect_ = NULL;
 BlittableRect* Widget::edit_cursor_rect_ = NULL;
@@ -41,8 +46,15 @@ Widget::Widget(void)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
-	root_.push_back(this);
-	all_.push_back(this);
+	if(event_lock_)
+	{
+		pending_root_.push_back(this);
+		pending_all_.push_back(this);
+	} else
+	{
+		root_.push_back(this);
+		all_.push_back(this);
+	}
 }
 
 Widget::Widget(std::string _filename)
@@ -68,8 +80,15 @@ Widget::Widget(std::string _filename)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
-	root_.push_back(this);
-	all_.push_back(this);
+	if(event_lock_)
+	{
+		pending_root_.push_back(this);
+		pending_all_.push_back(this);
+	} else
+	{
+		root_.push_back(this);
+		all_.push_back(this);
+	}
 }
 
 Widget::Widget(BlittableRect* _blittable)
@@ -95,8 +114,15 @@ Widget::Widget(BlittableRect* _blittable)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
-	root_.push_back(this);
-	all_.push_back(this);
+	if(event_lock_)
+	{
+		pending_root_.push_back(this);
+		pending_all_.push_back(this);
+	} else
+	{
+		root_.push_back(this);
+		all_.push_back(this);
+	}
 }
 
 Widget::Widget(VerticalTile _tiles, int _height)
@@ -136,8 +162,15 @@ Widget::Widget(VerticalTile _tiles, int _height)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
-	root_.push_back(this);
-	all_.push_back(this);
+	if(event_lock_)
+	{
+		pending_root_.push_back(this);
+		pending_all_.push_back(this);
+	} else
+	{
+		root_.push_back(this);
+		all_.push_back(this);
+	}
 }
 
 Widget::Widget(HorizontalTile _tiles, int _width)
@@ -177,14 +210,24 @@ Widget::Widget(HorizontalTile _tiles, int _width)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
-	root_.push_back(this);
-	all_.push_back(this);
+	if(event_lock_)
+	{
+		pending_root_.push_back(this);
+		pending_all_.push_back(this);
+	} else
+	{
+		root_.push_back(this);
+		all_.push_back(this);
+	}
 }
 
 Widget::~Widget(void)
 {
 	root_.erase(std::remove(root_.begin(), root_.end(), this), root_.end());
 	all_.erase(std::remove(all_.begin(), all_.end(), this), all_.end());
+	pending_root_.erase(std::remove(pending_root_.begin(), pending_root_.end(), this), pending_root_.end());
+	pending_all_.erase(std::remove(pending_all_.begin(), pending_all_.end(), this), pending_all_.end());
+
 	if(widget_with_focus_ == this)
 		widget_with_focus_ = NULL;
 	for(vector<Widget*>::iterator it = children_.begin(); it != children_.end(); ++it)
@@ -214,24 +257,41 @@ vector<Widget*>& Widget::GetChildren()
 
 void Widget::AddChild(Widget* _widget)
 {
-	root_.erase(std::remove(root_.begin(), root_.end(), _widget), root_.end());
-	children_.push_back(_widget);
+	if(event_lock_)
+	{
+		pending_root_.erase(std::remove(pending_root_.begin(), pending_root_.end(), _widget), pending_root_.end());
+		pending_children_.push_back(_widget);
+	} else
+	{
+		root_.erase(std::remove(root_.begin(), root_.end(), _widget), root_.end());
+		children_.push_back(_widget);
+	}
 	_widget->SetParent(this);
 	Invalidate();
 }
 
+/* Limitation, can only erase pending children while locked */
 void Widget::RemoveChild(Widget* _widget)
 {
 	//TODO potential bug if widget removed from non parent
-	root_.push_back(_widget);
-	children_.erase(std::remove(children_.begin(), children_.end(), _widget));
+	if(event_lock_)
+	{
+		pending_root_.push_back(_widget);
+		pending_children_.erase(std::remove(pending_children_.begin(), pending_children_.end(), _widget), pending_children_.end());
+	} else
+	{
+		root_.push_back(_widget);
+		children_.erase(std::remove(children_.begin(), children_.end(), _widget), children_.end());
+	}	
 	Invalidate();
 }
 
 void Widget::ClearChildren()
 {
 	std::vector<Widget*> detached = children_;
+	detached.insert(detached.begin(), pending_children_.begin(), pending_children_.begin());
 	children_.clear();
+	pending_children_.clear();
 	for(std::vector<Widget*>::iterator it = detached.begin(); it != detached.end(); ++it)
 	{
 		delete *it;
@@ -668,9 +728,17 @@ void Widget::Invalidate()
 	invalidated_ = true;
 }
 
+void Widget::InsertPending()
+{
+	children_.insert(children_.begin(), pending_children_.begin(), pending_children_.end());
+	pending_children_.clear();
+}
+
+
 void Widget::ClearRoot()
 {
 	vector<Widget*> root_copy = root_; //Make a copy - ~Widget removes itself from the list, invalidating iterators etc
+	root_copy.insert(root_copy.end(), pending_root_.begin(), pending_root_.end());
 	for(vector<Widget*>::iterator it = root_copy.begin(); it != root_copy.end(); ++it)
 	{
 		delete (*it);
@@ -728,6 +796,7 @@ void Widget::RenderRoot(BlittableRect* _screen)
 
 void Widget::DistributeSDLEvents(SDL_Event* event)
 {
+	event_lock_ = true;
 	Event e;
 	if(event->type == SDL_MOUSEBUTTONUP)
 	{
@@ -875,6 +944,18 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		if(focus)
 			focus->HandleEvent(e);
 	}
+	event_lock_ = false;
+
+	/* Merge widgets created during this callback */
+	all_.insert(all_.end(), pending_all_.begin(), pending_all_.end());
+	pending_all_.clear();
+
+	for(std::vector<Widget*>::iterator it = all_.begin(); it != all_.end(); ++it)
+	{
+		(*it)->InsertPending();
+	}	
+	root_.insert(root_.end(), pending_root_.begin(), pending_root_.end());
+	pending_root_.clear();
 }
 
 Vector2i Widget::GetGlobalPosition()

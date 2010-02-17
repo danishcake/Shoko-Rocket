@@ -908,10 +908,10 @@ void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_a
 	scroll_right_widget_ = new Widget(VerticalTile("Scroll_RightTop.png", "Scroll_RightCentre.png", "Scroll_RightBottom.png"), Settings::GetGridSize().y * render_area_size.y);
 	scroll_right_widget_->SetPosition(Vector2i(render_area_size.x * Settings::GetGridSize().x + 138 + 1, 10));
 	scroll_right_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollRightClick, this, _1));
-	scroll_down_widget_ = new Widget(HorizontalTile("Scroll_DownLeft.png", "ScrollDownCentre.png", "ScrollDownRight.png"), Settings::GetGridSize().x * render_area_size.x);
+	scroll_down_widget_ = new Widget(HorizontalTile("Scroll_DownLeft.png", "Scroll_DownCentre.png", "Scroll_DownRight.png"), Settings::GetGridSize().x * render_area_size.x);
 	scroll_down_widget_->SetPosition(Vector2i(138, render_area_size.y * Settings::GetGridSize().y + 11));
 	scroll_down_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollDownClick, this, _1));
-	scroll_up_widget_ = new Widget(HorizontalTile("Scroll_UpLeft.png", "ScrollUpCentre.png", "ScrollUpRight.png"), Settings::GetGridSize().x * render_area_size.x);
+	scroll_up_widget_ = new Widget(HorizontalTile("Scroll_UpLeft.png", "Scroll_UpCentre.png", "Scroll_UpRight.png"), Settings::GetGridSize().x * render_area_size.x);
 	scroll_up_widget_->SetPosition(Vector2i(138, 0));
 	scroll_up_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollUpClick, this, _1));
 

@@ -18,6 +18,7 @@ protected:
 	Vector2i position_;
 	Vector2i size_;
 	vector<Widget*> children_;
+	vector<Widget*> pending_children_;
 	Widget* parent_;
 	Widget* left_link_;
 	Widget* right_link_;
@@ -41,7 +42,10 @@ protected:
 	static Vector2i drag_start_position_;
 
 	static vector<Widget*> root_; // The widgets that aren't children
+	static vector<Widget*> pending_root_;
 	static vector<Widget*> all_;  // All the widgets
+	static vector<Widget*> pending_all_;  // All the widgets
+	static bool event_lock_;
 
 	bool invalidated_;
 	bool rejects_focus_;
@@ -58,7 +62,7 @@ protected:
 	static BlittableRect* edit_cursor_rect_;
 
 	static double sum_time_;
-
+	void InsertPending();
 public:
 	/* Typedefs etc */
 	typedef boost::signal<void (Widget*)> WidgetEvent;
@@ -162,7 +166,7 @@ public:
 	static vector<Widget*> GetRoot(){return root_;}
 	static void RenderRoot(BlittableRect* _screen);
 	static void DistributeSDLEvents(SDL_Event* event);
-	static void Tick(float _dt){sum_time_ += _dt;};
+	static void Tick(float _dt){sum_time_ += _dt;}	
 
 	/* Modal widget */
 	static Widget* GetModalWidget(){return widget_with_modal_;}
