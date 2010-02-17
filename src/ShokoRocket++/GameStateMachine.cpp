@@ -287,7 +287,6 @@ void GameStateMachine::MenuLevelSelect(Widget* _widget, std::string _name)
 		} else
 		{
 			puzzle_level_ = boost::shared_ptr<PuzzleLevel>(new PuzzleLevel(rel_path_ + "/" + _name, Settings::GetGridSize()));
-			CreateRenderArea(puzzle_level_->GetLevelSize(), Mode::Puzzle);
 			pend_mode_ = Mode::Puzzle;
 			mode_timer_ = 1.0f;
 			FadeInOut(2.0f);
@@ -376,24 +375,10 @@ void GameStateMachine::MenuLevelBrowerPageChange(Widget* /*_widget*/, int /*_old
 
 void GameStateMachine::SetupPuzzle()
 {
-	Widget* scroll_down = new Widget("ScrollDown.png");
-	scroll_down->SetPosition(Vector2i(138, 9 * Settings::GetGridSize().y + 11));
-	scroll_down->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollDownClick, this, _1));
-
-	Widget* scroll_up = new Widget("ScrollUp.png");
-	scroll_up->SetPosition(Vector2i(138, 0));
-	scroll_up->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollUpClick, this, _1));
-
-	Widget* scroll_left = new Widget("ScrollLeft.png");
-	scroll_left->SetPosition(Vector2i(128, 10));
-	scroll_left->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollLeftClick, this, _1));
-
-	Widget* scroll_right = new Widget("ScrollRight.png");
-	scroll_right->SetPosition(Vector2i(12 * Settings::GetGridSize().x + 138 + 1, 10));
-	scroll_right->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollRightClick, this, _1));
+	CreateRenderArea(puzzle_level_->GetLevelSize(), Mode::Puzzle);
 
 	arrow_stock_widget_ = new Widget("ArrowsArea.png");
-	arrow_stock_widget_->SetPosition(Vector2i(106, puzzle_level_->GetLevelSize().y * Settings::GetGridSize().y + 20));
+	arrow_stock_widget_->SetPosition(Vector2i(126, puzzle_level_->GetLevelSize().y * Settings::GetGridSize().y + 30));
 	arrow_stock_widget_->SetRejectsFocus(true);
 	arrow_hash_ = 0;
 
@@ -865,6 +850,7 @@ void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_a
 	}
 	//Limit to screen size
 	Vector2i render_area_size = _level_size;
+	size_ = _level_size;
 	int max_x = (SDL_GetVideoSurface()->w - 138) / Settings::GetGridSize().x;
 	int max_y = (SDL_GetVideoSurface()->h - 74) / Settings::GetGridSize().y;
 	if(render_area_size.x > max_x)
@@ -914,7 +900,6 @@ void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_a
 	scroll_up_widget_ = new Widget(HorizontalTile("Scroll_UpLeft.png", "Scroll_UpCentre.png", "Scroll_UpRight.png"), Settings::GetGridSize().x * render_area_size.x);
 	scroll_up_widget_->SetPosition(Vector2i(138, 0));
 	scroll_up_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollUpClick, this, _1));
-
 }
 
 bool GameStateMachine::Tick(float _timespan)
