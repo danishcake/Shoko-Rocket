@@ -30,6 +30,7 @@ protected:
 	Widget* down_inner_link_;
 	BlittableRect* blit_rect_;
 	BlittableRect* back_rect_;
+	int z_order_;
 
 	static Widget* widget_with_focus_;
 	static Widget* widget_with_highlight_;
@@ -85,6 +86,8 @@ public:
 	void SetPosition(Vector2i _position);
 	Vector2i GetSize(){return size_;}
 	void SetSize(Vector2i _size);
+	void SetZOrder(int _z_order){z_order_ = _z_order;}
+	int GetZOrder(){return z_order_;}
 
 	/* Children members */
 	vector<Widget*>& GetChildren();

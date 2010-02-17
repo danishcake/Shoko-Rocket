@@ -24,6 +24,17 @@ BlittableRect* Widget::screen_fade_rect_ = NULL;
 BlittableRect* Widget::edit_cursor_rect_ = NULL;
 double Widget::sum_time_ = 0;
 
+template <class list_t> 
+class WidgetZSort: public std::binary_function<list_t, list_t, bool> 
+{
+public:
+	bool operator()(list_t a, list_t b) const
+	{
+		return a->GetZOrder() < b->GetZOrder();
+	}
+};
+
+
 Widget::Widget(void)
 {
 	position_ = Vector2i(0, 0);
@@ -46,6 +57,7 @@ Widget::Widget(void)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
+	z_order_ = 0;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -80,6 +92,7 @@ Widget::Widget(std::string _filename)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
+	z_order_ = 0;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -114,6 +127,7 @@ Widget::Widget(BlittableRect* _blittable)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
+	z_order_ = 0;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -162,6 +176,7 @@ Widget::Widget(VerticalTile _tiles, int _height)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
+	z_order_ = 0;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -210,6 +225,7 @@ Widget::Widget(HorizontalTile _tiles, int _width)
 	ignore_dest_transparency_ = false;
 	visible_ = true;
 	allow_edit_ = false;
+	z_order_ = 0;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -576,6 +592,8 @@ void Widget::Redraw()
 	if(GetModalWidget() && !HasOrInheritsModal())
 		blit_rect_->Fade(0.5f, 0, 0, 0);
 
+	//Sort children by z order
+	std::sort(children_.begin(), children_.end(), WidgetZSort<Widget*>());
 	//Blit in children
 	for(vector<Widget*>::iterator it = children_.begin(); it != children_.end(); ++it)
 	{
@@ -686,7 +704,12 @@ void Widget::SetModal(bool _modal)
 		widget_with_modal_ = NULL;
 	if(_modal)
 		Widget::ClearFocus();
-
+	if(old_modal_widget && old_modal_widget != widget_with_modal_)
+	{
+		old_modal_widget->SetZOrder(old_modal_widget->GetZOrder() - 100000);
+	}
+	if(widget_with_modal_ != old_modal_widget && _modal)
+		SetZOrder(GetZOrder() + 100000);
 	if(widget_with_modal_ != old_modal_widget)
 	{
 		for(std::vector<Widget*>::iterator it = all_.begin(); it != all_.end(); ++it)
@@ -698,6 +721,7 @@ void Widget::SetModal(bool _modal)
 
 void Widget::SetModalWidget(Widget* _widget)
 {
+	/*
 	Widget* old_modal_widget = widget_with_modal_;
 
 	widget_with_modal_ = _widget;
@@ -710,7 +734,8 @@ void Widget::SetModalWidget(Widget* _widget)
 		{
 			(*it)->Invalidate();
 		}
-	}
+	}*/
+	_widget->SetModal(true);
 }
 
 bool Widget::HasOrInheritsModal()
@@ -757,6 +782,7 @@ void Widget::ClearRoot()
 
 void Widget::RenderRoot(BlittableRect* _screen)
 {
+	std::sort(root_.begin(), root_.end(), WidgetZSort<Widget*>());
 	for(vector<Widget*>::iterator it = root_.begin(); it != root_.end(); ++it)
 	{
 		if((*it)->invalidated_)
