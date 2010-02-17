@@ -895,13 +895,13 @@ void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_a
 	SDL_FreeSurface(tsurface);
 
 	if(scroll_left_widget_)
-		delete scroll_left_widget_;
+		scroll_left_widget_->Delete();
 	if(scroll_right_widget_)
-		delete scroll_right_widget_;
+		scroll_right_widget_->Delete();
 	if(scroll_up_widget_)
-		delete scroll_up_widget_;
+		scroll_up_widget_->Delete();
 	if(scroll_down_widget_)
-		delete scroll_down_widget_;
+		scroll_down_widget_->Delete();
 	scroll_left_widget_ = new Widget(VerticalTile("Scroll_LeftTop.png", "Scroll_LeftCentre.png", "Scroll_LeftBottom.png"), Settings::GetGridSize().y * render_area_size.y);
 	scroll_left_widget_->SetPosition(Vector2i(128, 10));
 	scroll_left_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollLeftClick, this, _1));

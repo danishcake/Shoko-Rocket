@@ -31,6 +31,7 @@ protected:
 	BlittableRect* blit_rect_;
 	BlittableRect* back_rect_;
 	int z_order_;
+	bool deletion_due_;
 
 	static Widget* widget_with_focus_;
 	static Widget* widget_with_highlight_;
@@ -43,9 +44,9 @@ protected:
 	static Vector2i drag_start_position_;
 
 	static vector<Widget*> root_; // The widgets that aren't children
-	static vector<Widget*> pending_root_;
 	static vector<Widget*> all_;  // All the widgets
-	static vector<Widget*> pending_all_;  // All the widgets
+	static vector<Widget*> pending_root_; //Pending version are widgets added by a callback
+	static vector<Widget*> pending_all_;
 	static bool event_lock_;
 
 	bool invalidated_;
@@ -64,6 +65,8 @@ protected:
 
 	static double sum_time_;
 	void InsertPending();
+	void DeleteInternal();
+	static void RemoveEventLock();
 public:
 	/* Typedefs etc */
 	typedef boost::signal<void (Widget*)> WidgetEvent;
@@ -78,6 +81,7 @@ public:
 	Widget(VerticalTile _tiles, int _height);
 	Widget(HorizontalTile _tiles, int _width);
 	virtual ~Widget(void);
+	void Delete();
 	static Widget* GetWidgetWithFocus(){return widget_with_focus_;}
 
 	/* Getters and setters */

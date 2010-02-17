@@ -58,6 +58,7 @@ Widget::Widget(void)
 	visible_ = true;
 	allow_edit_ = false;
 	z_order_ = 0;
+	deletion_due_ = false;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -93,6 +94,7 @@ Widget::Widget(std::string _filename)
 	visible_ = true;
 	allow_edit_ = false;
 	z_order_ = 0;
+	deletion_due_ = false;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -128,6 +130,7 @@ Widget::Widget(BlittableRect* _blittable)
 	visible_ = true;
 	allow_edit_ = false;
 	z_order_ = 0;
+	deletion_due_ = false;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -177,6 +180,7 @@ Widget::Widget(VerticalTile _tiles, int _height)
 	visible_ = true;
 	allow_edit_ = false;
 	z_order_ = 0;
+	deletion_due_ = false;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -226,6 +230,7 @@ Widget::Widget(HorizontalTile _tiles, int _width)
 	visible_ = true;
 	allow_edit_ = false;
 	z_order_ = 0;
+	deletion_due_ = false;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -265,6 +270,27 @@ Widget::~Widget(void)
 	delete blit_rect_;
 	delete back_rect_;
 }
+/* Complicated delete setup deserves an explanatory note.
+   Problem is I cannot delete widgets from callbacks as they manipulate all_ and root_,
+   invalidating the iterators. Instead widgets are marked for deletion, and then 
+   automatically deleted once safe with the DeleteInternal method. This removes it from 
+   any parent and frees it, and any children */
+void Widget::Delete()
+{
+	if(event_lock_)
+	{
+		deletion_due_ = true;
+	} else
+		delete this;
+}
+
+void Widget::DeleteInternal()
+{
+	assert(deletion_due_);
+	if(parent_)
+		parent_->RemoveChild(this); //Puts this into root
+	delete this;
+}
 
 vector<Widget*>& Widget::GetChildren()
 {
@@ -281,8 +307,8 @@ void Widget::AddChild(Widget* _widget)
 	{
 		root_.erase(std::remove(root_.begin(), root_.end(), _widget), root_.end());
 		children_.push_back(_widget);
+		_widget->SetParent(this);
 	}
-	_widget->SetParent(this);
 	Invalidate();
 }
 
@@ -755,8 +781,13 @@ void Widget::Invalidate()
 
 void Widget::InsertPending()
 {
-	children_.insert(children_.begin(), pending_children_.begin(), pending_children_.end());
+	children_.insert(children_.end(), pending_children_.begin(), pending_children_.end());
+	for(vector<Widget*>::iterator it = pending_children_.begin(); it != pending_children_.end(); ++it)
+	{
+		(*it)->SetParent(this);
+	}
 	pending_children_.clear();
+
 }
 
 
@@ -766,7 +797,10 @@ void Widget::ClearRoot()
 	root_copy.insert(root_copy.end(), pending_root_.begin(), pending_root_.end());
 	for(vector<Widget*>::iterator it = root_copy.begin(); it != root_copy.end(); ++it)
 	{
-		delete (*it);
+		if(event_lock_)
+			(*it)->Delete();
+		else
+			delete (*it);
 	}
 	assert(root_.size() == 0);
 	widget_with_focus_ = NULL;
@@ -895,7 +929,10 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		e.event.mouse_event.y = event->motion.y;
 		e.event.mouse_event.btns = MouseButton::None;
 	}else
+	{
+		RemoveEventLock();
 		return;
+	}
 
 	/* End mouse dragging */
 	if(e.event_type == EventType::MouseUp && e.event.mouse_event.btns == MouseButton::Left &&
@@ -914,6 +951,7 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		widget_with_drag_ = NULL;
 		widget_with_depression_ = NULL;
 
+		RemoveEventLock();
 		return;
 	}
 
@@ -970,6 +1008,11 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		if(focus)
 			focus->HandleEvent(e);
 	}
+	RemoveEventLock();
+}
+
+void Widget::RemoveEventLock()
+{
 	event_lock_ = false;
 
 	/* Merge widgets created during this callback */
@@ -982,6 +1025,13 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 	}	
 	root_.insert(root_.end(), pending_root_.begin(), pending_root_.end());
 	pending_root_.clear();
+
+	vector<Widget*> all_copy = all_;
+	for(vector<Widget*>::iterator it = all_copy.begin(); it != all_copy.end(); ++it)
+	{
+		if((*it)->deletion_due_)
+			(*it)->DeleteInternal();
+	}
 }
 
 Vector2i Widget::GetGlobalPosition()
