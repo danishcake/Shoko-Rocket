@@ -10,6 +10,7 @@ Widget* Widget::widget_with_drag_ = NULL;
 Widget* Widget::widget_with_modal_ = NULL;
 Widget* Widget::widget_with_edit_ = NULL;
 bool Widget::event_lock_ = false;
+Widget::KeyEvent Widget::OnGlobalKeyUp;
 
 DragEventArgs Widget::drag_event_args_ = DragEventArgs();
 Vector2i Widget::drag_start_position_ = Vector2i(0, 0);
@@ -52,6 +53,7 @@ Widget::Widget(void)
 	parent_ = NULL;
 	invalidated_ = true;
 	rejects_focus_ = false;
+	hides_highlight_ = false;
 	allow_drag_ = false;
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
@@ -88,6 +90,7 @@ Widget::Widget(std::string _filename)
 	parent_ = NULL;
 	invalidated_ = true;
 	rejects_focus_ = false;
+	hides_highlight_ = false;
 	allow_drag_ = false;
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
@@ -124,6 +127,7 @@ Widget::Widget(BlittableRect* _blittable)
 	parent_ = NULL;
 	invalidated_ = true;
 	rejects_focus_ = false;
+	hides_highlight_ = false;
 	allow_drag_ = false;
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
@@ -174,6 +178,7 @@ Widget::Widget(VerticalTile _tiles, int _height)
 	parent_ = NULL;
 	invalidated_ = true;
 	rejects_focus_ = false;
+	hides_highlight_ = false;
 	allow_drag_ = false;
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
@@ -224,6 +229,7 @@ Widget::Widget(HorizontalTile _tiles, int _width)
 	parent_ = NULL;
 	invalidated_ = true;
 	rejects_focus_ = false;
+	hides_highlight_ = false;
 	allow_drag_ = false;
 	depressed_ = false;
 	ignore_dest_transparency_ = false;
@@ -253,6 +259,7 @@ Widget::~Widget(void)
 		widget_with_focus_ = NULL;
 	for(vector<Widget*>::iterator it = children_.begin(); it != children_.end(); ++it)
 	{
+		(*it)->SetParent(NULL);	//Ensures that I don't try to act on a class executing it's destructor
 		delete *it;
 	}
 
@@ -414,7 +421,7 @@ void Widget::HandleEvent(Event _event)
 	if((_event.event_type == EventType::MouseUp || _event.event_type == EventType::MouseMove || _event.event_type == EventType::MouseDown) &&
 		(Collisions2i::PointInRectangle(Vector2i(_event.event.mouse_event.x, _event.event.mouse_event.y), Vector2i(0, 0), GetSize())))
 	{
-		if(_event.event_type == EventType::MouseUp || _event.event_type == EventType::MouseDown)
+		if(_event.event_type == EventType::MouseUp || _event.event_type == EventType::MouseDown || _event.event_type == EventType::MouseMove)
 		{
 			for(vector<Widget*>::iterator it = children_.begin(); it != children_.end(); ++it)
 			{
@@ -484,24 +491,28 @@ void Widget::HandleEvent(Event _event)
 				if(_event.event.mouse_event.x < size_.x && _event.event.mouse_event.x >= 0 &&
 				   _event.event.mouse_event.y < size_.y && _event.event.mouse_event.y >= 0)
 				{
+					MouseEventArgs e;
+					e.x = _event.event.mouse_event.x;
+					e.y = _event.event.mouse_event.y;
+					e.btns = _event.event.mouse_event.btns;
+					OnMouseMove(this, e);
 					SetHighlight();
 					/* Handle start of drag and drop*/
-
-				}
+					
+				}				
 			}
 		}
 
 	}
 	/* Keyboard navigation */
-	Widget* parent_link = NULL;
 	if(_event.event_type == EventType::KeyLeft)
 	{
 		if(this->left_inner_link_)
 			left_inner_link_->SetFocus();
 		else if(left_link_)
 			left_link_->SetFocus();
-		else if((parent_link = GetLeftParentLink()) != NULL)
-			parent_link->SetFocus();
+		else if(GetLeftParentLink())
+			GetLeftParentLink()->SetFocus();
 		else if(parent_)
 			parent_->SetFocus();
 	}
@@ -511,8 +522,8 @@ void Widget::HandleEvent(Event _event)
 			right_inner_link_->SetFocus();
 		else if(right_link_)
 			right_link_->SetFocus();
-		else if((parent_link = GetRightParentLink()) != NULL)
-			parent_link->SetFocus();
+		else if(GetRightParentLink())
+			GetRightParentLink()->SetFocus();
 		else if(parent_)
 			parent_->SetFocus();
 	}
@@ -522,8 +533,8 @@ void Widget::HandleEvent(Event _event)
 			up_inner_link_->SetFocus();
 		else if(up_link_)
 			up_link_->SetFocus();
-		else if((parent_link = GetUpParentLink()) != NULL)
-			parent_link->SetFocus();
+		else if(GetUpParentLink())
+			GetUpParentLink()->SetFocus();
 		else if(parent_)
 			parent_->SetFocus();
 	}
@@ -533,8 +544,8 @@ void Widget::HandleEvent(Event _event)
 			down_inner_link_->SetFocus();
 		else if(down_link_)
 			down_link_->SetFocus();
-		else if((parent_link = GetDownParentLink()) != NULL)
-			parent_link->SetFocus();
+		else if(GetDownParentLink())
+			GetDownParentLink()->SetFocus();
 		else if(parent_)
 			parent_->SetFocus();
 	}
@@ -579,14 +590,16 @@ void Widget::HandleEvent(Event _event)
 				nc = _event.event.key_event.key_code + ((!_event.event.key_event.shift) ? 32 : 0);
 			if(_event.event.key_event.key_code >= 97 && _event.event.key_event.key_code <= 122)
 				nc = _event.event.key_event.key_code + (_event.event.key_event.shift ? -32 : 0);
-			widget_text_.text = widget_text_.text + nc;
+			std::string cur_text = widget_text_.GetText();
+			cur_text = cur_text + nc;
+			widget_text_.SetText(cur_text);
 			Invalidate();
 		}
 		if(_event.event.key_event.key_code == 8) //Backspace
 		{
-			if(widget_text_.text.length() > 0)
+			if(widget_text_.GetText().length() > 0)
 			{
-				widget_text_.text = widget_text_.text.substr(0, widget_text_.text.length() - 1);
+				widget_text_.SetText(widget_text_.GetText().substr(0, widget_text_.GetText().length() - 1));
 				Invalidate();
 			}
 		}
@@ -596,24 +609,40 @@ void Widget::HandleEvent(Event _event)
 void Widget::SetText(std::string _text, TextAlignment::Enum _alignment)
 {
 	bool change = false;
-	change = widget_text_.text != _text || widget_text_.alignment != _alignment;
 
-	widget_text_.alignment = _alignment;
-	widget_text_.text = _text;
+	change = widget_text_.GetText() != _text || widget_text_.GetAlignment() != _alignment;
+
+	widget_text_.SetAlignment(_alignment);
+	widget_text_.SetText(_text);
 
 	if(change)
 		Invalidate();
 }
+void Widget::SetTextWrap(bool _wrap)
+{
+	bool change = false;
+	change = widget_text_.GetAutowrap() != _wrap;
+
+	if(change)
+	{
+		widget_text_.SetAutowrap(_wrap, size_.x / 16);
+		Invalidate();
+	}
+}
+
 
 void Widget::Redraw()
 {
 	//Draw self - puts backbuffer onto front buffer. Use raw blit to copy alpha
 	back_rect_->RawBlit(Vector2i(0,0), blit_rect_);
 	//Superimpose text
-	blit_rect_->BlitText(widget_text_.text, widget_text_.alignment);
-	if(widget_with_focus_ == this)
+	blit_rect_->BlitTextLines(widget_text_.GetTextLines(), widget_text_.GetAlignment());
+	//Do any custom hooked drawing
+	OnDraw(this, blit_rect_);
+
+	if(widget_with_focus_ == this && !hides_highlight_)
 		blit_rect_->Fade(0.25f, 255, 255, 255);
-	if(widget_with_highlight_ == this)
+	if(widget_with_highlight_ == this && !hides_highlight_)
 		blit_rect_->Fade(0.10f, 0, 0, 255);
 	if(GetModalWidget() && !HasOrInheritsModal())
 		blit_rect_->Fade(0.5f, 0, 0, 0);
@@ -674,10 +703,17 @@ void Widget::ClearFocus()
 
 void Widget::SetHighlight()
 {
-	if(Widget::widget_with_highlight_ != this)
+	if(Widget::widget_with_highlight_ != this && widget_with_drag_ != NULL)
 	{
-		drag_event_args_.drag_accepted = false;
-		OnDragEnter(this, &drag_event_args_);
+		
+		if(OnDragEnter.num_slots() > 0)
+		{
+			//DragEventArgs dea2 = drag_event_args_;
+			//dea2.drag_accept
+			drag_event_args_.drag_accepted = false;
+			OnDragEnter(this, &drag_event_args_);
+		}
+		
 	}
 
 	if(rejects_focus_)
@@ -846,7 +882,7 @@ void Widget::RenderRoot(BlittableRect* _screen)
 		if(fmod(sum_time_, 0.5) < 0.25)
 		{
 			Vector2i top_left, bottom_right;
-			widget_with_edit_->blit_rect_->MeasureText(widget_with_edit_->widget_text_.text, widget_with_edit_->widget_text_.alignment, top_left, bottom_right);
+			widget_with_edit_->blit_rect_->MeasureText(widget_with_edit_->widget_text_.GetText(), widget_with_edit_->widget_text_.GetAlignment(), top_left, bottom_right);
 			edit_cursor_rect_->Blit(widget_with_edit_->GetGlobalPosition() + Vector2i(bottom_right.x, bottom_right.y), _screen);
 		}
 		
@@ -858,7 +894,7 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 {
 	event_lock_ = true;
 	Event e;
-	if(event->type == SDL_MOUSEBUTTONUP)
+	if(event->type == SDL_MOUSEBUTTONUP || event->type == SDL_MOUSEBUTTONDOWN)
 	{
 		e.event.mouse_event.x = event->button.x;
 		e.event.mouse_event.y = event->button.y;
@@ -867,17 +903,10 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 													   ((event->button.button == SDL_BUTTON_MIDDLE) ? MouseButton::Middle : MouseButton::None) |
 													   ((event->button.button == SDL_BUTTON_WHEELUP) ? MouseButton::ScrollUp : MouseButton::None) |
 													   ((event->button.button == SDL_BUTTON_WHEELDOWN) ? MouseButton::ScrollDown : MouseButton::None));
-		e.event_type = EventType::MouseUp;
-	}  else if(event->type == SDL_MOUSEBUTTONDOWN)
-	{
-		e.event.mouse_event.x = event->button.x;
-		e.event.mouse_event.y = event->button.y;
-		e.event.mouse_event.btns = (MouseButton::Enum)(((event->button.button == SDL_BUTTON_LEFT) ? MouseButton::Left : MouseButton::None) |
-													   ((event->button.button == SDL_BUTTON_RIGHT) ? MouseButton::Right : MouseButton::None) |
-													   ((event->button.button == SDL_BUTTON_MIDDLE) ? MouseButton::Middle : MouseButton::None) |
-													   ((event->button.button == SDL_BUTTON_WHEELUP) ? MouseButton::ScrollUp : MouseButton::None) |
-													   ((event->button.button == SDL_BUTTON_WHEELDOWN) ? MouseButton::ScrollDown : MouseButton::None));
-		e.event_type = EventType::MouseDown;
+		if(event->type == SDL_MOUSEBUTTONDOWN)
+			e.event_type = EventType::MouseDown;
+		else
+			e.event_type = EventType::MouseUp;
 	} else if(event->type == SDL_KEYUP)
 	{
 		if(event->key.keysym.sym == SDLK_LEFT)
@@ -945,6 +974,10 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		{
 			drag_event_args_.x = e.event.mouse_event.x - drag_start_position_.x;
 			drag_event_args_.y = e.event.mouse_event.y - drag_start_position_.y;
+			drag_event_args_.sx = drag_start_position_.x - widget_with_drag_->GetPosition().x;
+			drag_event_args_.sy = drag_start_position_.y - widget_with_drag_->GetPosition().y;
+			drag_event_args_.ex = e.event.mouse_event.x - widget_with_drag_->GetPosition().x;
+			drag_event_args_.ey = e.event.mouse_event.y - widget_with_drag_->GetPosition().y;
 			widget_with_drag_->OnDragReset(widget_with_drag_, &drag_event_args_);
 		}
 
@@ -1007,6 +1040,10 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		Widget* focus = Widget::GetWidgetWithFocus();
 		if(focus)
 			focus->HandleEvent(e);
+
+		KeyPressEventArgs kp_args;
+		kp_args.key_code = e.event.key_event.key_code;
+		Widget::OnGlobalKeyUp(NULL, kp_args);
 	}
 	RemoveEventLock();
 }

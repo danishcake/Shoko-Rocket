@@ -134,6 +134,7 @@ BlittableRect::BlittableRect(std::string _filename)
 	{
 		error_occurred_ = true;
 		Logger::ErrorOut() << "Unable to load image " << _filename << "\n";
+		size_ = Vector2i(32, 32);
 		return; //Oh shit, TODO errors here
 	}
 	SDL_Surface* conv_surface = SDL_DisplayFormatAlpha(surface_);
@@ -378,6 +379,113 @@ void BlittableRect::BlitText(std::string _text, TextAlignment::Enum _alignment)
 		dest_rect.h = font_height;
 		SDL_BlitSurface(font, &src_rect, surface_, &dest_rect);
 		out_x += 16;
+	}
+}
+void BlittableRect::BlitTextLines(std::vector<std::string> _text_lines, TextAlignment::Enum _alignment)
+{
+	if(!font)
+	{
+		font = IMG_Load("Animations/Font.png");
+	}
+	if(!font || font->w != 256 || font->h != 144)
+	{
+		//TODO error
+		Logger::ErrorOut() << "Unable to font image  Animation/Font.png\n";
+		return;
+	}
+	int init_out_x = 0;
+	int init_out_y = 0;
+	const int font_width = 16;
+	const int font_height = 24;
+	int longest_line = 0;
+	for(std::vector<std::string>::iterator it = _text_lines.begin(); it != _text_lines.end(); ++it)
+	{
+		if((int)it->length() > longest_line)
+			longest_line = (int)it->length();
+	}
+
+	switch(_alignment)
+	{
+	case TextAlignment::TopLeft:
+		init_out_x = 4;
+		init_out_y = 4;
+		break;
+	case TextAlignment::Top:
+		init_out_x = static_cast<int>((size_.x/2) - longest_line * (font_width / 2));
+		init_out_y = 4;
+		break;
+	case TextAlignment::TopRight:
+		init_out_x = static_cast<int>(size_.x - longest_line * font_width - 4);
+		init_out_y = 4;
+		break;
+	case TextAlignment::Left:
+		init_out_x = 4;
+		init_out_y = static_cast<int>((size_.y / 2) - (_text_lines.size() * font_height / 2));
+		break;
+	case TextAlignment::Centre:
+		init_out_x = static_cast<int>((size_.x/2) - longest_line * (font_width / 2));
+		init_out_y = static_cast<int>((size_.y / 2)  - (_text_lines.size() * font_height / 2));
+		break;
+	case TextAlignment::Right:
+		init_out_x = static_cast<int>(size_.x - longest_line * font_width - 4);
+		init_out_y = static_cast<int>((size_.y / 2) - (_text_lines.size() * font_height / 2));
+		break;
+	case TextAlignment::BottomLeft:
+		init_out_x = 4;
+		init_out_y = static_cast<int>(size_.y - 4 - _text_lines.size() * font_height);
+		break;
+	case TextAlignment::Bottom:
+		init_out_x = static_cast<int>((size_.x/2) - longest_line * (font_width / 2));
+		init_out_y = static_cast<int>(size_.y - 4 - _text_lines.size() * font_height);
+		break;
+	case TextAlignment::BottomRight:
+		init_out_x = static_cast<int>(size_.x - longest_line * font_width - 4);
+		init_out_y = static_cast<int>(size_.y - 4 - _text_lines.size() * font_height);
+		break;
+	}
+	int out_x = init_out_x;
+	int out_y = init_out_y;
+	
+	for(std::vector<std::string>::iterator it = _text_lines.begin(); it != _text_lines.end(); ++it)
+	{
+		if(_alignment == TextAlignment::Top ||
+		   _alignment == TextAlignment::Centre ||
+		   _alignment == TextAlignment::Bottom)
+		{
+			out_x = static_cast<int>((size_.x / 2) - it->length() * (font_width / 2));
+
+		} else if(_alignment == TextAlignment::TopRight ||
+				  _alignment == TextAlignment::Right ||
+				  _alignment == TextAlignment::BottomRight)
+		{
+			out_x = static_cast<int>((size_.x / 2) - it->length() * font_width - 4);
+		} else
+			out_x = init_out_x;
+
+		for(unsigned int i = 0; i < it->length(); i++)
+		{
+			unsigned char c = it->c_str()[i];
+			c -= 32;
+			if(c >= 96)
+				continue;
+			int sample_x = (c % 16) * font_width;
+			int sample_y = (c / 16) * font_height;
+			SDL_Rect src_rect;
+			src_rect.x = static_cast<Sint16>(sample_x);
+			src_rect.y = static_cast<Sint16>(sample_y);
+			src_rect.w = static_cast<Uint16>(font_width);
+			src_rect.h = static_cast<Uint16>(font_height);
+
+
+			SDL_Rect dest_rect;
+			dest_rect.x = static_cast<Sint16>(out_x);
+			dest_rect.y = static_cast<Sint16>(out_y);
+			dest_rect.w = static_cast<Uint16>(font_width);
+			dest_rect.h = static_cast<Uint16>(font_height);
+			SDL_BlitSurface(font, &src_rect, surface_, &dest_rect);
+			out_x += font_width;
+		}
+		out_y += font_height;
 	}
 }
 

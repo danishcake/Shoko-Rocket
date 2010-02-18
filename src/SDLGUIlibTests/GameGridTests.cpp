@@ -29,7 +29,8 @@ TEST_FIXTURE(SDL_fixture, GameGridBasics)
 		CHECK_EQUAL(Vector2i(12, 9), p_widget->GetGridSize());
 		CHECK_EQUAL(Vector2i(32, 32), p_widget->GetItemSize());
 		CHECK(p_widget->GetRejectsFocus());
-		CHECK_EQUAL(9 * 12, p_widget->GetChildren().size());
+		//CHECK_EQUAL(9 * 12, p_widget->GetChildren().size());
+		//Test no longer valid, added a more efficient way of doing it
 
 		delete p_widget;
 	}

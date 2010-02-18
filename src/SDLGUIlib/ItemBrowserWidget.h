@@ -13,7 +13,16 @@ protected:
 
 	void ItemClick(Widget* _widget);
 	void ItemFocusedClick(Widget* _widget);
+
+	void ItemDragStart(Widget* _widget, DragEventArgs* _args);
+	void ItemDragEnter(Widget* _widget, DragEventArgs* _args);
+	void ItemDragReset(Widget* _widget, DragEventArgs* _args);
+	void ItemDragLand(Widget* _widget, DragEventArgs* _args);
 	
+	bool allow_scroll_;
+	Widget* left_move_;
+	Widget* right_move_;
+
 	Widget* last_clicked_;
 public:
 	/* Typedefs */
@@ -32,6 +41,9 @@ public:
 	Vector2i GetItemSize(){return item_size_;}
 	int GetPage(){return page_;}
 	int GetPageCount();
+	bool GetAllowScroll(){return allow_scroll_;}
+	void SetAllowScroll(bool _allow_scroll);
+
 	
 
 	/* Events */
@@ -40,6 +52,11 @@ public:
 	ItemClickEvent OnItemSelectedChanged;
 	ItemClickEvent OnItemFocusedClick;
 	PageChangeEvent OnPageChange;
+
+	DragEvent   OnItemDragStart; //Allows filling of drag data - drag_type must be non zero
+	DragEvent   OnItemDragReset;
+	DragEvent   OnItemDragEnter;
+	DragEvent   OnItemDragLand;
 	
 	/* Layout methods */
 	void PerformItemLayout();
@@ -49,5 +66,4 @@ public:
 	void NextPage(Widget* _widget);
 	void PrevPage(Widget* _widget);
 	void SetPage(int _page);
-
 };

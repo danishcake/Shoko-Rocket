@@ -11,45 +11,35 @@ GameGridWidget::GameGridWidget(Vector2i _grid_size, Vector2i _item_size)
 	delete back_rect_;
 	blit_rect_ = new BlittableRect(size_);
 	back_rect_ = new BlittableRect(size_);
+	offset_ = Vector2i(0, 0);
 
 	back_rect_->Fill(0,0,0,0); //Clear the image and make transparent
 
-	for(int x = 0; x < grid_size_.x; x++)
-	{
-		for(int y = 0; y < grid_size_.y; y++)
-		{
-			Widget* item = new Widget();
-			item->SetSize(item_size_);
-			item->SetAllowDrag(true);
-			item->SetPosition(Vector2i(item_size_.x * x, item_size_.y * y));
-
-			item->OnKeyUp.connect(boost::bind(&GameGridWidget::GridKeyUp, this, _1, _2));
-			item->OnMouseClick.connect(boost::bind(&GameGridWidget::GridMouseClick, this, _1, _2));			
-			item->OnDragReset.connect(boost::bind(&GameGridWidget::GridDragReset, this, _1, _2));
-			item->OnDragStart.connect(boost::bind(&GameGridWidget::GridDragStart, this, _1, _2));
-			AddChild(item);
-		}
-	}
+	OnKeyUp.connect(boost::bind(&GameGridWidget::GridKeyUp, this, _1, _2));
+	OnMouseClick.connect(boost::bind(&GameGridWidget::GridMouseClick, this, _1, _2));			
+	SetAllowDrag(true);
+	OnDragReset.connect(boost::bind(&GameGridWidget::GridDragReset, this, _1, _2));
+	OnDragStart.connect(boost::bind(&GameGridWidget::GridDragStart, this, _1, _2));
 }
 
 GameGridWidget::~GameGridWidget(void)
 {
 }
 
-void GameGridWidget::GridMouseClick(Widget* _widget, MouseEventArgs args)
+void GameGridWidget::GridMouseClick(Widget* /*_widget*/, MouseEventArgs args)
 {
 	MouseEventArgs e;
-	e.x = _widget->GetPosition().x / _widget->GetSize().x;
-	e.y = _widget->GetPosition().y / _widget->GetSize().y;
+	e.x = (args.x + offset_.x) / item_size_.x;
+	e.y = (args.y + offset_.y) / item_size_.y;
 	e.btns = args.btns;
 	OnGridClick(this, e);
 }
 
-void GameGridWidget::GridKeyUp(Widget* _widget, KeyPressEventArgs args)
+void GameGridWidget::GridKeyUp(Widget* /*_widget*/, KeyPressEventArgs args)
 {
 	GridKeyPressEventArgs e;
-	e.x = _widget->GetPosition().x / _widget->GetSize().x;
-	e.y = _widget->GetPosition().y / _widget->GetSize().y;
+	e.x = (last_mouse_position_.x + offset_.x) / item_size_.x;
+	e.y = (last_mouse_position_.y + offset_.y) / item_size_.y;
 	e.key_code = args.key_code;
 	OnGridKeyUp(this, e);
 }
@@ -59,11 +49,11 @@ void GameGridWidget::GridDragStart(Widget* /*_widget*/, DragEventArgs* _args)
 	_args->drag_type = 1;
 }
 
-void GameGridWidget::GridDragReset(Widget* _widget, DragEventArgs* _args)
+void GameGridWidget::GridDragReset(Widget* /*_widget*/, DragEventArgs* _args)
 {
 	GridGestureEventArgs e;
-	e.x = _widget->GetPosition().x / _widget->GetSize().x;
-	e.y = _widget->GetPosition().y / _widget->GetSize().y;
+	e.x = (_args->sx + offset_.x) / item_size_.x;
+	e.y = (_args->sy + offset_.y) / item_size_.y;
 	e.direction = GestureDirection::Center;
 
 	float angle = atan2f(static_cast<float>(_args->x), -static_cast<float>(_args->y));

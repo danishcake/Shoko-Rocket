@@ -1,5 +1,6 @@
 #pragma once
 #include "vmath.h"
+#include <vector>
 #include <string>
 #include "TextAlignment.h"
 
@@ -28,8 +29,9 @@ public:
 	void RawBlit(Vector2i _position, BlittableRect* _dest);
 	void Fade(float _degree, unsigned char r, unsigned char g, unsigned char b);
 	void SetAlpha(unsigned char a);
+	void BlittableRect::MeasureText(std::string _text, TextAlignment::Enum _alignment, Vector2i& top_left, Vector2i& bottom_right);
 	void BlitText(std::string _string, TextAlignment::Enum _alignment);
-	void MeasureText(std::string _string, TextAlignment::Enum _alignment, Vector2i& top_left, Vector2i& bottom_right);
+	void BlitTextLines(std::vector<std::string> _text_lines, TextAlignment::Enum _alignment);
 	void Fill(unsigned char a, unsigned char r, unsigned char g, unsigned char b);
 	void Save(std::string _filename);
 	

@@ -29,11 +29,16 @@ class GameGridWidget :
 protected:
 	Vector2i grid_size_;
 	Vector2i item_size_;
+	Vector2i offset_;
 
+	Vector2i last_mouse_position_;
+
+	void GridMouseMove(Widget* _widget, MouseEventArgs _args);
 	void GridMouseClick(Widget* _widget, MouseEventArgs _args);
 	void GridKeyUp(Widget* _widget, KeyPressEventArgs _args);
 	void GridDragReset(Widget* _widget, DragEventArgs* _args);
 	void GridDragStart(Widget* _widget, DragEventArgs* _args);
+	
 public:
 	/* Constructors */
 	GameGridWidget(Vector2i _grid_size, Vector2i _item_size);
@@ -46,6 +51,9 @@ public:
 	/* Properties */
 	Vector2i GetGridSize(){return grid_size_;}
 	Vector2i GetItemSize(){return item_size_;}
+
+	void SetOffset(Vector2i _offset){offset_ = _offset;}
+	Vector2i GetOffset(){return offset_;}
 
 	/* Events */
 	MouseEvent OnGridClick;

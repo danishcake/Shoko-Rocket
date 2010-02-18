@@ -51,6 +51,7 @@ protected:
 
 	bool invalidated_;
 	bool rejects_focus_;
+	bool hides_highlight_; //For item browser widget to prevent background turning blue
 	bool allow_drag_;
 	bool depressed_;
 	bool visible_;
@@ -58,6 +59,7 @@ protected:
 	bool allow_edit_;
 
 	WidgetText widget_text_;
+	std::string tag_;			//Stores some related name or useful data
 
 	static float screen_fade_;
 	static BlittableRect* screen_fade_rect_;
@@ -73,6 +75,7 @@ public:
 	typedef boost::signal<void (Widget*, MouseEventArgs)> MouseEvent;
 	typedef boost::signal<void (Widget*, KeyPressEventArgs)> KeyEvent;
 	typedef boost::signal<void (Widget*, DragEventArgs*)> DragEvent;
+	typedef boost::signal<void (Widget*, BlittableRect*)> DrawEvent;
 
 	/* Constructors */
 	Widget(void);
@@ -92,6 +95,8 @@ public:
 	void SetSize(Vector2i _size);
 	void SetZOrder(int _z_order){z_order_ = _z_order;}
 	int GetZOrder(){return z_order_;}
+	void SetTag(std::string _tag){tag_ = _tag;}
+	std::string GetTag(){return tag_;}
 
 	/* Children members */
 	vector<Widget*>& GetChildren();
@@ -106,9 +111,14 @@ public:
 	WidgetEvent OnClick;
 	WidgetEvent OnFocusedClick;
 	MouseEvent  OnMouseClick;
+	MouseEvent  OnMouseMove;
 	WidgetEvent OnGainFocus;
 	WidgetEvent OnLostFocus;
 	KeyEvent    OnKeyUp;
+	DrawEvent   OnDraw;
+	
+	/* Static signals */
+	static KeyEvent OnGlobalKeyUp;
 
 	DragEvent   OnDragStart; //Allows filling of drag data - drag_type must be non zero
 	DragEvent   OnDragReset;
@@ -152,6 +162,7 @@ public:
 
 	/* Highlight */
 	bool HasHighlight(){return widget_with_highlight_ == this;}
+	void SetHidesHighlight(bool _hides_highlight){hides_highlight_ = _hides_highlight;}
 	void SetHighlight();
 
 	/* Click depression */
@@ -167,6 +178,9 @@ public:
 	void Redraw();
 	void Invalidate();
 	void SetText(std::string _text, TextAlignment::Enum _alignment);
+	void SetTextWrap(bool _wrap);
+	BlittableRect* GetBackRect(){return back_rect_;}
+
 
 	/* Root handling and drawing */
 	static void ClearRoot();
@@ -188,7 +202,7 @@ public:
 	void SetEditable(bool _editable){allow_edit_ = _editable;}
 	bool HasEditting();
 	void SetEditting(bool _editting);
-	std::string GetText(){return widget_text_.text;}
+	std::string GetText(){return widget_text_.GetText();}
 	
 
 	/* Screen fading */
