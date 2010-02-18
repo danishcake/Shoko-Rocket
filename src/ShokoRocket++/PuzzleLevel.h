@@ -24,6 +24,7 @@ protected:
 	PuzzleMode::Enum puzzle_state_;
 	float timer_;
 	Vector2f grid_size_;
+	Vector2f scroll_remaining_;
 	Vector2f scroll_offset_;
 	Vector2i scroll_limit_;
 public:

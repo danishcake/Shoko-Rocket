@@ -579,7 +579,7 @@ void Widget::HandleEvent(Event _event)
 		OnKeyUp(this, args);
 	}
 
-	if(_event.event_type == EventType::OtherKeypress && HasEditting())
+	if(_event.event_type == EventType::OtherKeypress && _event.event.key_event.key_up && HasEditting())
 	{
 		//Expecting ascii
 		if(_event.event.key_event.key_code >= 32 && 
@@ -783,20 +783,6 @@ void Widget::SetModal(bool _modal)
 
 void Widget::SetModalWidget(Widget* _widget)
 {
-	/*
-	Widget* old_modal_widget = widget_with_modal_;
-
-	widget_with_modal_ = _widget;
-	if(_widget) 
-		Widget::ClearFocus();
-
-	if(widget_with_modal_ != old_modal_widget)
-	{
-		for(std::vector<Widget*>::iterator it = all_.begin(); it != all_.end(); ++it)
-		{
-			(*it)->Invalidate();
-		}
-	}*/
 	_widget->SetModal(true);
 }
 

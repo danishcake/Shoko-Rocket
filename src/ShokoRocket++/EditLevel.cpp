@@ -292,22 +292,68 @@ void EditLevel::Tick(float _time, Input _input)
 	switch(_input.action)
 	{
 	case Action::ScrollWest:
-		if(scroll_offset_.x > 0)
-			scroll_offset_.x--;
+		if(scroll_offset_.x + scroll_remaining_.x > 0.1)
+		{
+			scroll_remaining_.x--;
+		}
 		break;
 	case Action::ScrollEast:
-		if(scroll_offset_.x < scroll_limit_.x)
-			scroll_offset_.x++;
+		if(scroll_offset_.x + scroll_remaining_.x < scroll_limit_.x - 0.1)
+		{
+			scroll_remaining_.x++;
+		}
 		break;
 	case Action::ScrollNorth:
-		if(scroll_offset_.y > 0)
-			scroll_offset_.y--;
+		if(scroll_offset_.y + scroll_remaining_.y > 0.1)
+		{
+			scroll_remaining_.y--;
+		}
 		break;
 	case Action::ScrollSouth:
-		if(scroll_offset_.y < scroll_limit_.y)
-			scroll_offset_.y++;
+		if(scroll_offset_.y + scroll_remaining_.y < scroll_limit_.y - 0.1)
+		{
+			scroll_remaining_.y++;
+		}
 		break;
 	}
+	const float scroll_speed = 10;
+	const float scroll_smoothing = 10;
+	const float min_scroll_speed = 0.2;
+	if(abs(scroll_remaining_.x) > 0)
+	{
+		float delta = ceil(abs(scroll_remaining_.x * scroll_smoothing)) * (scroll_remaining_.x >= 0 ? 1 : -1) / scroll_smoothing;
+		if(abs(delta) < min_scroll_speed)
+			delta = delta * min_scroll_speed / abs(delta);
+		delta *= _time * scroll_speed;
+		if(abs(delta) < abs(scroll_remaining_.x))
+		{
+			scroll_offset_.x += delta;
+			scroll_remaining_.x -= delta;
+		}
+		else
+		{
+			scroll_offset_.x = floor(scroll_offset_.x + 0.5f);
+			scroll_remaining_.x = 0;
+		}
+	}
+	if(abs(scroll_remaining_.y) > 0)
+	{
+		float delta = ceil(abs(scroll_remaining_.y * scroll_smoothing)) * (scroll_remaining_.y >= 0 ? 1 : -1) / scroll_smoothing;
+		if(abs(delta) < min_scroll_speed)
+			delta = delta * min_scroll_speed / abs(delta);
+		delta *= _time * scroll_speed;
+		if(abs(delta) < abs(scroll_remaining_.y))
+		{
+			scroll_offset_.y += delta;
+			scroll_remaining_.y -= delta;
+		}
+		else
+		{
+			scroll_offset_.y = floor(scroll_offset_.y + 0.5f);
+			scroll_remaining_.y = 0;
+		}
+	}
+
 }
 
 vector<RenderItem> EditLevel::Draw()

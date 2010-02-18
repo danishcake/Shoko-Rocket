@@ -29,7 +29,7 @@ protected:
 	Vector2f grid_size_;
 	Vector2f scroll_offset_;
 	Vector2i scroll_limit_;
-	
+	Vector2f scroll_remaining_;
 	bool validated_;
 
 public:

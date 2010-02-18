@@ -74,6 +74,7 @@ TEST_FIXTURE(SDL_fixture, TextEditLossOfFocusEnds)
 		e.event_type = EventType::OtherKeypress;
 		e.event.key_event.key_code = SDLK_BACKSPACE;
 		p_widget->HandleEvent(e);
+		e.event.key_event.key_up = true;
 		CHECK_EQUAL("Howd", p_widget->GetText());
 		
 		
@@ -107,6 +108,7 @@ TEST_FIXTURE(SDL_fixture, TextEditAppends)
 		e.event_type = EventType::OtherKeypress;
 		e.event.key_event.key_code = SDLK_a;
 		e.event.key_event.shift = false;
+		e.event.key_event.key_up = true;
 		p_widget->HandleEvent(e);
 		CHECK_EQUAL("Howdya", p_widget->GetText());
 		e.event.key_event.key_code = SDLK_b;
@@ -133,6 +135,7 @@ TEST_FIXTURE(SDL_fixture, TextEditDeletes)
 		Event e;
 		e.event_type = EventType::OtherKeypress;
 		e.event.key_event.key_code = SDLK_BACKSPACE;
+		e.event.key_event.key_up = true;
 		p_widget->HandleEvent(e);
 		CHECK_EQUAL("Howd", p_widget->GetText());
 		p_widget->HandleEvent(e);
@@ -163,6 +166,7 @@ TEST_FIXTURE(SDL_fixture, TextEditEnterEndsEditting)
 		Event e;
 		e.event_type = EventType::OtherKeypress;
 		e.event.key_event.key_code = SDLK_BACKSPACE;
+		e.event.key_event.key_up = true;
 		p_widget->HandleEvent(e);
 		CHECK_EQUAL("Howd", p_widget->GetText());
 		e.event_type = EventType::KeyEnter;

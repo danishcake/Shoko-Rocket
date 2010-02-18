@@ -860,6 +860,7 @@ void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_a
 	switch(_mode_affected)
 	{
 	case Mode::Puzzle: //TODO puzzle scrolling
+		puzzle_level_->SetScrollLimit(scroll_limit_);
 		break;
 	case Mode::Editor:
 		editor_level_->SetScrollLimit(scroll_limit_);
