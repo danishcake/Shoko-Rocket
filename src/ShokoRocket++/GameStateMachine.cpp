@@ -1025,7 +1025,12 @@ void GameStateMachine::Draw(SDL_Surface* _target)
 			if(ri.position_.y > Settings::GetGridSize().y * size_.y - Settings::GetGridSize().y)
 				ri.frame_->Draw(Vector2f(ri.position_.x, ri.position_.y - Settings::GetGridSize().y * size_.y));
 		}
-		SDL_Rect game_area_rect;		game_area_rect.x = 138;		game_area_rect.y = 10;		game_area_rect.w = 0;		game_area_rect.h = 0;
+		SDL_Rect game_area_rect;
+		game_area_rect.x = 138;
+		game_area_rect.y = 10;
+		game_area_rect.w = 0;
+		game_area_rect.h = 0;
+
 		SDL_BlitSurface(render_area_, NULL, _target, &game_area_rect);	
 	}
 
