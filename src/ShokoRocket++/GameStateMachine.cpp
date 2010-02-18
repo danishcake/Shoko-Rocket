@@ -139,6 +139,7 @@ void GameStateMachine::SetupMenu()
 	input_method->OnClick.connect(boost::bind(&GameStateMachine::OptionsInputmethodCallback, this, _1));
 	input_method->SetPosition(Vector2i(10, 10));
 	options_widget_->AddChild(input_method);
+	options_widget_->SetText(" WASD keys place arrows\n Arrow keys scroll\n Escape resets\n Space starts", TextAlignment::BottomLeft);
 
 	gesture_hint_ = new Widget("Gestures.png");
 	gesture_hint_->SetPosition(Vector2i(10, 52));
