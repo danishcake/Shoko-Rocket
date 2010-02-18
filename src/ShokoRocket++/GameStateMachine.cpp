@@ -1142,5 +1142,4 @@ void GameStateMachine::GamegridMouseMoveCallback(Widget* _widget, MouseEventArgs
 {
 	last_grid_position_.x = _args.x / Settings::GetGridSize().x;
 	last_grid_position_.y = _args.y / Settings::GetGridSize().y;
-	Logger::DiagnosticOut() << last_grid_position_;
 }

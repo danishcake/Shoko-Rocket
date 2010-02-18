@@ -907,55 +907,45 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 			e.event_type = EventType::MouseDown;
 		else
 			e.event_type = EventType::MouseUp;
-	} else if(event->type == SDL_KEYUP)
+	} else if(event->type == SDL_KEYUP || event->type == SDL_KEYDOWN)
 	{
+		e.event.key_event.key_code = event->key.keysym.sym;
+		if(event->type == SDL_KEYUP)
+		{
+			e.event.key_event.key_up = true;
+		} else
+		{
+			e.event.key_event.key_up = false;
+		}
+
+
+		
 		if(event->key.keysym.sym == SDLK_LEFT)
 		{
 			e.event_type = EventType::KeyLeft;
-			e.event.key_event.key_code = event->key.keysym.sym;
-			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_RIGHT)
 		{
 			e.event_type = EventType::KeyRight;
-			e.event.key_event.key_code = event->key.keysym.sym;
-			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_UP)
 		{
 			e.event_type = EventType::KeyUp;
-			e.event.key_event.key_code = event->key.keysym.sym;
-			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_DOWN)
 		{
 			e.event_type = EventType::KeyDown;
-			e.event.key_event.key_code = event->key.keysym.sym;
-			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_RETURN)
 		{
 			e.event_type = EventType::KeyEnter;
-			e.event.key_event.key_code = event->key.keysym.sym;
-			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_ESCAPE)
 		{
 			e.event_type = EventType::KeyEscape;
-			e.event.key_event.key_code = event->key.keysym.sym;
-			e.event.key_event.key_up = true;
-		}
-		e.event.key_event.shift = SDL_GetModState() & (KMOD_RSHIFT | KMOD_LSHIFT);
-	} else if(event->type == SDL_KEYDOWN)
-	{
-		
-		if(event->key.keysym.sym != SDLK_LEFT   && event->key.keysym.sym != SDLK_RIGHT &&
-		   event->key.keysym.sym != SDLK_UP     && event->key.keysym.sym != SDLK_DOWN  &&
-		   event->key.keysym.sym != SDLK_RETURN && event->key.keysym.sym != SDLK_ESCAPE)
+		} else
 		{
 			e.event_type = EventType::OtherKeypress;
-			e.event.key_event.key_code = event->key.keysym.sym;
-			e.event.key_event.key_up = false;
 		}
 		e.event.key_event.shift = SDL_GetModState() & (KMOD_RSHIFT | KMOD_LSHIFT);
 	} else if(event->type == SDL_MOUSEMOTION)
@@ -1050,6 +1040,7 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 
 		KeyPressEventArgs kp_args;
 		kp_args.key_code = e.event.key_event.key_code;
+		kp_args.key_up = e.event.key_event.key_up;
 		Widget::OnGlobalKeyUp(NULL, kp_args);
 	}
 	RemoveEventLock();
