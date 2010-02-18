@@ -13,7 +13,7 @@
 SDL_Surface* p_screen = NULL;
 BlittableRect* p_screen_rect = NULL;
 BlittableRect* p_background = NULL;
-GameStateMachine gsm;
+GameStateMachine* gsm = NULL;
 clock_t ltv_time;
 
 SDL_Surface* SDL_init()
@@ -73,14 +73,14 @@ bool GameTick()
 	}
 	StandardTextures::TickAnimations(dt);
 	Widget::Tick(dt);
-	return gsm.Tick(dt);	
+	return gsm->Tick(dt);
 }
 
 void Draw()
 {
 	SDL_FillRect(p_screen, NULL, SDL_MapRGB(p_screen->format, 0, 0, 0));
 	p_background->Blit(Vector2i(0, 0), p_screen_rect);
-	gsm.Draw(p_screen);
+	gsm->Draw(p_screen);
 	Widget::RenderRoot(p_screen_rect);
 	SDL_Flip(p_screen);
 }
@@ -97,8 +97,11 @@ int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
 		SDLAnimationFrame::screen_ = p_screen;
 		bFinished = (AcquireResources() == false);
 		StandardTextures::LoadTextures();
+		gsm = new GameStateMachine();
 	}
 	
+
+
 	while(!bFinished)
 	{
 		SDL_Event event;
@@ -118,7 +121,7 @@ int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
 
 		SDL_Delay(10);
 	}
-
+	delete gsm;
 	SDL_Quit();
 	return 0;
 }

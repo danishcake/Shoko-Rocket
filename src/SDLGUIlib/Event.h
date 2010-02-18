@@ -30,6 +30,7 @@ struct KeyPressEventArgs
 {
 	int key_code;
 	bool shift;
+	bool key_up; //true for keyup, false for keydown
 };
 
 struct DragEventArgs

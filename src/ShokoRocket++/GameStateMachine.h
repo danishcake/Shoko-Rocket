@@ -150,6 +150,9 @@ private:
 	SDL_Surface* render_area_;
 	void CreateRenderArea(Vector2i _level_size, Mode::Enum);
 	Vector2i scroll_limit_;
+	void KeyboardCallback(Widget* _widget, KeyPressEventArgs _args);
+	void GamegridMouseMoveCallback(Widget* _widget, MouseEventArgs _args);
+	Vector2i last_grid_position_;
 
 	Widget* scroll_left_widget_;
 	Widget* scroll_right_widget_;

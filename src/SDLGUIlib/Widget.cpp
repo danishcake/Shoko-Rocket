@@ -913,31 +913,37 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		{
 			e.event_type = EventType::KeyLeft;
 			e.event.key_event.key_code = event->key.keysym.sym;
+			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_RIGHT)
 		{
 			e.event_type = EventType::KeyRight;
 			e.event.key_event.key_code = event->key.keysym.sym;
+			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_UP)
 		{
 			e.event_type = EventType::KeyUp;
 			e.event.key_event.key_code = event->key.keysym.sym;
+			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_DOWN)
 		{
 			e.event_type = EventType::KeyDown;
 			e.event.key_event.key_code = event->key.keysym.sym;
+			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_RETURN)
 		{
 			e.event_type = EventType::KeyEnter;
 			e.event.key_event.key_code = event->key.keysym.sym;
+			e.event.key_event.key_up = true;
 		}
 		else if(event->key.keysym.sym == SDLK_ESCAPE)
 		{
 			e.event_type = EventType::KeyEscape;
 			e.event.key_event.key_code = event->key.keysym.sym;
+			e.event.key_event.key_up = true;
 		}
 		e.event.key_event.shift = SDL_GetModState() & (KMOD_RSHIFT | KMOD_LSHIFT);
 	} else if(event->type == SDL_KEYDOWN)
@@ -949,6 +955,7 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 		{
 			e.event_type = EventType::OtherKeypress;
 			e.event.key_event.key_code = event->key.keysym.sym;
+			e.event.key_event.key_up = false;
 		}
 		e.event.key_event.shift = SDL_GetModState() & (KMOD_RSHIFT | KMOD_LSHIFT);
 	} else if(event->type == SDL_MOUSEMOTION)

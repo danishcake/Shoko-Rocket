@@ -42,6 +42,8 @@ GameStateMachine::GameStateMachine()
 	scroll_right_widget_ = NULL;
 	scroll_up_widget_ = NULL;
 	scroll_down_widget_ = NULL;
+
+	Widget::OnGlobalKeyUp.connect(boost::bind(&GameStateMachine::KeyboardCallback, this, _1, _2));
 }
 
 GameStateMachine::~GameStateMachine()
@@ -582,11 +584,6 @@ void GameStateMachine::PuzzleScrollRightClick(Widget* /*_widget*/)
 /* Editor methods */
 void GameStateMachine::SetupEditor()
 {
-	GameGridWidget* grid_widget = new GameGridWidget(Vector2i(12, 9), Vector2i(32, 32));
-	grid_widget->SetPosition(Vector2i(138, 10));
-	grid_widget->OnGridClick.connect(boost::bind(&GameStateMachine::PuzzleGridClick, this, _1, _2));
-	grid_widget->OnGridGesture.connect(boost::bind(&GameStateMachine::PuzzleGridGesture, this, _1, _2));
-
 	size_ = Vector2i(12, 9);
 	new_level_widget_ = new Widget("Blank384x384.png");
 	new_level_widget_->SetPosition(Vector2i(128, 48));
@@ -888,6 +885,7 @@ void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_a
 		scroll_up_widget_->Delete();
 	if(scroll_down_widget_)
 		scroll_down_widget_->Delete();
+
 	scroll_left_widget_ = new Widget(VerticalTile("Scroll_LeftTop.png", "Scroll_LeftCentre.png", "Scroll_LeftBottom.png"), Settings::GetGridSize().y * render_area_size.y);
 	scroll_left_widget_->SetPosition(Vector2i(128, 10));
 	scroll_left_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollLeftClick, this, _1));
@@ -900,6 +898,13 @@ void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_a
 	scroll_up_widget_ = new Widget(HorizontalTile("Scroll_UpLeft.png", "Scroll_UpCentre.png", "Scroll_UpRight.png"), Settings::GetGridSize().x * render_area_size.x);
 	scroll_up_widget_->SetPosition(Vector2i(138, 0));
 	scroll_up_widget_->OnClick.connect(boost::bind(&GameStateMachine::PuzzleScrollUpClick, this, _1));
+
+
+	GameGridWidget* grid_widget = new GameGridWidget(render_area_size, Vector2i(32, 32));
+	grid_widget->SetPosition(Vector2i(138, 10));
+	grid_widget->OnGridClick.connect(boost::bind(&GameStateMachine::PuzzleGridClick, this, _1, _2));
+	grid_widget->OnGridGesture.connect(boost::bind(&GameStateMachine::PuzzleGridGesture, this, _1, _2));
+	grid_widget->OnMouseMove.connect(boost::bind(&GameStateMachine::GamegridMouseMoveCallback, this, _1, _2));
 }
 
 bool GameStateMachine::Tick(float _timespan)
@@ -1087,3 +1092,55 @@ void GameStateMachine::LayoutArrows(std::vector<Direction::Enum> _arrows)
 	}
 }
 
+
+
+void GameStateMachine::KeyboardCallback(Widget* _widget, KeyPressEventArgs _args)
+{
+	if(!_args.key_up)
+		return;
+	switch(_args.key_code)
+	{
+	case SDLK_w:
+		input_.action = Action::PlaceNorthArrow;
+		input_.position = last_grid_position_;
+		break;
+	case SDLK_a:
+		input_.action = Action::PlaceWestArrow;
+		input_.position = last_grid_position_;
+		break;
+	case SDLK_s:
+		input_.action = Action::PlaceSouthArrow;
+		input_.position = last_grid_position_;
+		break;
+	case SDLK_d:
+		input_.action = Action::PlaceEastArrow;
+		input_.position = last_grid_position_;
+		break;
+	case SDLK_SPACE:
+		input_.action = Action::Start;
+		break;
+	case SDLK_LEFT:
+		input_.action = Action::ScrollWest;
+		break;
+	case SDLK_RIGHT:
+		input_.action = Action::ScrollEast;
+		break;
+	case SDLK_UP:
+		input_.action = Action::ScrollNorth;
+		break;
+	case SDLK_DOWN:
+		input_.action = Action::ScrollSouth;
+		break;
+	case SDLK_ESCAPE:
+	case SDLK_BACKSPACE:
+		input_.action = Action::Cancel;
+		break;
+	}
+}
+
+void GameStateMachine::GamegridMouseMoveCallback(Widget* _widget, MouseEventArgs _args)
+{
+	last_grid_position_.x = _args.x / Settings::GetGridSize().x;
+	last_grid_position_.y = _args.y / Settings::GetGridSize().y;
+	Logger::DiagnosticOut() << last_grid_position_;
+}
