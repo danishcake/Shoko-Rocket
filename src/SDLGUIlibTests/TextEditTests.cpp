@@ -73,8 +73,9 @@ TEST_FIXTURE(SDL_fixture, TextEditLossOfFocusEnds)
 		Event e;
 		e.event_type = EventType::OtherKeypress;
 		e.event.key_event.key_code = SDLK_BACKSPACE;
-		p_widget->HandleEvent(e);
 		e.event.key_event.key_up = true;
+		p_widget->HandleEvent(e);
+		
 		CHECK_EQUAL("Howd", p_widget->GetText());
 		
 		

@@ -20,6 +20,7 @@ private:
 	
 	Vector2i grid_size_;
 	Vector2i resolution_;
+	bool full_screen_;
 	Color grid_color_a;
 	Color grid_color_b;
 	std::string mouse_sprite_;
@@ -35,6 +36,7 @@ private:
 public:
 	static Vector2i GetGridSize();
 	static Vector2i GetResolution();
+	static bool GetFullScreen();
 	static Color GetGridColorA();
 	static Color GetGridColorB();
 	static std::string GetMouseSprite();
@@ -45,6 +47,7 @@ public:
 	static std::string GetHalfArrowsSprite();
 	static std::string GetRingSprite();
 	static std::string GetArrowSets();
+	
 	static bool GetUseGestures();
 	static void SetUseGestures(bool _use);
 

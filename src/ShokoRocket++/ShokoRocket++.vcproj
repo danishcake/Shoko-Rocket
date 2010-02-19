@@ -375,7 +375,43 @@
 				Name="Gui"
 				>
 				<File
-					RelativePath=".\Sprites\GUI\Background.png"
+					RelativePath=".\Sprites\GUI\Background1024x600.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\Background1024x768.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\Background1280x1024.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\Background1280x768.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\Background1280x960.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\Background1600x1200.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\Background640x480.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\Background800x600.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\BackgroundSolid.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\BackgroundTile.png"
 					>
 				</File>
 				<File

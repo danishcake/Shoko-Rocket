@@ -113,10 +113,8 @@ void GameStateMachine::SetupMenu()
 	exit->SetPosition(Vector2i(2, 104));
 	exit->SetText("Exit", TextAlignment::Centre);
 	puzzle_index_ = -1;
-
-	// Size = 72 * 5 = 360 x 54 * 5 = 270
 	
-	levels_widget_ = new ItemBrowserWidget(puzzle_files_, Vector2i(6, 6), Vector2i(78, 60));
+	levels_widget_ = new ItemBrowserWidget(puzzle_files_, Vector2i((Settings::GetResolution().x - 172) / 78, (Settings::GetResolution().y - 120) / 60), Vector2i(78, 60));
 	levels_widget_->SetPage(page_of_level_);
 	levels_widget_->SetPosition(Vector2i(138, 0));
 	levels_widget_->OnItemRender.connect(boost::bind(&GameStateMachine::RenderLevel, this, _1, _2, _3));
@@ -126,7 +124,7 @@ void GameStateMachine::SetupMenu()
 	levels_widget_->OnPageChange.connect(boost::bind(&GameStateMachine::MenuLevelBrowerPageChange, this, _1, _2, _3));
 	
 	level_name_ = new Widget("Blank384x96.png");
-	level_name_->SetPosition(Vector2i(138, 380));
+	level_name_->SetPosition(Vector2i(138, Settings::GetResolution().y - 120 + 20));
 	level_name_->SetText("Page " + boost::lexical_cast<std::string, int>(levels_widget_->GetPage() + 1) + "/" + boost::lexical_cast<std::string, int>(levels_widget_->GetPageCount()), TextAlignment::TopLeft);
 	level_name_->SetRejectsFocus(true);
 

@@ -43,6 +43,7 @@ Settings::Settings(void)
 	{
 		TiXmlElement* grid_size = root->FirstChildElement("GridSize");
 		TiXmlElement* resolution = root->FirstChildElement("Resolution");
+		TiXmlElement* fullscreen_el = root->FirstChildElement("Fullscreen");
 		TiXmlElement* mouse_animation = root->FirstChildElement("MouseAnimation");
 		TiXmlElement* cat_animation = root->FirstChildElement("CatAnimation");
 		TiXmlElement* rocket_animation = root->FirstChildElement("RocketAnimation");
@@ -63,6 +64,14 @@ Settings::Settings(void)
 		if(!resolution || (resolution->QueryIntAttribute("x", &resolution_.x) != TIXML_SUCCESS) ||
 						  (resolution->QueryIntAttribute("y", &resolution_.y) != TIXML_SUCCESS))
 			Logger::DiagnosticOut() << "Unable to load resolution, defaulting to 640x480\n";
+		if(resolution_.x < 640 || resolution_.y < 480)
+		{
+			Logger::DiagnosticOut() << "Resolutions below 640x480 in either dimension not supported, defaulting to 640x480\n";
+			resolution_.x = 640;
+			resolution_.y = 480;
+		}
+		if(!fullscreen_el || fullscreen_el->QueryValueAttribute("Value", &full_screen_) != TIXML_SUCCESS)
+			Logger::DiagnosticOut() << "Unable to find or parse Fullscreen\n";
 
 		if(!mouse_animation || (mouse_animation->QueryValueAttribute("File", &mouse_sprite_) != TIXML_SUCCESS))
 			Logger::DiagnosticOut() << "Unable to find or parse MouseAnimation, defaulting to Mouse_ShokoWhite.animation\n";
@@ -138,6 +147,8 @@ Settings::~Settings(void)
 	TiXmlElement* resolution = new TiXmlElement("Resolution");
 	resolution->SetAttribute("x", boost::lexical_cast<string, int>(resolution_.x));
 	resolution->SetAttribute("y", boost::lexical_cast<string, int>(resolution_.y));
+	TiXmlElement* fullscreen = new TiXmlElement("Fullscreen");
+	fullscreen->SetAttribute("Value", full_screen_);
 	TiXmlElement* mouse_animation_el = new TiXmlElement("MouseAnimation");
 	mouse_animation_el->SetAttribute("File", mouse_sprite_);
 	TiXmlElement* cat_animation_el = new TiXmlElement("CatAnimation");
@@ -169,6 +180,7 @@ Settings::~Settings(void)
 
 	root->LinkEndChild(grid_size);
 	root->LinkEndChild(resolution);
+	root->LinkEndChild(fullscreen);
 	root->LinkEndChild(mouse_animation_el);
 	root->LinkEndChild(cat_animation_el);
 	root->LinkEndChild(rocket_animation);
@@ -201,6 +213,10 @@ Vector2i Settings::GetGridSize()
 Vector2i Settings::GetResolution()
 {
 	return GetInstance().resolution_;
+}
+bool Settings::GetFullScreen()
+{
+	return GetInstance().full_screen_;
 }
 
 Color Settings::GetGridColorA()
