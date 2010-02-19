@@ -1337,6 +1337,10 @@
 							/>
 						</FileConfiguration>
 					</File>
+					<File
+						RelativePath=".\Levels\Miscellanea\Quite big.Level"
+						>
+					</File>
 				</Filter>
 			</Filter>
 		</Filter>
