@@ -443,12 +443,34 @@ void GameStateMachine::ProcessPuzzle(float _timespan)
 		pr.completed = true;
 		Progress::SetProgress(puzzle_level_->GetFilename(), pr);
 		level_completed_ = true;
+		state_indicator_level_->SetState(StatusState::Success);
 	}
 	if(arrow_stock_widget_ && puzzle_level_ && arrow_hash_ != puzzle_level_->ComputeArrowHash())
 	{
 		LayoutArrows(puzzle_level_->GetArrows());
 		arrow_hash_ = puzzle_level_->ComputeArrowHash();
 	}
+	switch(puzzle_level_->GetPuzzleState())
+	{
+	case PuzzleMode::Puzzle:
+		state_indicator_level_->SetState(StatusState::Stopped);
+		break;
+	case PuzzleMode::Running:
+		state_indicator_level_->SetState(StatusState::Running);
+		break;
+	case PuzzleMode::RunningFast:
+		state_indicator_level_->SetState(StatusState::RunningFast);
+		break;
+	case PuzzleMode::Victory:
+		state_indicator_level_->SetState(StatusState::Success);
+		break;
+	case PuzzleMode::Defeat:
+		state_indicator_level_->SetState(StatusState::Fail);
+		break;
+	}
+	state_indicator_level_->Tick(_timespan, Input());
+	
+
 	last_puzzle_mode_ = puzzle_level_->GetPuzzleState();
 	input_ = Input();
 }

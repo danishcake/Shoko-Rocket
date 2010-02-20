@@ -109,6 +109,8 @@ public:
 	int GetTotalMice(){return mice_.size() + dead_mice_.size();}
 	int GetRescuedMice(){return rescued_mice_;}
 	void ToggleMouse(Vector2i _position, Direction::Enum _direction);
+	void RescueAllMice();
+	void KillAllMice();
 
 	//Adds and queries cats
 	void AddCat(Vector2i _position, Direction::Enum _direction);

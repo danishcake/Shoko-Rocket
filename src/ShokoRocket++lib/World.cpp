@@ -881,3 +881,21 @@ void World::ClearArrow(Vector2i _position)
 	}
 }
 
+void World::RescueAllMice()
+{
+	for(std::vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
+	{
+		(*it)->Rescue();
+		just_dead_mice_.push_back(*it);	
+	}
+	rescued_mice_ = mice_.size();
+}
+
+void World::KillAllMice()
+{
+	for(std::vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
+	{
+		(*it)->Kill();
+		just_dead_mice_.push_back(*it);
+	}
+}
