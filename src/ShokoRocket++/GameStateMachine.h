@@ -5,6 +5,7 @@ class BlittableRect;
 #include <string>
 #include "PuzzleLevel.h"
 #include "EditLevel.h"
+#include "StatusLevel.h"
 #include "boost/shared_ptr.hpp"
 #include <event.h>
 #include <GameGridWidget.h>
@@ -159,6 +160,7 @@ private:
 	Widget* scroll_up_widget_;
 	Widget* scroll_down_widget_;
 
+	boost::shared_ptr<StatusLevel> state_indicator_level_;
 public:
 	/* Constructors */
 	GameStateMachine();

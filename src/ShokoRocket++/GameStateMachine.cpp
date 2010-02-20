@@ -18,6 +18,8 @@ const float GameStateMachine::sub_mode_widget_transition_time = 0.5f;
 
 GameStateMachine::GameStateMachine()
 {
+	//state_indicator_level_ = boost::shared_ptr<PuzzleLevel>(new PuzzleLevel("", Settings::GetGridSize()));
+
 	mode_timer_ = 0.01f;
 	sub_mode_timer_ = 0;
 	mode_ = Mode::Intro;
@@ -44,6 +46,7 @@ GameStateMachine::GameStateMachine()
 	scroll_down_widget_ = NULL;
 
 	Widget::OnGlobalKeyUp.connect(boost::bind(&GameStateMachine::KeyboardCallback, this, _1, _2));
+	state_indicator_level_ = boost::shared_ptr<StatusLevel>(new StatusLevel(Settings::GetGridSize()));
 }
 
 GameStateMachine::~GameStateMachine()
@@ -172,13 +175,14 @@ void GameStateMachine::SetupMenu()
 	sub_mode_timer_ = 1.0f;
 }
 
-void GameStateMachine::ProcessMenu(float /*_timespan*/)
+void GameStateMachine::ProcessMenu(float _timespan)
 {
 	if(reload_due_)
 	{
 		levels_widget_->SetItems(puzzle_files_);
 		reload_due_ = false;
 	}
+	state_indicator_level_->Tick(_timespan, input_);
 
 
 	Widget* active_sub_mode_widget = NULL;
@@ -1038,7 +1042,27 @@ void GameStateMachine::Draw(SDL_Surface* _target)
 
 		SDL_BlitSurface(render_area_, NULL, _target, &game_area_rect);	
 	}
-
+	//Render small indicator area
+	{
+		std::vector<RenderItem> render_items;
+				switch(mode_)
+		{
+		case Mode::Editor:
+		case Mode::Puzzle:
+			if(state_indicator_level_.get() != NULL)
+			{
+				render_items = state_indicator_level_->Draw();
+			}
+			break;
+		}
+		//Sort front to back to prevent overlay issues
+		std::sort(render_items.begin(), render_items.end(), RenderItem::DepthSort<RenderItem>());
+		SDLAnimationFrame::screen_ = _target;
+		BOOST_FOREACH(RenderItem& ri, render_items)
+		{
+			ri.frame_->Draw(ri.position_ + Vector2i(16, 378));
+		}
+	}
 }
 
 void GameStateMachine::FadeInOut(float _total_time)
@@ -1094,7 +1118,7 @@ void GameStateMachine::LayoutArrows(std::vector<Direction::Enum> _arrows)
 
 
 
-void GameStateMachine::KeyboardCallback(Widget* _widget, KeyPressEventArgs _args)
+void GameStateMachine::KeyboardCallback(Widget* /*_widget*/, KeyPressEventArgs _args)
 {
 	if(!_args.key_up)
 		return;
@@ -1138,7 +1162,7 @@ void GameStateMachine::KeyboardCallback(Widget* _widget, KeyPressEventArgs _args
 	}
 }
 
-void GameStateMachine::GamegridMouseMoveCallback(Widget* _widget, MouseEventArgs _args)
+void GameStateMachine::GamegridMouseMoveCallback(Widget* /*_widget*/, MouseEventArgs _args)
 {
 	last_grid_position_.x = _args.x / Settings::GetGridSize().x;
 	last_grid_position_.y = _args.y / Settings::GetGridSize().y;
