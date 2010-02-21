@@ -524,52 +524,65 @@ void World::AddCat(Walker* _pCat)
 WorldState::Enum World::Tick(float _dt)
 {
 	//TODO perhaps split large DT into smaller periods?
-
-	if(state_ == WorldState::OK)
+	const float max_dt = 0.1f;
+	int full_iterations = floor(_dt/max_dt);
+	float last_iteration = _dt - full_iterations * max_dt;
+	for(int i = 0; i < full_iterations + 1; i++)
 	{
-		//Walk forward
-		for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
+		float dt;
+		if(i == full_iterations)
+			dt = last_iteration;
+		else
+			dt = max_dt;
+		if(dt <= 0)
+			continue;
+		if(state_ == WorldState::OK)
 		{
-			(*it)->Advance(_dt);
-		}
-		for(vector<Walker*>::iterator it = cats_.begin(); it != cats_.end(); ++it)
-		{
-			(*it)->Advance(_dt);
-		}
-		//Collide cats and mice
-		for(vector<Walker*>::iterator m_it = mice_.begin(); m_it != mice_.end(); ++m_it)
-		{
-			for(vector<Walker*>::iterator c_it = cats_.begin(); c_it != cats_.end(); ++c_it)
+			//Walk forward
+			for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
 			{
-				if(((*m_it)->GetPosition() - (*c_it)->GetPosition()).length() < 0.3333f)
+				(*it)->Advance(dt);
+			}
+			for(vector<Walker*>::iterator it = cats_.begin(); it != cats_.end(); ++it)
+			{
+				(*it)->Advance(dt);
+			}
+			//Collide cats and mice
+			for(vector<Walker*>::iterator m_it = mice_.begin(); m_it != mice_.end(); ++m_it)
+			{
+				for(vector<Walker*>::iterator c_it = cats_.begin(); c_it != cats_.end(); ++c_it)
 				{
-					if(std::find(just_dead_mice_.begin(), just_dead_mice_.end(), *m_it) == just_dead_mice_.end())
+					if(World::GetShortestDistance((*m_it)->GetPosition(), (*c_it)->GetPosition(), size_) < 0.3333f)
+					//if(((*m_it)->GetPosition() - (*c_it)->GetPosition()).length() < 0.3333f)
 					{
-						just_dead_mice_.push_back(*m_it);
-						(*m_it)->Kill();
-						state_ = WorldState::Defeat;
-						problem_points_.push_back((*m_it)->GetPosition());
+						if(std::find(just_dead_mice_.begin(), just_dead_mice_.end(), *m_it) == just_dead_mice_.end())
+						{
+							just_dead_mice_.push_back(*m_it);
+							(*m_it)->Kill();
+							state_ = WorldState::Defeat;
+							problem_points_.push_back((*m_it)->GetPosition());
+						}
 					}
 				}
+			}	
+			//Remove cats and mice that have just died, from holes, rockets and cats etc
+			for(vector<Walker*>::iterator it = just_dead_mice_.begin(); it != just_dead_mice_.end(); ++it)
+			{
+				mice_.erase(std::remove(mice_.begin(), mice_.end(), *it), mice_.end());
+				dead_mice_.push_back(*it);
 			}
-		}	
-		//Remove cats and mice that have just died, from holes, rockets and cats etc
-		for(vector<Walker*>::iterator it = just_dead_mice_.begin(); it != just_dead_mice_.end(); ++it)
-		{
-			mice_.erase(std::remove(mice_.begin(), mice_.end(), *it), mice_.end());
-			dead_mice_.push_back(*it);
-		}
-		just_dead_mice_.clear();
-		for(vector<Walker*>::iterator it = just_dead_cats_.begin(); it != just_dead_cats_.end(); ++it)
-		{
-			cats_.erase(std::remove(cats_.begin(), cats_.end(), *it), cats_.end());
-			dead_cats_.push_back(*it);
-		}
-		just_dead_cats_.clear();
-		if(state_ == WorldState::OK && rescued_mice_ > 0)
-		{
-			if(rescued_mice_ == GetTotalMice())
-				state_ = WorldState::Victory;
+			just_dead_mice_.clear();
+			for(vector<Walker*>::iterator it = just_dead_cats_.begin(); it != just_dead_cats_.end(); ++it)
+			{
+				cats_.erase(std::remove(cats_.begin(), cats_.end(), *it), cats_.end());
+				dead_cats_.push_back(*it);
+			}
+			just_dead_cats_.clear();
+			if(state_ == WorldState::OK && rescued_mice_ > 0)
+			{
+				if(rescued_mice_ == GetTotalMice())
+					state_ = WorldState::Victory;
+			}
 		}
 	}
 
@@ -898,4 +911,33 @@ void World::KillAllMice()
 		(*it)->Kill();
 		just_dead_mice_.push_back(*it);
 	}
+}
+
+float World::GetShortestDistance(Vector2f _position1, Vector2f _position2, Vector2f _wrap_size)
+{
+	/* Rather than do comparison 0-10 etc map each coordinate to -5 to +5 
+	eg: 1 -> 1
+	    5 -> 5
+		6 -> -4
+		7 -> -3
+		9 -> -1
+	*/
+	float d1 = (_position1 - _position2).length();
+	Vector2f wrap1 = _position1;
+	if(wrap1.x > _wrap_size.x/2)
+		wrap1.x -= _wrap_size.x;
+	if(wrap1.y > _wrap_size.y/2)
+		wrap1.y -= _wrap_size.y;
+	Vector2f wrap2 = _position2;
+	if(wrap2.x > _wrap_size.x/2)
+		wrap2.x -= _wrap_size.x;
+	if(wrap2.y > _wrap_size.y/2)
+		wrap2.y -= _wrap_size.y;
+	float d2 = (wrap1 - wrap2).length();
+	if(d1 == 0 || d2 == 0)
+		return 0;
+	if(d1 < d2)
+		return d1;
+	else
+		return d2;
 }

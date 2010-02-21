@@ -140,4 +140,6 @@ public:
 	bool GetError(){return state_ == WorldState::FileLoadError;}
 
 	void WalkerReachNewSquare(Walker* _walker);
+
+	static float GetShortestDistance(Vector2f _position1, Vector2f _position2, Vector2f _wrap_size);
 };

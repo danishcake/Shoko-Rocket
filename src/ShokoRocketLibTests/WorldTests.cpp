@@ -362,33 +362,49 @@ TEST(WorldStates)
 	delete pWorld;
 }
 
-TEST(HolesKillWalkers)
+TEST(HolesKillMice)
 {
-	World* pWorld = new World("HolesKillWalkers.Level");
+	World* pWorld = new World("HolesKillMice.Level");
 	CHECK(!pWorld->GetError());
 	CHECK_EQUAL(1, pWorld->GetMice().size());
-	CHECK_EQUAL(1, pWorld->GetCats().size());
+	CHECK_EQUAL(0, pWorld->GetCats().size());
 	CHECK_EQUAL(0, pWorld->GetDeadMice().size());
 	CHECK_EQUAL(0, pWorld->GetDeadCats().size());
 
-	WorldState::Enum state = pWorld->Tick(6); //Should walk far enough to kill the mouse
+	WorldState::Enum state = pWorld->Tick(6.1f); //Should walk far enough to kill the mouse
 	CHECK_EQUAL(0, pWorld->GetMice().size());
-	CHECK_EQUAL(1, pWorld->GetCats().size());
+	CHECK_EQUAL(0, pWorld->GetCats().size());
 	CHECK_EQUAL(1, pWorld->GetDeadMice().size());
 	CHECK_EQUAL(0, pWorld->GetDeadCats().size());
 	CHECK_EQUAL(WorldState::Defeat, state);
 	
 	pWorld->Reset();
+	CHECK_EQUAL(1, pWorld->GetMice().size());
+	CHECK_EQUAL(0, pWorld->GetCats().size());
+	CHECK_EQUAL(0, pWorld->GetDeadMice().size());
+	CHECK_EQUAL(0, pWorld->GetDeadCats().size());
 
-	pWorld->Tick(12 ); //Should walk far enough to kill the cat
+	delete pWorld;
+}
+
+TEST(HolesKillCats)
+{
+	World* pWorld = new World("HolesKillCats.Level");
+	CHECK(!pWorld->GetError());
+	CHECK_EQUAL(0, pWorld->GetMice().size());
+	CHECK_EQUAL(1, pWorld->GetCats().size());
+	CHECK_EQUAL(0, pWorld->GetDeadMice().size());
+	CHECK_EQUAL(0, pWorld->GetDeadCats().size());
+
+	WorldState::Enum state = pWorld->Tick(12); //Should walk far enough to kill the mouse
 	CHECK_EQUAL(0, pWorld->GetMice().size());
 	CHECK_EQUAL(0, pWorld->GetCats().size());
-	CHECK_EQUAL(1, pWorld->GetDeadMice().size());
+	CHECK_EQUAL(0, pWorld->GetDeadMice().size());
 	CHECK_EQUAL(1, pWorld->GetDeadCats().size());
-	CHECK_EQUAL(WalkerState::Killed, pWorld->GetDeadCats()[0]->GetWalkerState());
-
+	CHECK_EQUAL(WorldState::OK, state);
+	
 	pWorld->Reset();
-	CHECK_EQUAL(1, pWorld->GetMice().size());
+	CHECK_EQUAL(0, pWorld->GetMice().size());
 	CHECK_EQUAL(1, pWorld->GetCats().size());
 	CHECK_EQUAL(0, pWorld->GetDeadMice().size());
 	CHECK_EQUAL(0, pWorld->GetDeadCats().size());
@@ -403,7 +419,7 @@ TEST(RocketsRescueMice)
 	CHECK_EQUAL(3, pWorld->GetMice().size());
 	CHECK_EQUAL(3, pWorld->GetTotalMice());
 	CHECK_EQUAL(0, pWorld->GetRescuedMice());
-	pWorld->Tick(6);
+	pWorld->Tick(6.1f);
 	CHECK_EQUAL(2, pWorld->GetMice().size());
 	CHECK_EQUAL(3, pWorld->GetTotalMice());
 	CHECK_EQUAL(1, pWorld->GetRescuedMice());
@@ -685,7 +701,7 @@ TEST(ArrowsDirectMice)
 	pWorld->SetSquareType(Vector2i(1,2), SquareType::WestArrow);
 	CHECK_EQUAL(Vector2f(3,3), pWorld->GetMice().at(0)->GetPosition());
 	CHECK_EQUAL(Direction::West, pWorld->GetMice().at(0)->GetDirection());
-	pWorld->Tick(1.0f);
+	pWorld->Tick(1.00001f);
 	CHECK_EQUAL(Vector2f(2,3), pWorld->GetMice().at(0)->GetPosition());
 	CHECK_EQUAL(Direction::North, pWorld->GetMice().at(0)->GetDirection());
 	pWorld->Tick(1.0f);
@@ -727,7 +743,7 @@ TEST(ArrowsDirectCats)
 	pWorld->SetSquareType(Vector2i(1,2), SquareType::WestArrow);
 	CHECK_EQUAL(Vector2f(3,3), pWorld->GetCats().at(0)->GetPosition());
 	CHECK_EQUAL(Direction::West, pWorld->GetCats().at(0)->GetDirection());
-	pWorld->Tick(1.5f); 
+	pWorld->Tick(1.50001f); 
 	CHECK_EQUAL(Vector2f(2,3), pWorld->GetCats().at(0)->GetPosition());
 	CHECK_EQUAL(Direction::North, pWorld->GetCats().at(0)->GetDirection());
 	pWorld->Tick(1.5f);
@@ -887,7 +903,7 @@ TEST(WrapAround)
 	World* pWorld = new World("WrapAround.Level");
 	CHECK_EQUAL(Vector2f(3,2), pWorld->GetMice().at(0)->GetPosition());
 	CHECK_EQUAL(Direction::West, pWorld->GetMice().at(0)->GetDirection());
-	pWorld->Tick(1.0f);
+	pWorld->Tick(1.00001f);
 	CHECK_EQUAL(Vector2f(2,2), pWorld->GetMice().at(0)->GetPosition());
 	CHECK_EQUAL(Direction::West, pWorld->GetMice().at(0)->GetDirection());
 	pWorld->Tick(1.0f);
@@ -924,4 +940,42 @@ TEST(WrapAround)
 	CHECK_EQUAL(WorldState::Victory, pWorld->Tick(1.0f));
 	
 	delete pWorld;
+}
+
+TEST(WrapAroundCollisions)
+{
+	World* pWorld = new World("WrapAroundCollisions.Level");
+
+	WorldState::Enum state = pWorld->Tick(2);
+	CHECK_EQUAL(WorldState::Defeat, state);
+
+	delete pWorld;
+}
+
+
+TEST(CatMouseTunnelling)
+{
+	World* pWorld = new World();
+	CHECK(pWorld);
+
+	//Mouse moves 1, Cat moves -2/3 so they at 2/3 apart for collisions if timestep done all in one go
+	//Collision radius = 1/3 so maximum timestep = 0.3333/1.666 = 0.2. For safety will split into 0.1s periods
+	pWorld->AddMouse(Vector2i(4,0), Direction::East);
+	pWorld->AddCat(Vector2i(5, 0), Direction::West);
+	pWorld->Tick(1);
+	CHECK_EQUAL(1, pWorld->GetDeadMice().size());
+	delete pWorld;
+}
+
+TEST(ShortestDistance)
+{
+	CHECK_CLOSE(1.414f, World::GetShortestDistance(Vector2f(0,0), Vector2f(9, 9), Vector2f(10, 10)), 0.1f); 
+	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(0,0), Vector2f(1, 0), Vector2f(10, 10)), 0.1f); 
+
+	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(5,0), Vector2f(6, 0), Vector2f(10, 10)), 0.1f); 
+	CHECK_CLOSE(3.0f, World::GetShortestDistance(Vector2f(4,0), Vector2f(7, 0), Vector2f(10, 10)), 0.1f); 
+	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(0,0), Vector2f(9, 0), Vector2f(10, 10)), 0.1f); 
+	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(0,0), Vector2f(0, 9), Vector2f(10, 10)), 0.1f);
+
+	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(9,5), Vector2f(0, 5), Vector2f(10, 10)), 0.1f);
 }

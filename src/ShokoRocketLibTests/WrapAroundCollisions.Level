@@ -1,0 +1,15 @@
+<?xml ?>
+<Level>
+    <Name>wraparound 2</Name>
+    <Size x="6" y="6" />
+    <V x="0" y="0" />
+    <V x="0" y="5" />
+    <H x="0" y="0" />
+    <H x="1" y="0" />
+    <H x="2" y="0" />
+    <H x="3" y="0" />
+    <H x="4" y="0" />
+    <H x="5" y="0" />
+    <Mouse x="0" y="2" d="West" />
+    <Cat x="5" y="2" d="East" />
+</Level>

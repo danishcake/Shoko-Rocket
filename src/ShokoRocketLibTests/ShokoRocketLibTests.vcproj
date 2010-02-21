@@ -334,7 +334,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -342,7 +342,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -354,7 +354,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -362,7 +362,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -374,7 +374,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -382,7 +382,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -394,7 +394,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -402,7 +402,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -414,7 +414,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -422,7 +422,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -434,7 +434,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -442,7 +442,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -454,7 +454,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -462,7 +462,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -474,7 +474,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -482,7 +482,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -494,7 +494,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -502,19 +502,19 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\HolesKillWalkers.Level"
+				RelativePath=".\HolesKillCats.Level"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -522,7 +522,27 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\HolesKillMice.Level"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -534,7 +554,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -542,7 +562,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -554,7 +574,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -562,7 +582,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -574,7 +594,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -582,7 +602,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -594,7 +614,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -602,7 +622,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -614,7 +634,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -622,7 +642,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -634,7 +654,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -642,7 +662,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -654,7 +674,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -662,7 +682,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -674,7 +694,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -682,7 +702,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -694,7 +714,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -702,7 +722,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -714,7 +734,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -722,7 +742,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -734,7 +754,7 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -742,7 +762,27 @@
 					>
 					<Tool
 						Name="Level copier"
-						LevelSet=""
+						Levelset=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\WrapAroundCollisions.Level"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -775,7 +815,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying DLL $(InputFileName)"
-						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;"
+						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;&#x0D;&#x0A;"
 						Outputs="$(OutDir)\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -785,7 +825,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying DLL $(InputFileName)"
-						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;"
+						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;&#x0D;&#x0A;"
 						Outputs="$(OutDir)\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -799,7 +839,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying DLL $(InputFileName)"
-						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;"
+						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;&#x0D;&#x0A;"
 						Outputs="$(OutDir)\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -809,7 +849,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying DLL $(InputFileName)"
-						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;"
+						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;&#x0D;&#x0A;"
 						Outputs="$(OutDir)\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -823,7 +863,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying DLL $(InputFileName)"
-						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;"
+						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;&#x0D;&#x0A;"
 						Outputs="$(OutDir)\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -833,7 +873,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying DLL $(InputFileName)"
-						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;"
+						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;&#x0D;&#x0A;"
 						Outputs="$(OutDir)\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -847,7 +887,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying DLL $(InputFileName)"
-						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;"
+						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;&#x0D;&#x0A;"
 						Outputs="$(OutDir)\$(InputFileName)"
 					/>
 				</FileConfiguration>
@@ -857,7 +897,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Copying DLL $(InputFileName)"
-						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;"
+						CommandLine="copy /Y &quot;$(InputPath)&quot; &quot;$(OutDir)\$(InputFileName)&quot;&#x0D;&#x0A;"
 						Outputs="$(OutDir)\$(InputFileName)"
 					/>
 				</FileConfiguration>
