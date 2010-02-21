@@ -779,6 +779,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Messages"
+				>
+				<File
+					RelativePath=".\Sprites\FailAnimation.animation"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\FailAnimation.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\WinAnimation.animation"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\WinAnimation.png"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Levels"

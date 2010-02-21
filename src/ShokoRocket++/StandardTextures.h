@@ -19,6 +19,8 @@ namespace StandardTextures
 	extern Animation* hole_animation;
 	extern Animation* ring_animation;
 	extern Animation* arrows_area;
+	extern Animation* win_animation;
+	extern Animation* fail_animation;
 	
 
 

@@ -26,6 +26,8 @@ namespace StandardTextures
 	Animation* hole_animation = 0;
 	Animation* ring_animation = 0;
 	Animation* grid_animation = 0;
+	Animation* win_animation = 0;
+	Animation* fail_animation = 0;
 	
 	
 
@@ -128,7 +130,8 @@ namespace StandardTextures
 		arrows_area = SDLTextureManager::GetAnimation("ArrowsArea.animation");
 		AnimationSet* rocket_animation_set = SDLTextureManager::GetAnimationSet(Settings::GetRocketSprite());
 		rocket_normal_animation = rocket_animation_set->GetAnimation("Normal");
-
+		win_animation = SDLTextureManager::GetAnimation("WinAnimation.animation");
+		fail_animation = SDLTextureManager::GetAnimation("FailAnimation.animation");
 
 		if(!hole_animation)
 		{
@@ -148,6 +151,16 @@ namespace StandardTextures
 		if(!arrows_area)
 		{
 			Logger::ErrorOut() << "Unable to load arrow area animation\n";
+		}
+
+		if(!win_animation)
+		{
+			Logger::ErrorOut() << "Unable to load win animation\n";
+		}
+
+		if(!fail_animation)
+		{
+			Logger::ErrorOut() << "Unable to load win animation\n";
 		}
 		//TODO blastoff
 	}

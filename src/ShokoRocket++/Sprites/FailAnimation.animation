@@ -1,0 +1,14 @@
+<AnimationSet>
+  <Animation Name="Normal">
+    <Frame Width="96" Height="50" Top="0" Left="0" File="FailAnimation.png" Time="0.1"/>
+	<Frame Width="96" Height="50" Top="50" Left="0" File="FailAnimation.png" Time="0.1"/>
+	<Frame Width="96" Height="50" Top="100" Left="0" File="FailAnimation.png" Time="0.1"/>
+	<Frame Width="96" Height="50" Top="150" Left="0" File="FailAnimation.png" Time="0.1"/>
+	<Frame Width="96" Height="50" Top="200" Left="0" File="FailAnimation.png" Time="1.85"/>
+	<Frame Width="96" Height="50" Top="250" Left="0" File="FailAnimation.png" Time="0.05"/>
+	<Frame Width="96" Height="50" Top="300" Left="0" File="FailAnimation.png" Time="0.05"/>
+	<Frame Width="96" Height="50" Top="350" Left="0" File="FailAnimation.png" Time="0.05"/>
+	<Frame Width="96" Height="50" Top="400" Left="0" File="FailAnimation.png" Time="0.05"/>
+	<Frame Width="96" Height="50" Top="450" Left="0" File="FailAnimation.png" Time="0.05"/>
+  </Animation>
+</AnimationSet>
