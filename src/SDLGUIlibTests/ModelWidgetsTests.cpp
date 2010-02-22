@@ -6,7 +6,6 @@ using std::string;
 
 TEST_FIXTURE(SDL_fixture, ModalDefaults)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
  	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -19,7 +18,6 @@ TEST_FIXTURE(SDL_fixture, ModalDefaults)
 
 TEST_FIXTURE(SDL_fixture, ModelWidgetSelection)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
  	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -65,7 +63,6 @@ namespace
 
 TEST_FIXTURE(SDL_fixture, ModelEvents)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
  	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -101,7 +98,6 @@ TEST_FIXTURE(SDL_fixture, ModelEvents)
 
 TEST_FIXTURE(SDL_fixture, ModalHierarchy)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
  	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{

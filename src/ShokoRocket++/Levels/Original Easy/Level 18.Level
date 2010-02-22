@@ -65,4 +65,5 @@
     <Cat x="5" y="5" d="North" />
     <Cat x="5" y="6" d="North" />
     <Cat x="2" y="8" d="South" />
+    <Cat x="5" y="7" d="North" />
 </Level>

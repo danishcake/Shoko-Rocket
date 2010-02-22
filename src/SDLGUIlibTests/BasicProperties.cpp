@@ -15,8 +15,6 @@ TEST_FIXTURE(SDL_fixture, WidgetDefaults)
 
 TEST_FIXTURE(SDL_fixture, WidgetSetters)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{

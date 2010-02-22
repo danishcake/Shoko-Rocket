@@ -42,8 +42,6 @@ TEST_FIXTURE(SDL_fixture, WidgetClickFiresCallback)
 
 TEST_FIXTURE(SDL_fixture, WidgetSecondClickFiresCallback)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -70,8 +68,6 @@ TEST_FIXTURE(SDL_fixture, WidgetSecondClickFiresCallback)
 
 TEST_FIXTURE(SDL_fixture, HierachalMouseClickHandling)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{

@@ -1393,6 +1393,26 @@
 							/>
 						</FileConfiguration>
 					</File>
+					<File
+						RelativePath=".\Levels\Miscellanea\Wraparound.Level"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Miscellanea"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Miscellanea"
+							/>
+						</FileConfiguration>
+					</File>
 				</Filter>
 			</Filter>
 		</Filter>

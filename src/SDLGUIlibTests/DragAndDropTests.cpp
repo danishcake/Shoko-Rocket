@@ -39,8 +39,6 @@ namespace
 
 TEST_FIXTURE(SDL_fixture, WidgetDragSources)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -56,8 +54,6 @@ TEST_FIXTURE(SDL_fixture, WidgetDragSources)
 
 TEST_FIXTURE(SDL_fixture, WidgetStartDragEvent)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -91,8 +87,6 @@ TEST_FIXTURE(SDL_fixture, WidgetStartDragEvent)
 
 TEST_FIXTURE(SDL_fixture, WidgetDragResetEventOverSelf)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -136,8 +130,6 @@ TEST_FIXTURE(SDL_fixture, WidgetDragResetEventOverSelf)
 
 TEST_FIXTURE(SDL_fixture, WidgetDragResetEventOverEmpty)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -181,8 +173,6 @@ TEST_FIXTURE(SDL_fixture, WidgetDragResetEventOverEmpty)
 
 TEST_FIXTURE(SDL_fixture, WidgetDragResetEventOverRejectingWidget)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{
@@ -235,8 +225,6 @@ TEST_FIXTURE(SDL_fixture, WidgetDragResetEventOverRejectingWidget)
 
 TEST_FIXTURE(SDL_fixture, WidgetDragResetEventOverAccceptingWidget)
 {
-	UNITTEST_TIME_CONSTRAINT(50);
-
 	CHECK(SDL_init_ok);
 	if(SDL_init_ok)
 	{

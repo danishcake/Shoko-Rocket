@@ -22,6 +22,7 @@ EditLevel::EditLevel(std::string _filename, Vector2f _grid_size)
 : BaseLevel(_grid_size)
 {
 	world_ = shared_ptr<World>(new World(_filename));
+	world_->LoadSolution();
 	world_->SetArrowStockUnlimited();
 	grid_animation_ = CreateGridTexture(world_, grid_size_);
 	edit_mode_ = EditMode::EditWalls;
