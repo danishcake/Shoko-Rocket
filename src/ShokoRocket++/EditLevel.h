@@ -19,13 +19,16 @@ protected:
 
 public:
 	EditLevel(Vector2i _level_size, Vector2f _grid_size);
+	EditLevel(std::string _filename, Vector2f _grid_size);
 	virtual ~EditLevel(void);
 
 	virtual void Tick(float _time, Input _input);
 	EditMode::Enum GetEditMode(){return edit_mode_;}
 	void SetEditMode(EditMode::Enum _edit_mode);
 	bool GetValidated(){return validated_;}
+	bool LoadOK(){return !world_->GetError();}
 	void SetName(std::string _level_name){world_->SetName(_level_name);}
 	std::string GetName(){return world_->GetName();}
 	void Save(std::string _name);
+	Vector2i GetSize(){return world_->GetSize();}
 };

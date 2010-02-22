@@ -326,7 +326,8 @@ void Widget::RemoveChild(Widget* _widget)
 	if(event_lock_)
 	{
 		pending_root_.push_back(_widget);
-		pending_children_.erase(std::remove(pending_children_.begin(), pending_children_.end(), _widget), pending_children_.end());
+		//pending_children_.erase(std::remove(pending_children_.begin(), pending_children_.end(), _widget), pending_children_.end());
+		pending_removal_children_.push_back(_widget);
 	} else
 	{
 		root_.push_back(_widget);
@@ -803,13 +804,18 @@ void Widget::Invalidate()
 
 void Widget::InsertPending()
 {
+	for(vector<Widget*>::iterator it = pending_removal_children_.begin(); it != pending_removal_children_.end(); ++it)
+	{
+		children_.erase(std::remove(children_.begin(), children_.end(), *it), children_.end());
+	}
+	
+	pending_removal_children_.clear();
 	children_.insert(children_.end(), pending_children_.begin(), pending_children_.end());
 	for(vector<Widget*>::iterator it = pending_children_.begin(); it != pending_children_.end(); ++it)
 	{
 		(*it)->SetParent(this);
 	}
 	pending_children_.clear();
-
 }
 
 
@@ -1039,6 +1045,8 @@ void Widget::RemoveEventLock()
 	/* Merge widgets created during this callback */
 	all_.insert(all_.end(), pending_all_.begin(), pending_all_.end());
 	pending_all_.clear();
+
+
 
 	for(std::vector<Widget*>::iterator it = all_.begin(); it != all_.end(); ++it)
 	{

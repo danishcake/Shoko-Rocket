@@ -18,8 +18,6 @@ const float GameStateMachine::sub_mode_widget_transition_time = 0.5f;
 
 GameStateMachine::GameStateMachine()
 {
-	//state_indicator_level_ = boost::shared_ptr<PuzzleLevel>(new PuzzleLevel("", Settings::GetGridSize()));
-
 	mode_timer_ = 0.01f;
 	sub_mode_timer_ = 0;
 	mode_ = Mode::Intro;
@@ -123,13 +121,20 @@ void GameStateMachine::SetupMenu()
 	levels_widget_->OnItemRender.connect(boost::bind(&GameStateMachine::RenderLevel, this, _1, _2, _3));
 	levels_widget_->PerformItemLayout();
 	levels_widget_->OnItemFocusedClick.connect(boost::bind(&GameStateMachine::MenuLevelSelect, this, _1, _2));
-	levels_widget_->OnItemClick.connect(boost::bind(&GameStateMachine::MenuLevelHighlight, this, _1, _2));
+	levels_widget_->OnItemSelectedChanged.connect(boost::bind(&GameStateMachine::MenuLevelHighlight, this, _1, _2));
 	levels_widget_->OnPageChange.connect(boost::bind(&GameStateMachine::MenuLevelBrowerPageChange, this, _1, _2, _3));
 	
 	level_name_ = new Widget("Blank384x96.png");
 	level_name_->SetPosition(Vector2i(138, Settings::GetResolution().y - 120 + 20));
 	level_name_->SetText("Page " + boost::lexical_cast<std::string, int>(levels_widget_->GetPage() + 1) + "/" + boost::lexical_cast<std::string, int>(levels_widget_->GetPageCount()), TextAlignment::TopLeft);
 	level_name_->SetRejectsFocus(true);
+
+	edit_widget_ = new Widget("Blank96x32.png");
+	edit_widget_->SetPosition(Vector2i(138+384+10, Settings::GetResolution().y - 120 + 20));
+	edit_widget_->SetText("Edit", TextAlignment::Centre);
+	edit_widget_->SetVisibility(false);
+	edit_widget_->OnClick.connect(boost::bind(&GameStateMachine::MenuEditExistingCallback, this, _1));
+
 
 
 	options_widget_ = new Widget("Options.png");
@@ -311,6 +316,15 @@ void GameStateMachine::MenuLevelHighlight(Widget* /*_widget*/, std::string _name
 {
 	Logger::DiagnosticOut() << _name << "\n";
 	level_name_->SetText(_name, TextAlignment::TopLeft);
+	if(boost::filesystem::is_directory("Levels" + rel_path_ + "/" + _name))
+	{
+		selected_level_ = "";
+		edit_widget_->SetVisibility(false);
+	} else
+	{
+		selected_level_ = rel_path_ + "/" + _name;
+		edit_widget_->SetVisibility(true);
+	}
 }
 
 void GameStateMachine::MenuExitCallback(Widget* /*_widget*/)
@@ -340,9 +354,20 @@ void GameStateMachine::MenuEditorCallback(Widget* /*_widget*/)
 		pend_mode_ = Mode::Editor;
 		mode_timer_ = 1.0f;
 		FadeInOut(2.0f);
+		create_new_level_ = true;
 	}
 }
 
+void GameStateMachine::MenuEditExistingCallback(Widget* /*_widget*/)
+{
+	if(sub_mode_ == pend_sub_mode_ && selected_level_.length() > 0)
+	{
+		pend_mode_ = Mode::Editor;
+		mode_timer_ = 1.0f;
+		FadeInOut(2.0f);
+		create_new_level_ = false;
+	}
+}
 void GameStateMachine::MenuOptionsCallback(Widget* /*_widget*/)
 {
 	if(sub_mode_ == pend_sub_mode_)
@@ -402,10 +427,10 @@ void GameStateMachine::SetupPuzzle()
 	quit->OnClick.connect(boost::bind(&GameStateMachine::PuzzleQuitClick, this, _1));
 	quit->SetText("Back", TextAlignment::Centre);
 
-	GameGridWidget* grid_widget = new GameGridWidget(Vector2i(12, 9), Vector2i(32, 32));
-	grid_widget->SetPosition(Vector2i(138, 10));
-	grid_widget->OnGridClick.connect(boost::bind(&GameStateMachine::PuzzleGridClick, this, _1, _2));
-	grid_widget->OnGridGesture.connect(boost::bind(&GameStateMachine::PuzzleGridGesture, this, _1, _2));
+//	GameGridWidget* grid_widget = new GameGridWidget(Vector2i(12, 9), Vector2i(32, 32));
+//	grid_widget->SetPosition(Vector2i(138, 10));
+//	grid_widget->OnGridClick.connect(boost::bind(&GameStateMachine::PuzzleGridClick, this, _1, _2));
+//	grid_widget->OnGridGesture.connect(boost::bind(&GameStateMachine::PuzzleGridGesture, this, _1, _2));
 
 	puzzle_complete_widget_ = new Widget("Blank384x96.png");
 	puzzle_complete_widget_->SetText("Solved!", TextAlignment::Top);
@@ -611,10 +636,7 @@ void GameStateMachine::SetupEditor()
 {
 	size_ = Vector2i(12, 9);
 	new_level_widget_ = new Widget("Blank384x384.png");
-	new_level_widget_->SetPosition(Vector2i(128, 48));
 	new_level_widget_->SetRejectsFocus(true);
-	new_level_widget_->SetVisibility(true);
-	new_level_widget_->SetModal(true);
 
 	Widget* sizex_desc = new Widget("Blank32x32.png");
 	sizex_desc->SetPosition(Vector2i(10, 10));
@@ -740,8 +762,22 @@ void GameStateMachine::SetupEditor()
 	back->OnClick.connect(boost::bind(&GameStateMachine::EditorReturnClick, this, _1));
 
 	
+	if(create_new_level_)
+	{
+		editor_level_ = boost::shared_ptr<EditLevel>((EditLevel*)NULL);	
+		new_level_widget_->SetVisibility(true);
+		new_level_widget_->SetModal(true);
+		new_level_widget_->SetPosition(Vector2i(128, 48));
+	} else
+	{
+		editor_level_ = boost::shared_ptr<EditLevel>(new EditLevel(selected_level_, Settings::GetGridSize()));	
+		size_ = editor_level_->GetSize();
+		new_level_widget_->SetVisibility(false);
+		new_level_widget_->SetModal(false);
+		new_level_widget_->SetPosition(Vector2i(-500, -500));
+		CreateRenderArea(editor_level_->GetLevelSize(), Mode::Editor);
+	}
 
-	editor_level_ = boost::shared_ptr<EditLevel>((EditLevel*)NULL);	
 }
 
 void GameStateMachine::TeardownEditor()
@@ -809,6 +845,7 @@ void GameStateMachine::EditorCreateClick(Widget* /*_widget*/)
 	new_level_widget_->SetModal(false);
 	new_level_widget_->SetPosition(Vector2i(-500, -500));
 	editor_level_->SetName(level_name_editor_->GetText());
+	selected_level_ = "";
 }
 
 void GameStateMachine::EditorWallMode(Widget* /*_widget*/)
@@ -846,6 +883,10 @@ void GameStateMachine::EditorNewClick(Widget* /*_widget*/)
 	new_level_widget_->SetVisibility(true);
 	new_level_widget_->SetModal(true);
 	new_level_widget_->SetPosition(Vector2i(128, 48));
+	size_ = Vector2i(12, 9);
+	sizex_->SetText(boost::lexical_cast<std::string, int>(size_.x), TextAlignment::Centre);
+	sizey_->SetText(boost::lexical_cast<std::string, int>(size_.y), TextAlignment::Centre);
+
 }
 
 void GameStateMachine::EditorStartClick(Widget* /*_widget*/)
@@ -860,7 +901,10 @@ void GameStateMachine::EditorResetClick(Widget* /*_widget*/)
 
 void GameStateMachine::EditorSaveClick(Widget* /*_widget*/)
 {
-	editor_level_->Save(std::string("Editor - ") + editor_level_->GetName() + ".Level");
+	if(selected_level_.length() > 0)
+		editor_level_->Save(selected_level_);
+	else
+		editor_level_->Save(std::string("Editor - ") + editor_level_->GetName() + ".Level");
 }
 
 /* Main methods */

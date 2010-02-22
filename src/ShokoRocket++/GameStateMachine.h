@@ -64,10 +64,12 @@ private:
 	Widget* gesture_hint_;
 	Widget* clicks_hint_;
 	Widget* level_name_;
+	Widget* edit_widget_;
 
 	ItemBrowserWidget* levels_widget_;
 	std::string rel_path_;
 	bool reload_due_;
+	std::string selected_level_;
 	/*Menu methods */
 	void SetupMenu();
 	void ProcessMenu(float _timespan);
@@ -79,6 +81,7 @@ private:
 	void MenuExitCallback(Widget* _widget);
 	void MenuPuzzleCallback(Widget* _widget);
 	void MenuEditorCallback(Widget* _widget);
+	void MenuEditExistingCallback(Widget* _widget);
 	void MenuOptionsCallback(Widget* _widget);
 	void MenuLevelBrowerPageChange(Widget* _widget, int _old_page, int _new_page);
 	void OptionsInputmethodCallback(Widget* _widget);
@@ -115,6 +118,7 @@ private:
 	Widget* sizex_;
 	Widget* sizey_;
 	Widget* level_name_editor_;
+	bool create_new_level_;
 	/* Editor methods */
 	void SetupEditor();
 	void ProcessEditor(float _timespan);

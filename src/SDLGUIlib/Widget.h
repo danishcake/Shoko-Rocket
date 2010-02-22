@@ -19,6 +19,7 @@ protected:
 	Vector2i size_;
 	vector<Widget*> children_;
 	vector<Widget*> pending_children_;
+	vector<Widget*> pending_removal_children_;
 	Widget* parent_;
 	Widget* left_link_;
 	Widget* right_link_;
