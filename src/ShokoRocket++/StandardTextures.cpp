@@ -28,7 +28,7 @@ namespace StandardTextures
 	Animation* grid_animation = 0;
 	Animation* win_animation = 0;
 	Animation* fail_animation = 0;
-	
+	Animation* exclamation_animation = 0;
 	
 
 	void LoadTextures()
@@ -132,6 +132,7 @@ namespace StandardTextures
 		rocket_normal_animation = rocket_animation_set->GetAnimation("Normal");
 		win_animation = SDLTextureManager::GetAnimation("WinAnimation.animation");
 		fail_animation = SDLTextureManager::GetAnimation("FailAnimation.animation");
+		exclamation_animation = SDLTextureManager::GetAnimation("Exclamation.animation");
 
 		if(!hole_animation)
 		{
@@ -161,6 +162,10 @@ namespace StandardTextures
 		if(!fail_animation)
 		{
 			Logger::ErrorOut() << "Unable to load win animation\n";
+		}
+		if(!exclamation_animation)
+		{
+			Logger::ErrorOut() << "Unable to load exclamation animation\n";
 		}
 		//TODO blastoff
 	}

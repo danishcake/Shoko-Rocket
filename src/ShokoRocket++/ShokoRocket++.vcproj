@@ -783,6 +783,14 @@
 				Name="Messages"
 				>
 				<File
+					RelativePath=".\Sprites\Exclamation.animation"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\Exclamation.png"
+					>
+				</File>
+				<File
 					RelativePath=".\Sprites\FailAnimation.animation"
 					>
 				</File>

@@ -22,6 +22,7 @@ Walker::Walker(void)
 	Total_created++;
 	death_time_ = 0;
 	walker_state_ = WalkerState::Live;
+	problem_ = false;
 }
 
 Walker::~Walker(void)

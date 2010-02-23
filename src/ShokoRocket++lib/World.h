@@ -134,6 +134,7 @@ public:
 
 	void LoadSolution();
 	vector<Vector2f> GetProblemPoints(){return problem_points_;}
+	void ResetProblemWalkers();
 	
 
 	//Gets the error state

@@ -4,6 +4,7 @@
 #include <boost/foreach.hpp>
 #include "Animation.h"
 #include "GridTextureCreator.h"
+#include "StandardTextures.h"
 using std::string;
 using std::vector;
 using boost::shared_ptr;
@@ -72,7 +73,7 @@ void EditLevel::Tick(float _time, Input _input)
 			case Action::Start:
 				edit_mode_restore_ = edit_mode_;
 				edit_mode_ = EditMode::Running;
-				
+				world_->ResetProblemWalkers();
 				break;
 			}
 		}
@@ -116,6 +117,7 @@ void EditLevel::Tick(float _time, Input _input)
 			case Action::Start:
 				edit_mode_restore_ = edit_mode_;
 				edit_mode_ = EditMode::Running;
+				world_->ResetProblemWalkers();
 				break;
 			}
 		}
@@ -151,6 +153,7 @@ void EditLevel::Tick(float _time, Input _input)
 			case Action::Start:
 				edit_mode_restore_ = edit_mode_;
 				edit_mode_ = EditMode::Running;
+				world_->ResetProblemWalkers();
 				break;
 			}
 		}
@@ -186,6 +189,7 @@ void EditLevel::Tick(float _time, Input _input)
 			case Action::Start:
 				edit_mode_restore_ = edit_mode_;
 				edit_mode_ = EditMode::Running;
+				world_->ResetProblemWalkers();
 				break;
 			}
 		}
@@ -217,6 +221,7 @@ void EditLevel::Tick(float _time, Input _input)
 			case Action::Start:
 				edit_mode_restore_ = edit_mode_;
 				edit_mode_ = EditMode::Running;
+				world_->ResetProblemWalkers();
 				break;
 			}
 		}
@@ -246,6 +251,7 @@ void EditLevel::Tick(float _time, Input _input)
 			case Action::Start:
 				edit_mode_restore_ = edit_mode_;
 				edit_mode_ = EditMode::Running;
+				world_->ResetProblemWalkers();
 				break;
 			}
 		}
@@ -299,6 +305,42 @@ void EditLevel::Tick(float _time, Input _input)
 	BaseLevel::Tick(_time, _input);
 }
 
+vector<RenderItem> EditLevel::Draw()
+{
+	vector<RenderItem> draw_list = BaseLevel::Draw();
+
+	vector<Walker*>& mice = world_->GetMice();
+	vector<Walker*>& cats = world_->GetCats();
+	if(edit_mode_ != EditMode::Running && edit_mode_ != EditMode::RunningFast)
+	{
+		for(vector<Walker*>::iterator it = mice.begin(); it != mice.end(); ++it)
+		{
+			if((*it)->GetProblem())
+			{
+				RenderItem ri;
+				ri.position_ = (*it)->GetPosition() * grid_size_ + Vector2i(2, grid_size_.y - 18);
+
+				ri.depth = 1;
+				ri.frame_ = StandardTextures::exclamation_animation->GetCurrentFrame();
+				draw_list.push_back(ri);
+			}
+		}
+		for(vector<Walker*>::iterator it = cats.begin(); it != cats.end(); ++it)
+		{
+			if((*it)->GetProblem())
+			{
+				RenderItem ri;
+				ri.position_ = (*it)->GetPosition() * grid_size_ + Vector2i(2, grid_size_.y - 18);
+
+				ri.depth = 1;
+				ri.frame_ = StandardTextures::exclamation_animation->GetCurrentFrame();
+				draw_list.push_back(ri);
+			}
+		}
+	}
+
+	return draw_list;
+}
 void EditLevel::SetEditMode(EditMode::Enum _edit_mode)
 {
 	switch(edit_mode_)

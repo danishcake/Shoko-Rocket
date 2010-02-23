@@ -559,6 +559,7 @@ WorldState::Enum World::Tick(float _dt)
 						{
 							just_dead_mice_.push_back(*m_it);
 							(*m_it)->Kill();
+							(*c_it)->SetProblem(true);
 							state_ = WorldState::Defeat;
 							problem_points_.push_back((*m_it)->GetPosition());
 						}
@@ -569,6 +570,7 @@ WorldState::Enum World::Tick(float _dt)
 			for(vector<Walker*>::iterator it = just_dead_mice_.begin(); it != just_dead_mice_.end(); ++it)
 			{
 				mice_.erase(std::remove(mice_.begin(), mice_.end(), *it), mice_.end());
+				(*it)->SetProblem(true);
 				dead_mice_.push_back(*it);
 			}
 			just_dead_mice_.clear();
@@ -940,4 +942,23 @@ float World::GetShortestDistance(Vector2f _position1, Vector2f _position2, Vecto
 		return d1;
 	else
 		return d2;
+}
+void World::ResetProblemWalkers()
+{
+	for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
+	{
+		(*it)->SetProblem(false);
+	}
+	for(vector<Walker*>::iterator it = dead_mice_.begin(); it != dead_mice_.end(); ++it)
+	{
+		(*it)->SetProblem(false);
+	}
+	for(vector<Walker*>::iterator it = cats_.begin(); it != cats_.end(); ++it)
+	{
+		(*it)->SetProblem(false);
+	}
+	for(vector<Walker*>::iterator it = dead_cats_.begin(); it != dead_cats_.end(); ++it)
+	{
+		(*it)->SetProblem(false);
+	}
 }

@@ -23,6 +23,7 @@ public:
 	virtual ~EditLevel(void);
 
 	virtual void Tick(float _time, Input _input);
+	virtual vector<RenderItem> Draw();
 	EditMode::Enum GetEditMode(){return edit_mode_;}
 	void SetEditMode(EditMode::Enum _edit_mode);
 	bool GetValidated(){return validated_;}

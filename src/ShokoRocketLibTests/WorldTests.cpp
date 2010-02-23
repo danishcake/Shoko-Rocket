@@ -979,3 +979,38 @@ TEST(ShortestDistance)
 
 	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(9,5), Vector2f(0, 5), Vector2f(10, 10)), 0.1f);
 }
+
+TEST(TroublesomeWalkersMarked)
+{
+	/*
+	Collides cat & mouse together, checks that they are marked as colliders, 
+	but uncollided mouse is not.
+	*/
+	World* pWorld = new World();
+	Walker* mouse = new Walker();
+	mouse->SetPosition(Vector2f(0,0));
+	mouse->SetDirection(Direction::East);
+	Walker* mouse2 = new Walker();
+	mouse2->SetPosition(Vector2f(0,1));
+	mouse2->SetDirection(Direction::East);
+
+	Walker* cat = new Walker();
+	cat->SetPosition(Vector2f(4,0));
+	cat->SetDirection(Direction::West);
+	
+	pWorld->AddCat(cat);
+	pWorld->AddMouse(mouse);
+	pWorld->AddMouse(mouse2);
+
+	WorldState::Enum state = pWorld->Tick(4);
+	CHECK_EQUAL(WorldState::Defeat, state);
+	CHECK_EQUAL(true, mouse->GetProblem());
+	CHECK_EQUAL(true, cat->GetProblem());
+	CHECK_EQUAL(false, mouse2->GetProblem());
+	pWorld->ResetProblemWalkers();
+	CHECK_EQUAL(false, mouse->GetProblem());
+	CHECK_EQUAL(false, cat->GetProblem());
+	CHECK_EQUAL(false, mouse2->GetProblem());
+
+	delete pWorld;
+}

@@ -32,6 +32,7 @@ protected:
 	WalkerType::Enum walker_type_;
 	WalkerState::Enum walker_state_;
 	float death_time_;
+	bool problem_;
 
 public:
 	Walker(void);
@@ -72,4 +73,8 @@ public:
 	/* Changes the walker state to rescued */
 	void Rescue();
 	WalkerState::Enum GetWalkerState();
+
+	/* The entity can be marked as a problem if it collided */
+	void SetProblem(bool _problem){problem_ = _problem;}
+	bool GetProblem(){return problem_;}
 };

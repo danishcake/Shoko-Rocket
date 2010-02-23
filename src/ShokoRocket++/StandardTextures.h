@@ -21,6 +21,7 @@ namespace StandardTextures
 	extern Animation* arrows_area;
 	extern Animation* win_animation;
 	extern Animation* fail_animation;
+	extern Animation* exclamation_animation;
 	
 
 
