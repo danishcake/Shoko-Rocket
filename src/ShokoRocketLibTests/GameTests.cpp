@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <Walker.h>
-#include <World.h>
+#include <BaseWorld.h>
 //#include <Game.h>
 
 TEST(GameEntities)
