@@ -2,7 +2,7 @@
 #include "vmath.h"
 #include "Direction.h"
 
-class World;
+class BaseWorld;
 
 namespace WalkerType
 {
@@ -28,7 +28,7 @@ protected:
 	Direction::Enum direction_;
 	Direction::Enum initial_direction_;
 	float speed_;
-	World* pWorld_;
+	BaseWorld* pWorld_;
 	WalkerType::Enum walker_type_;
 	WalkerState::Enum walker_state_;
 	float death_time_;
@@ -53,8 +53,8 @@ public:
 	void SetWalkerType(WalkerType::Enum _walker_type);
 
 	/* Gets and sets the world */
-	World* GetWorld(){return pWorld_;}
-	void SetWorld(World* _pWorld){pWorld_ = _pWorld;}
+	BaseWorld* GetWorld(){return pWorld_;}
+	void SetWorld(BaseWorld* _pWorld){pWorld_ = _pWorld;}
 
 
 	

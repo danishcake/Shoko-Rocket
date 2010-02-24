@@ -1,5 +1,5 @@
 #include "PuzzleLevel.h"
-#include <World.h>
+#include <SPWorld.h>
 #include <Walker.h>
 #include <boost/foreach.hpp>
 #include "GridTextureCreator.h"
@@ -11,7 +11,7 @@ using boost::shared_ptr;
 PuzzleLevel::PuzzleLevel(string _name, Vector2f _grid_size) 
 	: BaseLevel(_grid_size)
 {
-	world_ = shared_ptr<World>(new World(_name));
+	world_ = shared_ptr<SPWorld>(new SPWorld(_name));
 	grid_animation_ = CreateGridTexture(world_, grid_size_);
 	puzzle_state_ = PuzzleMode::Puzzle;
 	

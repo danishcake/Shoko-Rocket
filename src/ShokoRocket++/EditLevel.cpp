@@ -1,5 +1,5 @@
 #include "EditLevel.h"
-#include <World.h>
+#include <SPWorld.h>
 #include <Walker.h>
 #include <boost/foreach.hpp>
 #include "Animation.h"
@@ -12,7 +12,7 @@ using boost::shared_ptr;
 EditLevel::EditLevel(Vector2i _level_size, Vector2f _grid_size)
 : BaseLevel(_grid_size)
 {
-	world_ = shared_ptr<World>(new World());
+	world_ = shared_ptr<SPWorld>(new SPWorld());
 	world_->SetSize(_level_size);
 	world_->SetArrowStockUnlimited();
 	grid_animation_ = CreateGridTexture(world_, grid_size_);
@@ -22,7 +22,7 @@ EditLevel::EditLevel(Vector2i _level_size, Vector2f _grid_size)
 EditLevel::EditLevel(std::string _filename, Vector2f _grid_size) 
 : BaseLevel(_grid_size)
 {
-	world_ = shared_ptr<World>(new World(_filename));
+	world_ = shared_ptr<SPWorld>(new SPWorld(_filename));
 	world_->LoadSolution();
 	world_->SetArrowStockUnlimited();
 	grid_animation_ = CreateGridTexture(world_, grid_size_);

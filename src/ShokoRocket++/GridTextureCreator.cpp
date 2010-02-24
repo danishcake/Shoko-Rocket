@@ -19,7 +19,7 @@ namespace
 #endif
 }
 
-Animation* CreateGridTexture(boost::shared_ptr<World> _world, Vector2i _grid_size)
+Animation* CreateGridTexture(boost::shared_ptr<BaseWorld> _world, Vector2i _grid_size)
 {
 	bool fill = true;
 	

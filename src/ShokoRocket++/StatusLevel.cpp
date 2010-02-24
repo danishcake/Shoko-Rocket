@@ -9,7 +9,7 @@ using boost::shared_ptr;
 StatusLevel::StatusLevel(Vector2i _grid_size) 
 : BaseLevel(_grid_size)
 {
-	world_ = shared_ptr<World>(new World());
+	world_ = shared_ptr<SPWorld>(new SPWorld());
 	world_->SetSize(Vector2i(3,3));
 	grid_animation_ = CreateGridTexture(world_, grid_size_);
 	world_->AddMouse(Vector2i(0,0), Direction::South);

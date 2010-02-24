@@ -1,11 +1,9 @@
 #include "StandardTextures.h"
 #include <AnimationSet.h>
-//#include <Animation.h>
 #include "SDLTextureManager.h"
 #include <Direction.h>
 #include <Logger.h>
 #include <Animation.h>
-#include <World.h>
 #include <SDL.h>
 #include "Settings.h"
 #include "SDLAnimationFrame.h"

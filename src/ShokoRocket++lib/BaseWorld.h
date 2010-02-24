@@ -36,15 +36,10 @@ namespace WorldState
 	};
 }
 
-struct ArrowRecord
-{
-	Vector2i Position;
-	Direction::Enum Direction;
-};
-
 class Walker;
+class TiXmlHandle;
 
-class World
+class BaseWorld
 {
 protected:
 	Vector2i size_;
@@ -56,29 +51,19 @@ protected:
 	vector<Walker*> dead_cats_;
 	vector<Walker*> just_dead_mice_;
 	vector<Walker*> just_dead_cats_;
-	vector<Vector2f> problem_points_;
 
-
-	vector<Direction::Enum> arrows_;
-	vector<ArrowRecord> solution_arrows_;
-	bool unlimited_arrow_stock_;
-
-	int rescued_mice_;
 	string name_;
 	string filename_;
 	WorldState::Enum state_;
 
+	virtual void LoadXML(TiXmlHandle& _root);
 public:
-	World(void);
-	World(std::string _filename);
-	~World(void);
+	//Constructors
+	BaseWorld();
+	virtual ~BaseWorld(void);
 
-	//Advances all the mice and cats and collides everything
-	WorldState::Enum Tick(float _dt);
-	//Resets the level to it's starting state(Mice reset, placed arrows restored)
-	void Reset();
-	//Saves the level to XML
-	void SaveAs(string _filename);
+	//Ticks dead walkers, extra functionality provided by subclasses
+	virtual WorldState::Enum Tick(float _dt);
 
 	//Gets / sets the size of the level
 	Vector2i GetSize(){return size_;}
@@ -87,7 +72,6 @@ public:
 	GridSquare GetGridSquare(Vector2i _point);
 	void SetGridSquare(Vector2i _point, GridSquare _gs);
 	void ToggleWall(Vector2i _position, Direction::Enum _direction);
-
 
 	//Gets / sets the square type
 	SquareType::Enum GetSquareType(Vector2i _point);
@@ -107,10 +91,7 @@ public:
 	vector<Walker*>& GetMice(){return mice_;}
 	vector<Walker*>& GetDeadMice(){return dead_mice_;}
 	int GetTotalMice(){return mice_.size() + dead_mice_.size();}
-	int GetRescuedMice(){return rescued_mice_;}
 	void ToggleMouse(Vector2i _position, Direction::Enum _direction);
-	void RescueAllMice();
-	void KillAllMice();
 
 	//Adds and queries cats
 	void AddCat(Vector2i _position, Direction::Enum _direction);
@@ -119,28 +100,12 @@ public:
 	vector<Walker*>& GetDeadCats(){return dead_cats_;}
 	void ToggleCat(Vector2i _position, Direction::Enum _direction);
 
-	//Arrow helper functions and stock querier
-	void AddArrow(Direction::Enum _arrow){arrows_.push_back(_arrow);}
-	vector<Direction::Enum> GetArrows(){return arrows_;}
-	void ClearArrow(Vector2i _position);
-	void ToggleArrow(Vector2i _position, Direction::Enum _direction);
-	void ToggleNorthArrow(Vector2i _position){ToggleArrow(_position, Direction::North);}
-	void ToggleSouthArrow(Vector2i _position){ToggleArrow(_position, Direction::South);}
-	void ToggleEastArrow(Vector2i _position){ToggleArrow(_position, Direction::East);}
-	void ToggleWestArrow(Vector2i _position){ToggleArrow(_position, Direction::West);}
-	void ClearArrows();
-	void SetArrowStockUnlimited(){unlimited_arrow_stock_ = true;}
-
-
-	void LoadSolution();
-	vector<Vector2f> GetProblemPoints(){return problem_points_;}
-	void ResetProblemWalkers();
-	
+	//Called by walkers, to be overriden by base classes
+	virtual void WalkerReachNewSquare(Walker* _walker) = 0;
 
 	//Gets the error state
 	bool GetError(){return state_ == WorldState::FileLoadError;}
 
-	void WalkerReachNewSquare(Walker* _walker);
-
+	//Range calculations with wrapping
 	static float GetShortestDistance(Vector2f _position1, Vector2f _position2, Vector2f _wrap_size);
 };

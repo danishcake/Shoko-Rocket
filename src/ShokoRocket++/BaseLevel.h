@@ -1,6 +1,6 @@
 #pragma once
 struct SDL_Surface;
-#include <World.h>
+#include <SPWorld.h>
 #include "RenderItem.h"
 #include "Input.h"
 #include <vector>
@@ -12,7 +12,7 @@ class Animation;
 class BaseLevel
 {
 protected:
-	boost::shared_ptr<World> world_;
+	boost::shared_ptr<SPWorld> world_;
 	float timer_;
 	Vector2f grid_size_;
 	Vector2f scroll_remaining_;

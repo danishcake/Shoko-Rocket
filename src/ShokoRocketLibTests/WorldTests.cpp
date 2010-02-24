@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include <World.h>
+#include <SPWorld.h>
 #include <Walker.h>
 
 TEST(CheckWorldDefaults)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	CHECK_EQUAL(pWorld->GetSize(), Vector2i(20,20));
 
 	GridSquare gs_nw = pWorld->GetGridSquare(Vector2i(0,0));
@@ -36,7 +36,7 @@ TEST(CheckWorldDefaults)
 
 TEST(CheckWorldResize)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->SetSize(Vector2i(10,10));
 	CHECK_EQUAL(Vector2i(10,10), pWorld->GetSize());
 
@@ -59,7 +59,7 @@ TEST(CheckWorldResize)
 
 TEST(CheckWorldWallEdit)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 
 	GridSquare gs_ne = pWorld->GetGridSquare(Vector2i(0,0));
 	CHECK(gs_ne.GetNorth());
@@ -77,7 +77,7 @@ TEST(CheckWorldWallEdit)
 
 TEST(CheckWorldWallToggle)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	//CHECK_EQUAL(false, WalkerAt(Vector2i(0, 0), Direction::West, pWorld->GetCats()));
 	CHECK_EQUAL(false, pWorld->GetGridSquare(Vector2i(1, 1)).GetWest());
 	pWorld->ToggleWall(Vector2i(1, 1), Direction::West);
@@ -86,13 +86,13 @@ TEST(CheckWorldWallToggle)
 
 TEST(WorldWithWalls)
 {
-	World* pWorld = new World("Empty10x10.Level");
+	SPWorld* pWorld = new SPWorld("Empty10x10.Level");
 	CHECK_EQUAL(Vector2i(10, 10), pWorld->GetSize());
 	CHECK_EQUAL("Empty 10x10", pWorld->GetName());
 	CHECK_EQUAL(false, pWorld->GetError());
 	delete pWorld;
 
-	pWorld = new World("OutsideOnly3x3.Level");
+	pWorld = new SPWorld("OutsideOnly3x3.Level");
 	CHECK_EQUAL(Vector2i(3, 3), pWorld->GetSize());
 	CHECK_EQUAL("Outside only 3x3", pWorld->GetName());
 	CHECK_EQUAL(false, pWorld->GetError());
@@ -116,7 +116,7 @@ TEST(WorldWithWalls)
 
 TEST(ManuallyAddedMice)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->SetSize(Vector2i(3,3));
 	pWorld->AddMouse(Vector2i(0, 0), Direction::East);
 	CHECK_EQUAL(1, pWorld->GetMice().size());
@@ -140,7 +140,7 @@ TEST(ManuallyAddedMice)
 
 TEST(ManuallyAddedCats)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->SetSize(Vector2i(3,3));
 	pWorld->AddCat(Vector2i(0, 0), Direction::East);
 	CHECK_EQUAL(1, pWorld->GetCats().size());
@@ -175,7 +175,7 @@ bool WalkerAt(Vector2f _position, Direction::Enum _direction, std::vector<Walker
 
 TEST(CheckMouseToggle)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->AddMouse(Vector2i(0, 0), Direction::East);
 	CHECK_EQUAL(true, WalkerAt(Vector2i(0, 0), Direction::East, pWorld->GetMice()));
 
@@ -192,7 +192,7 @@ TEST(CheckMouseToggle)
 
 TEST(CheckCatToggle)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->AddCat(Vector2i(0, 0), Direction::East);
 	CHECK_EQUAL(true, WalkerAt(Vector2i(0, 0), Direction::East, pWorld->GetCats()));
 
@@ -209,7 +209,7 @@ TEST(CheckCatToggle)
 
 TEST(CatsToggleMiceEtc)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->AddCat(Vector2i(0, 0), Direction::East);
 	CHECK_EQUAL(true, WalkerAt(Vector2i(0, 0), Direction::East, pWorld->GetCats()));
 	pWorld->ToggleMouse(Vector2i(0, 0), Direction::East);
@@ -224,7 +224,7 @@ TEST(WorldReset)
 {
 	//When walkers are created or repositioned with SetPosition they store that position to be reset to
 	//When they die they are moved to a different list so they can be recreated
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->AddMouse(Vector2i(5,5), Direction::South);
 
 
@@ -240,7 +240,7 @@ TEST(WorldReset)
 
 TEST(WorldWithMice)
 {
-	World* pWorld = new World("OutsideAndMice3x3.Level");
+	SPWorld* pWorld = new SPWorld("OutsideAndMice3x3.Level");
 	CHECK_EQUAL(Vector2i(3, 3), pWorld->GetSize());
 	CHECK_EQUAL("Outside and mice 3x3", pWorld->GetName());
 	CHECK_EQUAL(false, pWorld->GetError());
@@ -250,7 +250,7 @@ TEST(WorldWithMice)
 
 TEST(WorldWithCats)
 {
-	World* pWorld = new World("OutsideAndCats3x3.Level");
+	SPWorld* pWorld = new SPWorld("OutsideAndCats3x3.Level");
 	CHECK_EQUAL(Vector2i(3, 3), pWorld->GetSize());
 	CHECK_EQUAL("Outside and cats 3x3", pWorld->GetName());
 	CHECK_EQUAL(false, pWorld->GetError());
@@ -260,7 +260,7 @@ TEST(WorldWithCats)
 
 TEST(WorldWithHolesAndRocketsManual)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 
 	pWorld->SetSquareType(Vector2i(0,0), SquareType::Rocket);
 	pWorld->SetSquareType(Vector2i(1,0), SquareType::Hole);
@@ -272,7 +272,7 @@ TEST(WorldWithHolesAndRocketsManual)
 
 TEST(CheckHoleAndRocketToggle)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->ToggleRocket(Vector2i(0,0));
 	CHECK_EQUAL(SquareType::Rocket, pWorld->GetSquareType(Vector2i(0,0)));
 	pWorld->ToggleRocket(Vector2i(0,0));
@@ -288,7 +288,7 @@ TEST(CheckHoleAndRocketToggle)
 
 TEST(WorldWithRockets)
 {
-	World* pWorld = new World("OutsideAndRockets3x3.Level");
+	SPWorld* pWorld = new SPWorld("OutsideAndRockets3x3.Level");
 	CHECK(!pWorld->GetError());
 	CHECK_EQUAL(Vector2i(3, 3), pWorld->GetSize());
 	CHECK_EQUAL("Outside and rockets 3x3", pWorld->GetName());
@@ -301,7 +301,7 @@ TEST(WorldWithRockets)
 
 TEST(WorldWithHole)
 {
-	World* pWorld = new World("OutsideAndHoles3x3.Level");
+	SPWorld* pWorld = new SPWorld("OutsideAndHoles3x3.Level");
 	CHECK(!pWorld->GetError());
 	CHECK_EQUAL(Vector2i(3, 3), pWorld->GetSize());
 	CHECK_EQUAL("Outside and holes 3x3", pWorld->GetName());
@@ -315,7 +315,7 @@ TEST(WorldWithHole)
 
 TEST(WorldWithAll)
 {
-	World* pWorld = new World("OutsideWithAll4x4.Level");
+	SPWorld* pWorld = new SPWorld("OutsideWithAll4x4.Level");
 	CHECK(!pWorld->GetError());
 
 	CHECK_EQUAL(SquareType::Rocket, pWorld->GetSquareType(Vector2i(0,0)));
@@ -330,12 +330,12 @@ TEST(WorldWithAll)
 
 TEST(WorldToFile)
 {
-	World* pWorld = new World("OutsideWithAll4x4.Level");
+	SPWorld* pWorld = new SPWorld("OutsideWithAll4x4.Level");
 	pWorld->Tick(0.5f); //Upon save should revert
 	pWorld->SaveAs("SaveAsTest.Level");
 	delete pWorld;
 
-	World* pWorld2 = new World("SaveAsTest.Level");
+	SPWorld* pWorld2 = new SPWorld("SaveAsTest.Level");
 	CHECK(!pWorld2->GetError());
 	if(!pWorld2->GetError())
 	{
@@ -354,17 +354,17 @@ TEST(WorldToFile)
 
 TEST(WorldStates)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	CHECK_EQUAL(WorldState::OK, pWorld->Tick(0));
 	delete pWorld;
-	pWorld = new World("NotALevel.level");
+	pWorld = new SPWorld("NotALevel.level");
 	CHECK_EQUAL(WorldState::FileLoadError, pWorld->Tick(0));
 	delete pWorld;
 }
 
 TEST(HolesKillMice)
 {
-	World* pWorld = new World("HolesKillMice.Level");
+	SPWorld* pWorld = new SPWorld("HolesKillMice.Level");
 	CHECK(!pWorld->GetError());
 	CHECK_EQUAL(1, pWorld->GetMice().size());
 	CHECK_EQUAL(0, pWorld->GetCats().size());
@@ -389,7 +389,7 @@ TEST(HolesKillMice)
 
 TEST(HolesKillCats)
 {
-	World* pWorld = new World("HolesKillCats.Level");
+	SPWorld* pWorld = new SPWorld("HolesKillCats.Level");
 	CHECK(!pWorld->GetError());
 	CHECK_EQUAL(0, pWorld->GetMice().size());
 	CHECK_EQUAL(1, pWorld->GetCats().size());
@@ -414,7 +414,7 @@ TEST(HolesKillCats)
 
 TEST(RocketsRescueMice)
 {
-	World* pWorld = new World("RocketsRescueMice.Level");
+	SPWorld* pWorld = new SPWorld("RocketsRescueMice.Level");
 	CHECK(!pWorld->GetError());
 	CHECK_EQUAL(3, pWorld->GetMice().size());
 	CHECK_EQUAL(3, pWorld->GetTotalMice());
@@ -436,7 +436,7 @@ TEST(RocketsRescueMice)
 
 TEST(CatsKillRockets)
 {
-	World* pWorld = new World("CatsKillRockets.Level");
+	SPWorld* pWorld = new SPWorld("CatsKillRockets.Level");
 	CHECK(!pWorld->GetError());
 	CHECK_EQUAL(1, pWorld->GetCats().size());
 	CHECK_EQUAL(WorldState::Defeat, pWorld->Tick(15));
@@ -446,7 +446,7 @@ TEST(CatsKillRockets)
 TEST(WorldCleansUpWalkers)
 {
 	int sumWalkers = Walker::Total_created - Walker::Total_destroyed;
-	World* pWorld = new World("OutsideWithAll4x4.Level");
+	SPWorld* pWorld = new SPWorld("OutsideWithAll4x4.Level");
 	CHECK(sumWalkers < (Walker::Total_created - Walker::Total_destroyed));
 	delete pWorld;
 	CHECK(sumWalkers == (Walker::Total_created - Walker::Total_destroyed));
@@ -454,7 +454,7 @@ TEST(WorldCleansUpWalkers)
 
 TEST(CatMouseHeadToHead)
 {
-	World* pWorld = new World("CatMouseHeadToHead.Level");
+	SPWorld* pWorld = new SPWorld("CatMouseHeadToHead.Level");
 	CHECK_EQUAL(1, pWorld->GetMice().size());
 	CHECK_EQUAL(0, pWorld->GetDeadMice().size());
 	CHECK_EQUAL(WorldState::OK, pWorld->Tick(0));
@@ -469,7 +469,7 @@ TEST(CatMouseHeadToHead)
 
 TEST(CloseCatsMiss)
 {//Cat Walks across path of mouse
-	World* pWorld = new World("CloseCatMiss.Level");
+	SPWorld* pWorld = new SPWorld("CloseCatMiss.Level");
 	WorldState::Enum e;
 	float total_time = 0;
 	while((e = pWorld->Tick(0.1f)) == WorldState::OK)
@@ -485,7 +485,7 @@ TEST(MouseFromBehind)
 { //Mouse walks into the back of a cat from behind
   //Collision distance is 0.33
   //Effectively solving x = t, y = 3 + 2t/3 for t.
-	World* pWorld = new World("MouseFromBehind.Level");
+	SPWorld* pWorld = new SPWorld("MouseFromBehind.Level");
 	WorldState::Enum e;
 	float total_time = 0;
 	while((e = pWorld->Tick(0.01f)) == WorldState::OK)
@@ -499,7 +499,7 @@ TEST(MouseFromBehind)
 
 TEST(CannotPlaceArrowOnRocketOrHole)
 {
-	World* pWorld = new World("OutsideWithAll4x4.Level");
+	SPWorld* pWorld = new SPWorld("OutsideWithAll4x4.Level");
 	CHECK_EQUAL(false, pWorld->SetSquareType(Vector2i(0,0), SquareType::NorthArrow));
 	CHECK_EQUAL(false, pWorld->SetSquareType(Vector2i(1,0), SquareType::SouthArrow));
 	CHECK_EQUAL(true, pWorld->SetSquareType(Vector2i(2,0), SquareType::EastArrow));
@@ -509,7 +509,7 @@ TEST(CannotPlaceArrowOnRocketOrHole)
 
 TEST(TrappedWalkersStop)
 {
-	World* pWorld = new World("MouseTrap!.Level");
+	SPWorld* pWorld = new SPWorld("MouseTrap!.Level");
 	pWorld->Tick(0.1f);
 	CHECK_EQUAL(Direction::Stopped, pWorld->GetMice().at(0)->GetDirection());
 	delete pWorld;
@@ -517,7 +517,7 @@ TEST(TrappedWalkersStop)
 
 TEST(ArrowsAddedManually)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->AddArrow(Direction::North);
 	pWorld->AddArrow(Direction::South);
 	vector<Direction::Enum> arrow_stock = pWorld->GetArrows();
@@ -565,7 +565,7 @@ int countArrowType(vector<Direction::Enum> _arrows, Direction::Enum _direction)
 
 TEST(UnlimitedArrowsMode)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->ToggleArrow(Vector2i(0,0), Direction::West);
 	CHECK_EQUAL(SquareType::Empty, pWorld->GetSquareType(Vector2i(0, 0)));
 	
@@ -596,7 +596,7 @@ TEST(UnlimitedArrowsMode)
 
 TEST(ArrowsInFile)
 {
-	World* pWorld = new World("ArrowsInFile.Level");
+	SPWorld* pWorld = new SPWorld("ArrowsInFile.Level");
 
 	CHECK_EQUAL(1, countArrowType(pWorld->GetArrows(), Direction::North));
 	CHECK_EQUAL(2, countArrowType(pWorld->GetArrows(), Direction::South));
@@ -607,7 +607,7 @@ TEST(ArrowsInFile)
 
 TEST(ArrowsConsumed)
 {
-	World* pWorld = new World("ArrowsInFile.Level");
+	SPWorld* pWorld = new SPWorld("ArrowsInFile.Level");
 
 	CHECK_EQUAL(1, countArrowType(pWorld->GetArrows(), Direction::North));
 	CHECK_EQUAL(2, countArrowType(pWorld->GetArrows(), Direction::South));
@@ -693,7 +693,7 @@ TEST(ArrowsConsumed)
 
 TEST(ArrowsDirectMice)
 {
-	World* pWorld = new World("ArrowsDirectMice.Level");
+	SPWorld* pWorld = new SPWorld("ArrowsDirectMice.Level");
 	pWorld->SetSquareType(Vector2i(2,3), SquareType::NorthArrow);
 	pWorld->SetSquareType(Vector2i(2,1), SquareType::EastArrow);
 	pWorld->SetSquareType(Vector2i(3,1), SquareType::NorthArrow);
@@ -735,7 +735,7 @@ TEST(ArrowsDirectMice)
 
 TEST(ArrowsDirectCats)
 {
-	World* pWorld = new World("ArrowsDirectCats.Level");
+	SPWorld* pWorld = new SPWorld("ArrowsDirectCats.Level");
 	pWorld->SetSquareType(Vector2i(2,3), SquareType::NorthArrow);
 	pWorld->SetSquareType(Vector2i(2,1), SquareType::EastArrow);
 	pWorld->SetSquareType(Vector2i(3,1), SquareType::NorthArrow);
@@ -777,7 +777,7 @@ TEST(ArrowsDirectCats)
 
 TEST(ArrowsInteractWithWallsProperly)
 {
-	World* pWorld = new World("ArrowsInteractWithWalls.Level");
+	SPWorld* pWorld = new SPWorld("ArrowsInteractWithWalls.Level");
 	pWorld->SetSquareType(Vector2i(0,0), SquareType::NorthArrow);
 	pWorld->AddMouse(Vector2i(0,0), Direction::South);
 	pWorld->Tick(1);
@@ -802,7 +802,7 @@ TEST(DiminishArrow)
 
 TEST(CatsDestroyArrows)
 {
-	World* pWorld = new World("CatsDestroyArrows.Level");
+	SPWorld* pWorld = new SPWorld("CatsDestroyArrows.Level");
 	pWorld->ToggleSouthArrow(Vector2i(1,1));
 	CHECK_EQUAL(SquareType::SouthArrow, pWorld->GetSquareType(Vector2i(1,1)));
 	pWorld->Tick(2);
@@ -814,7 +814,7 @@ TEST(CatsDestroyArrows)
 
 TEST(ArrowsReset)
 {
-	World* pWorld = new World("Empty10x10.Level");
+	SPWorld* pWorld = new SPWorld("Empty10x10.Level");
 	pWorld->AddArrow(Direction::North);
 	pWorld->ToggleNorthArrow(Vector2i(1,2));
 	CHECK_EQUAL(SquareType::NorthArrow, pWorld->GetSquareType(Vector2i(1,2)));
@@ -837,7 +837,7 @@ TEST(ArrowsReset)
 
 TEST(ArrowsClear)
 {
-	World* pWorld = new World("Empty10x10.Level");
+	SPWorld* pWorld = new SPWorld("Empty10x10.Level");
 	pWorld->AddArrow(Direction::North);
 	pWorld->ToggleNorthArrow(Vector2i(1,1));
 	CHECK_EQUAL(SquareType::NorthArrow, pWorld->GetSquareType(Vector2i(1,1)));
@@ -858,7 +858,7 @@ TEST(ArrowsClear)
 
 TEST(ArrowsGridClear)
 {
-	World* pWorld = new World("Empty10x10.Level");
+	SPWorld* pWorld = new SPWorld("Empty10x10.Level");
 	pWorld->AddArrow(Direction::North);
 	pWorld->ToggleNorthArrow(Vector2i(1,1));
 	CHECK_EQUAL(SquareType::NorthArrow, pWorld->GetSquareType(Vector2i(1,1)));
@@ -872,7 +872,7 @@ TEST(ArrowsGridClear)
 
 TEST(SolutionLoadedFromFile)
 {
-	World* pWorld = new World("LevelWithSolution.Level");
+	SPWorld* pWorld = new SPWorld("LevelWithSolution.Level");
 	CHECK_EQUAL(4, pWorld->GetArrows().size());
 	pWorld->LoadSolution();
 	CHECK_EQUAL(0, pWorld->GetArrows().size());
@@ -900,7 +900,7 @@ TEST(CatsAndMiceRemovableByCoordinate)
 
 TEST(WrapAround)
 {
-	World* pWorld = new World("WrapAround.Level");
+	SPWorld* pWorld = new SPWorld("WrapAround.Level");
 	CHECK_EQUAL(Vector2f(3,2), pWorld->GetMice().at(0)->GetPosition());
 	CHECK_EQUAL(Direction::West, pWorld->GetMice().at(0)->GetDirection());
 	pWorld->Tick(1.00001f);
@@ -944,7 +944,7 @@ TEST(WrapAround)
 
 TEST(WrapAroundCollisions)
 {
-	World* pWorld = new World("WrapAroundCollisions.Level");
+	SPWorld* pWorld = new SPWorld("WrapAroundCollisions.Level");
 
 	WorldState::Enum state = pWorld->Tick(2);
 	CHECK_EQUAL(WorldState::Defeat, state);
@@ -955,7 +955,7 @@ TEST(WrapAroundCollisions)
 
 TEST(CatMouseTunnelling)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	CHECK(pWorld);
 
 	//Mouse moves 1, Cat moves -2/3 so they at 2/3 apart for collisions if timestep done all in one go
@@ -969,15 +969,15 @@ TEST(CatMouseTunnelling)
 
 TEST(ShortestDistance)
 {
-	CHECK_CLOSE(1.414f, World::GetShortestDistance(Vector2f(0,0), Vector2f(9, 9), Vector2f(10, 10)), 0.1f); 
-	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(0,0), Vector2f(1, 0), Vector2f(10, 10)), 0.1f); 
+	CHECK_CLOSE(1.414f, SPWorld::GetShortestDistance(Vector2f(0,0), Vector2f(9, 9), Vector2f(10, 10)), 0.1f); 
+	CHECK_CLOSE(1.0f, SPWorld::GetShortestDistance(Vector2f(0,0), Vector2f(1, 0), Vector2f(10, 10)), 0.1f); 
 
-	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(5,0), Vector2f(6, 0), Vector2f(10, 10)), 0.1f); 
-	CHECK_CLOSE(3.0f, World::GetShortestDistance(Vector2f(4,0), Vector2f(7, 0), Vector2f(10, 10)), 0.1f); 
-	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(0,0), Vector2f(9, 0), Vector2f(10, 10)), 0.1f); 
-	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(0,0), Vector2f(0, 9), Vector2f(10, 10)), 0.1f);
+	CHECK_CLOSE(1.0f, SPWorld::GetShortestDistance(Vector2f(5,0), Vector2f(6, 0), Vector2f(10, 10)), 0.1f); 
+	CHECK_CLOSE(3.0f, SPWorld::GetShortestDistance(Vector2f(4,0), Vector2f(7, 0), Vector2f(10, 10)), 0.1f); 
+	CHECK_CLOSE(1.0f, SPWorld::GetShortestDistance(Vector2f(0,0), Vector2f(9, 0), Vector2f(10, 10)), 0.1f); 
+	CHECK_CLOSE(1.0f, SPWorld::GetShortestDistance(Vector2f(0,0), Vector2f(0, 9), Vector2f(10, 10)), 0.1f);
 
-	CHECK_CLOSE(1.0f, World::GetShortestDistance(Vector2f(9,5), Vector2f(0, 5), Vector2f(10, 10)), 0.1f);
+	CHECK_CLOSE(1.0f, SPWorld::GetShortestDistance(Vector2f(9,5), Vector2f(0, 5), Vector2f(10, 10)), 0.1f);
 }
 
 TEST(TroublesomeWalkersMarked)
@@ -986,7 +986,7 @@ TEST(TroublesomeWalkersMarked)
 	Collides cat & mouse together, checks that they are marked as colliders, 
 	but uncollided mouse is not.
 	*/
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	Walker* mouse = new Walker();
 	mouse->SetPosition(Vector2f(0,0));
 	mouse->SetDirection(Direction::East);

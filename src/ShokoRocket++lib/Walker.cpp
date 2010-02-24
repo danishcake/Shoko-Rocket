@@ -1,7 +1,7 @@
 #include "Walker.h"
 
 #include <cmath>
-#include "World.h"
+#include "BaseWorld.h"
 
 int Walker::Total_created = 0;
 int Walker::Total_destroyed = 0;

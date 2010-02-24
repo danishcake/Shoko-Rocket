@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <Walker.h>
-#include <World.h>
+#include <SPWorld.h>
 
 TEST(CheckWalkerDirections)
 {
@@ -67,8 +67,8 @@ TEST(CheckWalkerDirections)
 TEST(CheckWalkerTurns)
 {
 	Walker* pWalker = new Walker();
-	World* pWorld = new World();
-	CHECK_EQUAL((World*)NULL, pWalker->GetWorld());
+	SPWorld* pWorld = new SPWorld();
+	CHECK_EQUAL((SPWorld*)NULL, pWalker->GetWorld());
 	pWalker->SetWorld(pWorld);
 	CHECK_EQUAL(pWorld, pWalker->GetWorld());
 	
@@ -112,7 +112,7 @@ TEST(CheckWalkerArrowInteraction)
 
 TEST(CheckWalkerReset)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	Walker* pWalker = new Walker();
 	pWorld->AddMouse(pWalker);
 	pWalker->SetPosition(Vector2f(2,2));
@@ -136,7 +136,7 @@ TEST(CheckWalkerReset)
 
 TEST(WalkersStartTheRightWay)
 {
-	World* pWorld = new World();
+	SPWorld* pWorld = new SPWorld();
 	pWorld->SetSize(Vector2i(3,3));
 	pWorld->AddMouse(Vector2i(2, 2), Direction::East); //Should start going north automatically
 	Walker* pMouse = new Walker();

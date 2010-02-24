@@ -151,6 +151,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\BaseWorld.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Direction.cpp"
 				>
 			</File>
@@ -163,11 +167,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Walker.cpp"
+				RelativePath=".\SPWorld.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\World.cpp"
+				RelativePath=".\Walker.cpp"
 				>
 			</File>
 			<Filter
@@ -197,6 +201,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\BaseWorld.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Direction.h"
 				>
 			</File>
@@ -209,6 +217,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SPWorld.h"
+				>
+			</File>
+			<File
 				RelativePath=".\vmath-collisions.h"
 				>
 			</File>
@@ -218,10 +230,6 @@
 			</File>
 			<File
 				RelativePath=".\Walker.h"
-				>
-			</File>
-			<File
-				RelativePath=".\World.h"
 				>
 			</File>
 			<Filter
