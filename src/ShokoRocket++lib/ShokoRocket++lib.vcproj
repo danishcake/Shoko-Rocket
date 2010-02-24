@@ -167,6 +167,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MPWorld.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SPWorld.cpp"
 				>
 			</File>
@@ -214,6 +218,10 @@
 			</File>
 			<File
 				RelativePath=".\Logger.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MPWorld.h"
 				>
 			</File>
 			<File

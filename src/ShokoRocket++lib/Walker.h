@@ -33,6 +33,7 @@ protected:
 	WalkerState::Enum walker_state_;
 	float death_time_;
 	bool problem_;
+	unsigned int id_;
 
 public:
 	Walker(void);
@@ -77,4 +78,8 @@ public:
 	/* The entity can be marked as a problem if it collided */
 	void SetProblem(bool _problem){problem_ = _problem;}
 	bool GetProblem(){return problem_;}
+
+	/* Network tracking ID */
+	unsigned int GetID(){return id_;}
+	void SetID(unsigned int _id){id_ = _id;}
 };

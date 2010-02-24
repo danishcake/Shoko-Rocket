@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Level>
+  <Name>Spawners in file</Name>
+  <Size x="8" y="8"/>
+  <V x="0" y="0"/>
+  <H x="0" y="0"/>
+  <V x="0" y="1"/>
+  <V x="0" y="2"/>
+  <H x="1" y="0"/>
+  <H x="2" y="0"/>
+	<PlayerRocket x="2" y="2" player_id="1"/>
+	<PlayerRocket x="5" y="5" player_id="0"/>
+</Level>

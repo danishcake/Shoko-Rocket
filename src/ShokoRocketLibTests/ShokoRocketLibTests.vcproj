@@ -250,11 +250,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\WalkerTests.cpp"
+					RelativePath=".\MPWorldTests.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WorldTests.cpp"
+					RelativePath=".\SPWorldTests.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\WalkerTests.cpp"
 					>
 				</File>
 			</Filter>
@@ -727,7 +731,47 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\PlayerRocketsLoad.Level"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\RocketsRescueMice.Level"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\SpawnersLoad.Level"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

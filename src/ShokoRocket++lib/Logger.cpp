@@ -29,6 +29,13 @@ Logger& Logger::operator <<( int i )
 	return *this;
 }
 
+Logger& Logger::operator <<( unsigned int i )
+{
+	output_ << i;
+	printf("%d", i);
+	return *this;
+}
+
 Logger& Logger::operator <<( float i )
 {
 	output_ << i;

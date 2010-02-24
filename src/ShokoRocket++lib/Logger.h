@@ -16,6 +16,7 @@ public:
 	~Logger(void);
 
 	Logger& Logger::operator <<( int i );
+	Logger& Logger::operator <<( unsigned int i );
 	Logger& Logger::operator <<( float i );
 	Logger& Logger::operator <<( double i );
 	Logger& Logger::operator <<( std::string i );
