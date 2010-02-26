@@ -40,7 +40,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(PROGRAMFILES)\tinyxml&quot;;&quot;$(PROGRAMFILES)\boost\boost_1_36_0&quot;"
-				PreprocessorDefinitions="TIXML_USE_STL"
+				PreprocessorDefinitions="TIXML_USE_STL;BOOST_DATE_TIME_NO_LIB;BOOST_REGEX_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -105,7 +105,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="&quot;$(PROGRAMFILES)\tinyxml&quot;;&quot;$(PROGRAMFILES)\boost\boost_1_36_0&quot;"
-				PreprocessorDefinitions="TIXML_USE_STL"
+				PreprocessorDefinitions="TIXML_USE_STL;BOOST_DATE_TIME_NO_LIB;BOOST_REGEX_NO_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="4"
@@ -198,6 +198,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Networking"
+				>
+				<File
+					RelativePath=".\Client.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Server.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ServerConnection.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -257,6 +273,22 @@
 				</File>
 				<File
 					RelativePath=".\TextureManager.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Networking"
+				>
+				<File
+					RelativePath=".\Client.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Server.h"
+					>
+				</File>
+				<File
+					RelativePath=".\ServerConnection.h"
 					>
 				</File>
 			</Filter>

@@ -54,7 +54,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)src/UnitTest++Redist\Include&quot;;&quot;$(SolutionDir)src/ShokoRocket++lib\&quot;;&quot;$(PROGRAMFILES)\boost\boost_1_36_0&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;BOOST_DATE_TIME_NO_LIB;BOOST_REGEX_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -76,7 +76,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="UnitTest++.vsnet2005.lib ShokoRocket++lib.lib tinyxmld_STL.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(PROGRAMFILES)\tinyxml\Debug_STL&quot;;&quot;$(SolutionDir)src/UnitTest++Redist/Debug&quot;;&quot;$(SolutionDir)lib/$(ConfigurationName)&quot;;&quot;$(SolutionDir)Debug&quot;"
+				AdditionalLibraryDirectories="&quot;$(PROGRAMFILES)\boost\boost_1_36_0\lib&quot;;&quot;$(PROGRAMFILES)\tinyxml\Debug_STL&quot;;&quot;$(SolutionDir)src/UnitTest++Redist/Debug&quot;;&quot;$(SolutionDir)lib/$(ConfigurationName)&quot;;&quot;$(SolutionDir)Debug&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -146,7 +146,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)src/UnitTest++Redist/Include&quot;;&quot;$(SolutionDir)src/ShokoRocket++lib\&quot;;&quot;$(PROGRAMFILES)\boost\boost_1_36_0&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;;BOOST_DATE_TIME_NO_LIB;BOOST_REGEX_NO_LIB"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
@@ -167,7 +167,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="UnitTest++.vsnet2005.lib ShokoRocket++lib.lib tinyxml_STL.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(PROGRAMFILES)\tinyxml\Release_STL&quot;;&quot;$(SolutionDir)lib/$(ConfigurationName)&quot;;&quot;$(SolutionDir)src/UnitTest++Redist\Release&quot;"
+				AdditionalLibraryDirectories="&quot;$(PROGRAMFILES)boost\boost_1_36_0\lib&quot;;&quot;$(PROGRAMFILES)\tinyxml\Release_STL&quot;;&quot;$(SolutionDir)lib/$(ConfigurationName)&quot;;&quot;$(SolutionDir)src/UnitTest++Redist\Release&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -251,6 +251,10 @@
 				</File>
 				<File
 					RelativePath=".\MPWorldTests.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\NetworkingTests.cpp"
 					>
 				</File>
 				<File
