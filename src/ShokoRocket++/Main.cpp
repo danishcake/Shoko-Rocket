@@ -145,9 +145,11 @@ int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
 		bFinished = (AcquireResources() == false);
 		StandardTextures::LoadTextures();
 		gsm = new GameStateMachine();
+	} else
+	{
+		SDL_Quit();
+		return -1;
 	}
-	
-
 
 	while(!bFinished)
 	{
