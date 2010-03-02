@@ -2,16 +2,34 @@
 #include <boost/bind.hpp>
 #include "Logger.h"
 
-Server::Server(void) : io_(), acceptor_(io_, tcp::endpoint(tcp::v4(), 9020)), work_(io_)
+void ServerThread::operator()()
 {
+	bool finished = false;
+	while(!finished)
+	{
+		finished = server_->Tick();
+	}
+}
+
+Server::Server(void) : io_(), acceptor_(io_, tcp::endpoint(tcp::v4(), 9020)),
+					    timer_(io_, boost::posix_time::milliseconds(100)), closing_(false)
+{
+	thread_ = new boost::thread(ServerThread(this));
+	timer_.async_wait(boost::bind(&Server::PeriodicTidyup, this, boost::asio::placeholders::error));
+	work_ = new boost::asio::io_service::work(io_);
 }
 
 Server::~Server(void)
 {
+	closing_ = true;
+	delete work_;
 	for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
 	{
 		delete *it;
 	}
+	//Should rejoin as all connections will throw errors
+	thread_->join();
+	delete thread_;
 }
 
 void Server::StartConnection()
@@ -41,8 +59,9 @@ void Server::ConnectionAccepted(ServerConnection* _connection, boost::system::er
 	}
 }
 
-void Server::Tick()
+void Server::PeriodicTidyup(boost::system::error_code _error)
 {
+	//TODO use a predicate here
 	vector<ServerConnection*> dead_connections;
 	for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
 	{
@@ -54,4 +73,14 @@ void Server::Tick()
 		delete *it;
 		connections_.erase(std::remove(connections_.begin(), connections_.end(), *it), connections_.end());
 	}
+	//Schedule another cleanup in 100ms
+	if(!closing_)
+		timer_.async_wait(boost::bind(&Server::PeriodicTidyup, this, boost::asio::placeholders::error));
+}
+
+bool Server::Tick()
+{
+	io_.run();
+
+	return closing_;
 }

@@ -2,14 +2,29 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include "Logger.h"
+#include <boost/thread.hpp>
 
-Client::Client(void) : name_("CHU CHU"), io_(boost::asio::io_service()), socket_(io_)
+void ClientThread::operator()()
+{
+	bool finished = false;
+	while(!finished)
+	{
+		finished = client_->Tick();
+	}
+}
+
+Client::Client(void) : name_("CHU CHU"), io_(boost::asio::io_service()), socket_(io_), closing_(false)
 {
 	state_ = ClientState::NotConnected;
+	thread_ = new boost::thread(ClientThread(this));
 }
 
 Client::~Client(void)
 {
+	closing_ = true;
+	socket_.close();
+	thread_->join();
+	delete thread_;
 }
 
 void Client::Connect(std::string _host, unsigned short _port)
@@ -22,9 +37,11 @@ void Client::Connect(std::string _host, unsigned short _port)
 	socket_.async_connect(ep, boost::bind(&Client::ConnectHandler, this, boost::asio::placeholders::error));
 }
 
-void Client::Tick()
+bool Client::Tick()
 {
 	io_.run();
+
+	return closing_;
 }
 
 void Client::ConnectHandler(const boost::system::error_code& error)
@@ -47,7 +64,12 @@ void Client::ConnectHandler(const boost::system::error_code& error)
 	{
 		Logger::DiagnosticOut() << "Connected successfully\n";
 		state_ = ClientState::Connected;
+		boost::shared_ptr<Opcodes::ClientOpcode> opcode = boost::shared_ptr<Opcodes::ClientOpcode>(new Opcodes::SetName(name_));
+		
+		socket_.async_send(boost::asio::buffer((char*)opcode.get(), sizeof(Opcodes::SetName)), boost::bind(&Client::WriteFinished, this, boost::asio::placeholders::error, opcode));
+
 		boost::asio::async_read(socket_, boost::asio::buffer(read_buffer, 1), boost::bind(&Client::ReadHeaderFinished, this, boost::asio::placeholders::error));
+		
 	}
 }
 void Client::ReadHeaderFinished(boost::system::error_code error)
@@ -61,7 +83,12 @@ void Client::ReadHeaderFinished(boost::system::error_code error)
 		std::cout << "Client: Read header finished\n";
 		boost::asio::async_read(socket_, boost::asio::buffer(read_buffer, 32), boost::bind(&Client::ReadBodyFinished, this, boost::asio::placeholders::error));
 	}
-	if(error) error_ = error;
+	if(error)
+	{
+		error_ = error;
+		closing_ = true;
+		state_ = ClientState::NotConnected;
+	}
 }
 
 void Client::ReadBodyFinished(boost::system::error_code error)
@@ -75,5 +102,14 @@ void Client::ReadBodyFinished(boost::system::error_code error)
 		std::cout << "Client: Read body finished, looking for header again\n";
 		boost::asio::async_read(socket_, boost::asio::buffer(read_buffer, 1), boost::bind(&Client::ReadHeaderFinished, this, boost::asio::placeholders::error));
 	}
-	if(error) error_ = error;	
+	if(error)
+	{
+		error_ = error;	
+		closing_ = true;
+		state_ = ClientState::NotConnected;
+	}
+}
+void Client::WriteFinished(boost::system::error_code error, boost::shared_ptr<Opcodes::ClientOpcode> _data)
+{
+	//Do nothing, but memory should now be freed
 }

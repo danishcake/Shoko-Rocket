@@ -206,6 +206,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Opcodes.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Server.cpp"
 					>
 				</File>
@@ -281,6 +285,10 @@
 				>
 				<File
 					RelativePath=".\Client.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Opcodes.h"
 					>
 				</File>
 				<File

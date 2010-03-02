@@ -167,7 +167,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="UnitTest++.vsnet2005.lib ShokoRocket++lib.lib tinyxml_STL.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(PROGRAMFILES)boost\boost_1_36_0\lib&quot;;&quot;$(PROGRAMFILES)\tinyxml\Release_STL&quot;;&quot;$(SolutionDir)lib/$(ConfigurationName)&quot;;&quot;$(SolutionDir)src/UnitTest++Redist\Release&quot;"
+				AdditionalLibraryDirectories="&quot;$(PROGRAMFILES)\boost\boost_1_36_0\lib&quot;;&quot;$(PROGRAMFILES)\tinyxml\Release_STL&quot;;&quot;$(SolutionDir)lib/$(ConfigurationName)&quot;;&quot;$(SolutionDir)src/UnitTest++Redist\Release&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -255,6 +255,10 @@
 				</File>
 				<File
 					RelativePath=".\NetworkingTests.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\NetworkOpcodeTests.cpp"
 					>
 				</File>
 				<File

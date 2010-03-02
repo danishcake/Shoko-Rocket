@@ -45,21 +45,14 @@ TEST(ClientCanConnectToServer)
 	CHECK_EQUAL(ClientState::NotConnected, c->GetState());
 	c->Connect("localhost", 9020);
 	CHECK_EQUAL(ClientState::Connecting, c->GetState());
-	for(int i = 0; i < 100; i++)
-	{
-		s->Tick();
-		c->Tick();
-	}
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	CHECK_EQUAL(ClientState::Connected, c->GetState());
 	delete s;
-	for(int i = 0; i < 100; i++)
-	{
-		c->Tick();
-	}
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	CHECK_EQUAL(ClientState::NotConnected, c->GetState());
 	delete c;
-	
 }
 
 TEST(ClientCanAuthenticate)
