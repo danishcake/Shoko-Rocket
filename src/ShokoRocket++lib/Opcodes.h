@@ -225,4 +225,6 @@ namespace Opcodes
 
 	unsigned int GetBodySize(ServerOpcode* _header);
 	unsigned int GetBodySize(ClientOpcode* _header);
+	ServerOpcode* GetServerOpcode(ServerOpcode* _header);
+	ClientOpcode* GetClientOpcode(ClientOpcode* _header);
 }

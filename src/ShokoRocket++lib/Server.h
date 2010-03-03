@@ -1,12 +1,14 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "ServerConnection.h"
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
+#include "ServerConnection.h"
+#include "Opcodes.h"
 
 using std::string;
 using std::vector;
+using std::map;
 
 class Server;
 
@@ -33,7 +35,9 @@ protected:
 	void ConnectionAccepted(ServerConnection* _connection, boost::system::error_code ec);
 
 	vector<ServerConnection*> connections_;
+	vector<vector<Opcodes::ClientOpcode*> > opcodes_;
 	bool closing_;
+	int players_count_;
 public:
 	Server(void);
 	~Server(void);
@@ -41,8 +45,9 @@ public:
 	void SetName(string _name){name_ = _name;}
 	string GetName(){return name_;}
 
-	vector<string> GetPlayers(){return vector<string>();}
-
 	bool Tick();
 	void PeriodicTidyup(boost::system::error_code _error);
+	void HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode);
+
+	vector<vector<Opcodes::ClientOpcode*> > GetOpcodes();
 };

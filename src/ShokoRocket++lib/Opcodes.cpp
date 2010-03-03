@@ -46,4 +46,26 @@ namespace Opcodes
 			break;
 		}
 	}
+
+	ClientOpcode* GetClientOpcode(ClientOpcode* _header)
+	{
+		ClientOpcode* opcode = NULL;
+		switch(_header->opcode_)
+		{
+		case UpdateCursor::OPCODE:
+			opcode = new UpdateCursor(Vector2<unsigned short>());
+			break;
+		case SendInput::OPCODE:
+			opcode = new SendInput(Vector2<unsigned short>(), SendInput::ACT_CLEAR);
+			break;
+		case SetName::OPCODE:
+			opcode = new SetName("");
+			break;
+		default:
+			//TODO warnings here
+			break;
+		}
+		return opcode;
+	}
 }
+

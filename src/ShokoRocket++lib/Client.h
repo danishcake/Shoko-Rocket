@@ -42,6 +42,7 @@ protected:
 	boost::system::error_code error_;
 
 	boost::thread* thread_;
+	boost::mutex mutex_;
 
 	void ConnectHandler(const boost::system::error_code& error);
 	void ReadHeaderFinished(boost::system::error_code error);
