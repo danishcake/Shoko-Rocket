@@ -33,6 +33,7 @@ public:
 	//Called when first connected
 	void Start();
 	void WriteFinished(boost::system::error_code error, SBuffer _buffer);
+	void Close(){socket_.close();}
 
 	void ReadHeaderFinished(boost::system::error_code error, SBuffer _buffer);
 	void ReadBodyFinished(boost::system::error_code error, SBuffer _buffer);

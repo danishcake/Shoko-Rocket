@@ -37,51 +37,62 @@ void ServerConnection::Start()
 
 void ServerConnection::WriteFinished(boost::system::error_code error, SBuffer _buffer)
 {
-	if(error == boost::asio::error::eof)
-		Logger::DiagnosticOut() << "Server: Write finished, connection closed cleanly\n";
-	else if(error)
-		Logger::DiagnosticOut() << "Server: Error encountered writing: " << error.message() << "\n";
-	else
-		Logger::DiagnosticOut() << "Server: Write finished\n";
-	if(error) error_ = error;
-	
+	if(server_->GetMutex().timed_lock(boost::posix_time::milliseconds(100)))
+	{
+		if(error == boost::asio::error::eof)
+			Logger::DiagnosticOut() << "Server: Write finished, connection closed cleanly\n";
+		else if(error)
+			Logger::DiagnosticOut() << "Server: Error encountered writing: " << error.message() << "\n";
+		else
+			Logger::DiagnosticOut() << "Server: Write finished\n";
+		if(error) error_ = error;
+		server_->GetMutex().unlock();
+	} else Logger::DiagnosticOut() << "ServerConnection::WriteFinished: Unable to lock, probably being shutdown\n";
 }
 
 void ServerConnection::ReadHeaderFinished(boost::system::error_code error, SBuffer _buffer)
 {
-	if(error == boost::asio::error::eof)
-		Logger::DiagnosticOut() << "Server: Header read OK, but client DC'd\n";
-	else if(error)
-		Logger::DiagnosticOut() << "Server: Error during header read: " << error.message() << "\n";
-	else
+	if(server_->GetMutex().timed_lock(boost::posix_time::milliseconds(100)))
 	{
-		Logger::DiagnosticOut() << "Server: Read header finished\n";
-		int body_size = Opcodes::GetBodySize((Opcodes::ClientOpcode*)_buffer->c_array());
-		client_opcode_ = Opcodes::GetClientOpcode((Opcodes::ClientOpcode*)_buffer->c_array());
-		SBuffer read_buffer = SBuffer(new boost::array<char, 512>());
-		boost::asio::async_read(socket_, boost::asio::buffer(*read_buffer, body_size), boost::bind(&ServerConnection::ReadBodyFinished, this, boost::asio::placeholders::error, read_buffer));
-	}
-	if(error) error_ = error;
+		if(error == boost::asio::error::eof)
+			Logger::DiagnosticOut() << "Server: Header read OK, but client DC'd\n";
+		else if(error)
+			Logger::DiagnosticOut() << "Server: Error during header read: " << error.message() << "\n";
+		else
+		{
+			Logger::DiagnosticOut() << "Server: Read header finished\n";
+			int body_size = Opcodes::GetBodySize((Opcodes::ClientOpcode*)_buffer->c_array());
+			client_opcode_ = Opcodes::GetClientOpcode((Opcodes::ClientOpcode*)_buffer->c_array());
+			SBuffer read_buffer = SBuffer(new boost::array<char, 512>());
+			boost::asio::async_read(socket_, boost::asio::buffer(*read_buffer, body_size), boost::bind(&ServerConnection::ReadBodyFinished, this, boost::asio::placeholders::error, read_buffer));
+		}
+		if(error) error_ = error;
+		server_->GetMutex().unlock();
+	} else Logger::DiagnosticOut() << "ServerConnection::ReadHeaderFinished: Unable to lock, probably being shutdown\n";
 }
 
 void ServerConnection::ReadBodyFinished(boost::system::error_code error, SBuffer _buffer)
 {
-	if(error == boost::asio::error::eof)
-		Logger::DiagnosticOut() << "Server: Body read OK, but client DC'd\n";
-	else if(error)
-		Logger::DiagnosticOut() << "Server: Error during body read: " << error.message() << "\n";
-	else
+	if(server_->GetMutex().timed_lock(boost::posix_time::milliseconds(100)))
 	{
-		//Handle opcode creation
+		if(error == boost::asio::error::eof)
+			Logger::DiagnosticOut() << "Server: Body read OK, but client DC'd\n";
+		else if(error)
+			Logger::DiagnosticOut() << "Server: Error during body read: " << error.message() << "\n";
+		else
+		{
+			//Handle opcode creation
 
-		memcpy(((char*)client_opcode_) + Opcodes::ClientOpcode::HEADERSIZE, _buffer->c_array(),  Opcodes::GetBodySize(client_opcode_));
-		//Pass newly created opcode to server, which is then responsible for freeing it
-		server_->HandleOpcode(player_id_, client_opcode_);
+			memcpy(((char*)client_opcode_) + Opcodes::ClientOpcode::HEADERSIZE, _buffer->c_array(),  Opcodes::GetBodySize(client_opcode_));
+			//Pass newly created opcode to server, which is then responsible for freeing it
+			server_->HandleOpcode(player_id_, client_opcode_);
 
-		Logger::DiagnosticOut() << "Server: Read body finished, looking for header again\n";
-		SBuffer read_buffer = SBuffer(new boost::array<char, 512>());
-		boost::asio::async_read(socket_, boost::asio::buffer(*read_buffer, Opcodes::ClientOpcode::HEADERSIZE), boost::bind(&ServerConnection::ReadHeaderFinished, this, boost::asio::placeholders::error, read_buffer));
-	}
-	if(error) error_ = error;	
-	client_opcode_ = NULL;
+			Logger::DiagnosticOut() << "Server: Read body finished, looking for header again\n";
+			SBuffer read_buffer = SBuffer(new boost::array<char, 512>());
+			boost::asio::async_read(socket_, boost::asio::buffer(*read_buffer, Opcodes::ClientOpcode::HEADERSIZE), boost::bind(&ServerConnection::ReadHeaderFinished, this, boost::asio::placeholders::error, read_buffer));
+		}
+		if(error) error_ = error;
+		client_opcode_ = NULL;
+		server_->GetMutex().unlock();
+	} else Logger::DiagnosticOut() << "ServerConnection::ReadBodyFinished: Unable to lock, probably being shutdown\n";
 }

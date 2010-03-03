@@ -23,16 +23,29 @@ Server::Server(void) : io_(), acceptor_(io_, tcp::endpoint(tcp::v4(), 9020)),
 
 Server::~Server(void)
 {
+	Logger::DiagnosticOut() << "Server: Destructor started\n";
 	closing_ = true;
+	mutex_.lock();
 	delete work_;
+	//Call close, giving handlers opportunity to complete on a valid object
+	for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+	{
+		(*it)->Close();
+	}
+
+	connections_.clear();
+	acceptor_.close();
+	timer_.cancel();
+	//Should rejoin as all connections will throw errors
+	thread_->join();
+
+	delete thread_;
 	for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
 	{
 		delete *it;
 	}
-	acceptor_.close();
-	//Should rejoin as all connections will throw errors
-	thread_->join();
-	delete thread_;
+	mutex_.unlock();
+	Logger::DiagnosticOut() << "Server: Destructor finished\n";
 }
 
 void Server::StartConnection()
@@ -51,40 +64,48 @@ void Server::StartConnection()
 
 void Server::ConnectionAccepted(ServerConnection* _connection, boost::system::error_code ec)
 {
-	if(!ec)
+	if(mutex_.timed_lock(boost::posix_time::milliseconds(100)))
 	{
-		Logger::DiagnosticOut() << "Server: Connection accepted\n";
-		_connection->Start();
-		StartConnection();
-		players_count_++;
-	}
-	else
-	{
-		Logger::DiagnosticOut() << "Error during connection, " << ec.message() << "\n";
-	}
+		if(!ec)
+		{
+			Logger::DiagnosticOut() << "Server: Connection accepted\n";
+			_connection->Start();
+			StartConnection();
+			players_count_++;
+		}
+		else
+		{
+			Logger::DiagnosticOut() << "Error during connection, " << ec.message() << "\n";
+		}
+		mutex_.unlock();
+	} else Logger::DiagnosticOut() << "Server: Unable to acquire mutex, must be shutting down\n";
 }
 
 void Server::PeriodicTidyup(boost::system::error_code _error)
 {
-	Logger::DiagnosticOut() << "Periodic tidyup at server\n";
-	//TODO use a predicate here
-	vector<ServerConnection*> dead_connections;
-	for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+	if(mutex_.timed_lock(boost::posix_time::microseconds(100)))
 	{
-		//if((*it)->GetError())
-		//	dead_connections.push_back(*it);
-	}
-	for(vector<ServerConnection*>::iterator it = dead_connections.begin(); it != dead_connections.end(); ++it)
-	{
-		delete *it;
-		connections_.erase(std::remove(connections_.begin(), connections_.end(), *it), connections_.end());
-	}
-	//Schedule another cleanup in 100ms
-	if(!closing_)
-	{
-		timer_.expires_from_now(boost::posix_time::milliseconds(100));	
-		timer_.async_wait(boost::bind(&Server::PeriodicTidyup, this, boost::asio::placeholders::error));
-	}
+		Logger::DiagnosticOut() << "Periodic tidyup at server\n";
+		//TODO use a predicate here
+		vector<ServerConnection*> dead_connections;
+		for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+		{
+			if((*it)->GetError())
+				dead_connections.push_back(*it);
+		}
+		for(vector<ServerConnection*>::iterator it = dead_connections.begin(); it != dead_connections.end(); ++it)
+		{
+			delete *it;
+			connections_.erase(std::remove(connections_.begin(), connections_.end(), *it), connections_.end());
+		}
+		//Schedule another cleanup in 100ms
+		if(!closing_)
+		{
+			timer_.expires_from_now(boost::posix_time::milliseconds(100));	
+			timer_.async_wait(boost::bind(&Server::PeriodicTidyup, this, boost::asio::placeholders::error));
+		}
+		mutex_.unlock();
+	} else Logger::DiagnosticOut() << "Server: Unable to acquire mutex, must be shutting down\n";
 }
 
 bool Server::Tick()
@@ -96,6 +117,7 @@ bool Server::Tick()
 
 void Server::HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode)
 {
+	//No need to lock mutex as will already be locked by calling method
 	if(opcodes_.size() <= _player_id)
 	{
 		opcodes_.push_back(vector<Opcodes::ClientOpcode*>());
@@ -105,7 +127,10 @@ void Server::HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode)
 
 vector<vector<Opcodes::ClientOpcode*> > Server::GetOpcodes()
 {
+	//Prevent vector being changed by background thread while I work with it
+	mutex_.lock();
 	vector<vector<Opcodes::ClientOpcode*> > opcodes_copy = opcodes_;
 	opcodes_.clear();
+	mutex_.unlock();
 	return opcodes_copy;
 }

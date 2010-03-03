@@ -21,6 +21,14 @@ public:
 	void operator()();
 };
 
+/* Server class. Handles multiple clients
+ *
+ * Designed to run on a single thread that it manages itself. Mutex prevents concurrent 
+ * access to resources and ensure safe deletion
+ * main() thread should always lock() before acting and should complete fast (<100ms)
+ * callbacks should always be on a background thread, and should attempt to lock. Being unable to lock indicates
+ * shutdown in process
+ */
 class Server
 {
 protected:
@@ -28,6 +36,7 @@ protected:
 	boost::asio::io_service io_;
 	boost::asio::io_service::work* work_;
 	boost::thread* thread_;
+	boost::mutex mutex_;
 	boost::asio::deadline_timer timer_;
 
 	tcp::acceptor acceptor_;
@@ -48,6 +57,8 @@ public:
 	bool Tick();
 	void PeriodicTidyup(boost::system::error_code _error);
 	void HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode);
+
+	boost::mutex& GetMutex(){return mutex_;}
 
 	vector<vector<Opcodes::ClientOpcode*> > GetOpcodes();
 };
