@@ -67,5 +67,35 @@ namespace Opcodes
 		}
 		return opcode;
 	}
+
+	ServerOpcode* GetServerOpcode(ServerOpcode* _header)
+	{
+		ServerOpcode* opcode = NULL;
+		switch(_header->opcode_)
+		{
+		case ChatMessage::OPCODE:
+			opcode = new ChatMessage("", 0);
+			break;
+		case DriveCursor::OPCODE:
+			opcode = new DriveCursor(0, Vector2<short>());
+			break;
+		case WalkerSpawn::OPCODE:
+			opcode = new WalkerSpawn(WalkerSpawn::WALKER_CAT,Vector2<short>(), WalkerSpawn::DIRECTION_EAST, 0);
+			break;
+		case ArrowSpawn::OPCODE:
+			opcode = new ArrowSpawn(ArrowSpawn::ARROW_CLEAR, Vector2<unsigned char>(), ArrowSpawn::DIRECTION_EAST, 0);
+			break;
+		case KillWalker::OPCODE:
+			opcode = new KillWalker(Vector2f(), 0);
+			break;
+		case PlayerName::OPCODE:
+			opcode = new PlayerName("", 0);
+			break;
+		default:
+			//TODO warnings here
+			break;
+		}
+		return opcode;
+	}
 }
 

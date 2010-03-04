@@ -6,6 +6,10 @@
 
 using std::string;
 using boost::asio::ip::tcp;
+using std::vector;
+
+typedef boost::array<char, 512> CBuffer;
+typedef boost::shared_ptr<CBuffer> CBuffer_ptr;
 
 namespace ClientState
 {
@@ -27,6 +31,9 @@ public:
 
 };
 
+/* Represents a client that interacts with the server
+ * Collects opcodes and puts them in a vector to be processed
+ */
 class Client
 {
 protected:
@@ -38,18 +45,20 @@ protected:
 	boost::asio::io_service io_;
 	tcp::resolver::iterator endpoints_;
 	tcp::socket socket_;
-	boost::array<char, 512> read_buffer;
 	boost::system::error_code error_;
 
 	boost::thread* thread_;
 	boost::mutex mutex_;
 
 	void ConnectHandler(const boost::system::error_code& error);
-	void ReadHeaderFinished(boost::system::error_code error);
-	void ReadBodyFinished(boost::system::error_code error);
+	void ReadHeaderFinished(boost::system::error_code error, CBuffer_ptr _read_buffer);
+	void ReadBodyFinished(boost::system::error_code error, CBuffer_ptr _read_buffer);
 	void WriteFinished(boost::system::error_code error, boost::shared_ptr<Opcodes::ClientOpcode> _data);
 
 	bool closing_;
+	vector<Opcodes::ServerOpcode*> opcodes_;
+	Opcodes::ServerOpcode* server_opcode_;
+
 public:
 	Client(void);
 	~Client(void);
@@ -61,4 +70,7 @@ public:
 
 	void Connect(std::string _host, unsigned short _port);
 	bool Tick();
+
+	vector<Opcodes::ServerOpcode*> GetOpcodes();
+
 };

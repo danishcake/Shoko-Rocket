@@ -29,7 +29,8 @@ void ServerConnection::Start()
 	Opcodes::ChatMessage cm("Welcome to ShokoRocket", Opcodes::ChatMessage::SENDER_SERVER);
 	memcpy(send_buffer->c_array(), &cm, sizeof(cm));
 
-	socket_.async_send(boost::asio::buffer(*send_buffer, 5), boost::bind(&ServerConnection::WriteFinished, this, boost::asio::placeholders::error, send_buffer));
+	
+	socket_.async_send(boost::asio::buffer(*send_buffer, sizeof(Opcodes::ChatMessage)), boost::bind(&ServerConnection::WriteFinished, this, boost::asio::placeholders::error, send_buffer));
 	//At same time expect data
 	SBuffer read_buffer = SBuffer(new boost::array<char, 512>());
 	boost::asio::async_read(socket_, boost::asio::buffer(*read_buffer, Opcodes::ClientOpcode::HEADERSIZE), boost::bind(&ServerConnection::ReadHeaderFinished, this, boost::asio::placeholders::error, read_buffer));

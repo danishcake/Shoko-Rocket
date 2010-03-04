@@ -27,7 +27,6 @@ TEST(ClientBasics)
 
 TEST(ClientCantConnectToNothing)
 {
-	Logger::DiagnosticOut() << "ClientCantConnectToNothing Tests\n";
 	Client* client = new Client();
 	client->Connect("localhost", 9020);
 	CHECK_EQUAL(ClientState::Connecting, client->GetState());
@@ -35,7 +34,6 @@ TEST(ClientCantConnectToNothing)
 	CHECK_EQUAL(ClientState::NotConnected, client->GetState());
 
 	delete client;
-	Logger::DiagnosticOut() << "ClientCantConnectToNothing Tests end\n";
 }
 
 TEST(ClientCanConnectToServer)
@@ -74,6 +72,7 @@ TEST(ServerGetsClientName)
 	CHECK_EQUAL(1, opcodes.size()); //One client connected
 	//Assumes first message client sends is name of Client
 	CHECK_EQUAL("Edward", ((Opcodes::SetName*)opcodes[0][0])->name_);
+	//TODO fix this memory leak by freeing opcodes
 
 	// Opcodes are cleared once returned
 	CHECK_EQUAL(0, s->GetOpcodes().size());
@@ -81,8 +80,28 @@ TEST(ServerGetsClientName)
 	delete c;
 }
 
-TEST(ClientGetsServerName)
+TEST(ClientGetsServerWelcome)
 {
+	Logger::DiagnosticOut() << "Running test: Do clients get server welcome?\n";
+	Server* s = new Server();
+	Client* c = new Client();
+
+	c->Connect("localhost", 9020);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	CHECK_EQUAL(ClientState::Connected, c->GetState());
+
+	vector<Opcodes::ServerOpcode*> opcodes = c->GetOpcodes(); //Returns a vector of collected opcodes
+	CHECK_EQUAL(1, opcodes.size()); //Only one welcome message
+	if(opcodes.size() > 0)
+	{
+		CHECK_EQUAL(Opcodes::ChatMessage::OPCODE, opcodes[0]->opcode_);
+	}
+
+	// Opcodes are cleared once returned
+	CHECK_EQUAL(0, c->GetOpcodes().size());
+	delete s;
+	delete c;
+	Logger::DiagnosticOut() << "End test: Do clients get server welcome?\n\n";
 }
 
 TEST(ClientsChat)

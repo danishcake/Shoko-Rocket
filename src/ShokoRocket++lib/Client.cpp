@@ -18,6 +18,7 @@ Client::Client(void) : name_("CHU CHU"), io_(boost::asio::io_service()), socket_
 {
 	state_ = ClientState::NotConnected;
 	thread_ = new boost::thread(ClientThread(this));
+	server_opcode_ = NULL;
 }
 
 Client::~Client(void)
@@ -78,24 +79,41 @@ void Client::ConnectHandler(const boost::system::error_code& error)
 			
 			socket_.async_send(boost::asio::buffer((char*)opcode.get(), sizeof(Opcodes::SetName)), boost::bind(&Client::WriteFinished, this, boost::asio::placeholders::error, opcode));
 
-			boost::asio::async_read(socket_, boost::asio::buffer(read_buffer, 1), boost::bind(&Client::ReadHeaderFinished, this, boost::asio::placeholders::error));
+			CBuffer_ptr read_buffer = CBuffer_ptr(new CBuffer());
+
+			boost::asio::async_read(socket_, boost::asio::buffer(*read_buffer, Opcodes::ServerOpcode::HEADERSIZE), 
+									boost::bind(&Client::ReadHeaderFinished, 
+									this, 
+									boost::asio::placeholders::error,
+									read_buffer));
 			
 		}
 		mutex_.unlock();
 	} else Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
 }
-void Client::ReadHeaderFinished(boost::system::error_code error)
+
+void Client::ReadHeaderFinished(boost::system::error_code error, CBuffer_ptr _read_buffer)
 {
 	if(mutex_.timed_lock(boost::posix_time::milliseconds(100)))
 	{
 		if(error == boost::asio::error::eof)
-			std::cout << "Client: Header read OK, but server DC'd\n";
+			Logger::DiagnosticOut() << "Client: Header read OK, but server DC'd\n";
 		else if(error)
-			std::cout << "Client: Error during header read: " << error.message() << "\n";
+			Logger::DiagnosticOut() << "Client: Error during header read: " << error.message() << "\n";
 		else
 		{
-			std::cout << "Client: Read header finished\n";
-			boost::asio::async_read(socket_, boost::asio::buffer(read_buffer, 32), boost::bind(&Client::ReadBodyFinished, this, boost::asio::placeholders::error));
+			Logger::DiagnosticOut() << "Client: Read header finished\n";
+			int body_size = Opcodes::GetBodySize((Opcodes::ServerOpcode*)_read_buffer->c_array());
+			Logger::DiagnosticOut() << "Client: Trying to read body of size " << body_size << "\n";
+			server_opcode_ = Opcodes::GetServerOpcode((Opcodes::ServerOpcode*)_read_buffer->c_array());
+		
+			CBuffer_ptr read_buffer = CBuffer_ptr(new CBuffer());
+			boost::asio::async_read(socket_, 
+									boost::asio::buffer(*read_buffer, body_size),
+									boost::bind(&Client::ReadBodyFinished,
+									this,
+									boost::asio::placeholders::error,
+									read_buffer));
 		}
 		if(error)
 		{
@@ -107,18 +125,27 @@ void Client::ReadHeaderFinished(boost::system::error_code error)
 	} else Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
 }
 
-void Client::ReadBodyFinished(boost::system::error_code error)
+void Client::ReadBodyFinished(boost::system::error_code error, CBuffer_ptr _read_buffer)
 {
 	if(mutex_.timed_lock(boost::posix_time::milliseconds(100)))
 	{
 		if(error == boost::asio::error::eof)
-			std::cout << "Client: Body read OK, but client DC'd\n";
+			Logger::DiagnosticOut() << "Client: Body read OK, but client DC'd\n";
 		else if(error)
-			std::cout << "Client: Error during body read: " << error.message() << "\n";
+			Logger::DiagnosticOut() << "Client: Error during body read: " << error.message() << "\n";
 		else
 		{
-			std::cout << "Client: Read body finished, looking for header again\n";
-			boost::asio::async_read(socket_, boost::asio::buffer(read_buffer, 1), boost::bind(&Client::ReadHeaderFinished, this, boost::asio::placeholders::error));
+			memcpy(((char*)server_opcode_) + Opcodes::ServerOpcode::HEADERSIZE, _read_buffer->c_array(),  Opcodes::GetBodySize(server_opcode_));
+			opcodes_.push_back(server_opcode_);
+			server_opcode_ = NULL;
+			CBuffer_ptr read_buffer = CBuffer_ptr(new CBuffer());
+			Logger::DiagnosticOut() << "Client: Read body finished, looking for header again\n";
+			boost::asio::async_read(socket_, 
+									boost::asio::buffer(*read_buffer, Opcodes::ServerOpcode::HEADERSIZE),
+									boost::bind(&Client::ReadHeaderFinished,
+									this,
+									boost::asio::placeholders::error,
+									read_buffer));
 		}
 		if(error)
 		{
@@ -129,10 +156,20 @@ void Client::ReadBodyFinished(boost::system::error_code error)
 		mutex_.unlock();
 	} else Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
 }
+
 void Client::WriteFinished(boost::system::error_code error, boost::shared_ptr<Opcodes::ClientOpcode> _data)
 {
 	mutex_.lock();
-	Logger::DiagnosticOut() << "Finished writing from client\n";
+	Logger::DiagnosticOut() << "Client: Write complete\n";
 	//Do nothing, but memory should now be freed
 	mutex_.unlock();
+}
+
+vector<Opcodes::ServerOpcode*> Client::GetOpcodes()
+{
+	mutex_.lock();
+	vector<Opcodes::ServerOpcode*> opcodes_copy = opcodes_;
+	opcodes_.clear();
+	mutex_.unlock();
+	return opcodes_copy;
 }
