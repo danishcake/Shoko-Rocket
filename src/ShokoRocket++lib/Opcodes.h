@@ -228,6 +228,27 @@ namespace Opcodes
 		char name_[32];
 	};
 
+	/*
+	 * Represents a message sent either by the client to the server
+	 */
+	struct SendChatMessage : public ClientOpcode
+	{
+		static const unsigned char OPCODE = 4;
+		static const unsigned char SENDER_SERVER = 255;
+	public:
+		SendChatMessage(string _message)
+		{
+			opcode_ = OPCODE;
+			//Construct message carefully
+			std::size_t len = _message.size();
+			len = len > 255 ? 255 : len;
+			memset(&message_, 0, 256);
+			memcpy(&message_, _message.c_str(), len);
+			
+		}
+		char message_[256];
+	};
+
 	unsigned int GetBodySize(ServerOpcode* _header);
 	unsigned int GetBodySize(ClientOpcode* _header);
 	ServerOpcode* GetServerOpcode(ServerOpcode* _header);

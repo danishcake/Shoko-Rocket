@@ -40,6 +40,9 @@ namespace Opcodes
 		case SetName::OPCODE:
 			return sizeof(SetName) - ClientOpcode::HEADERSIZE;
 			break;
+		case SendChatMessage::OPCODE:
+			return sizeof(SendChatMessage) - ClientOpcode::HEADERSIZE;
+			break;
 		default:
 			//TODO warnings here
 			return 0;
@@ -60,6 +63,9 @@ namespace Opcodes
 			break;
 		case SetName::OPCODE:
 			opcode = new SetName("");
+			break;
+		case SendChatMessage::OPCODE:
+			opcode = new SendChatMessage("");
 			break;
 		default:
 			//TODO warnings here
