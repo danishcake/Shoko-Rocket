@@ -163,6 +163,28 @@ namespace Opcodes
 
 
 	/*
+	 * Transitions the client state
+	 */
+	struct StateTransition : public ServerOpcode
+	{
+		static const unsigned OPCODE = 7;
+
+		typedef unsigned char NewState;
+		static const NewState STATE_LOBBY = 1;
+		static const NewState STATE_GAME = 2;
+	public:
+		StateTransition(NewState _state)
+		{
+			opcode_ = OPCODE;
+			state_ = _state;
+		}
+		NewState state_;
+	};
+
+
+
+
+	/*
 	 * Messages sent from client to server
 	 */
 	struct ClientOpcode

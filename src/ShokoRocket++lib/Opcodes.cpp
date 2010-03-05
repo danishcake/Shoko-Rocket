@@ -20,6 +20,10 @@ namespace Opcodes
 			break;
 		case DriveCursor::OPCODE:
 			return sizeof(DriveCursor) - ServerOpcode::HEADERSIZE;
+			break;
+		case StateTransition::OPCODE:
+			return sizeof(StateTransition) - ServerOpcode::HEADERSIZE;
+			break;
 		default:
 			//TODO warnings here
 			return 0;
@@ -96,6 +100,9 @@ namespace Opcodes
 			break;
 		case PlayerName::OPCODE:
 			opcode = new PlayerName("", 0);
+			break;
+		case StateTransition::OPCODE:
+			opcode = new StateTransition(StateTransition::STATE_GAME);
 			break;
 		default:
 			//TODO warnings here
