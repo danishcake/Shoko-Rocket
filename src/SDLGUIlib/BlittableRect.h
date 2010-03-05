@@ -6,6 +6,14 @@
 
 struct SDL_Surface;
 
+namespace TextSize
+{
+	enum Enum
+	{
+		Normal, Small
+	};
+}
+
 class BlittableRect
 {
 private:
@@ -16,6 +24,8 @@ private:
 	SDL_Surface* surface_;
 	bool error_occurred_;
 	bool dont_free_;
+	TextSize::Enum text_size_;
+
 
 public:
 	BlittableRect(SDL_Surface* _surface, bool _dont_free_surface);
@@ -39,6 +49,7 @@ public:
 	
 	Vector2i GetSize(){return size_;}
 	BlittableRect* Resize(Vector2i _new_size);
+	void SetTextSize(TextSize::Enum _text_size){text_size_ = _text_size;}
 
 
 	static void SetSurfaceFlags(unsigned int flags);

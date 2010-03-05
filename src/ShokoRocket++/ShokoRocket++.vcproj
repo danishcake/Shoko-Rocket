@@ -499,11 +499,27 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Sprites\GUI\Font_small.png"
+					>
+				</File>
+				<File
 					RelativePath=".\Sprites\GUI\Gestures.png"
 					>
 				</File>
 				<File
+					RelativePath=".\Sprites\GUI\IPArea.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\IPBar.png"
+					>
+				</File>
+				<File
 					RelativePath=".\Sprites\GUI\Options.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\PortArea.png"
 					>
 				</File>
 				<File
@@ -520,6 +536,10 @@
 				</File>
 				<File
 					RelativePath=".\Sprites\GUI\ScrollUp.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\ServerIcon.png"
 					>
 				</File>
 				<File

@@ -12,6 +12,8 @@
 #include <boost/foreach.hpp>
 #include "Progress.h"
 #include <boost/filesystem.hpp>
+#include <boost/tokenizer.hpp>
+
 
 /* Consts */
 const float GameStateMachine::sub_mode_widget_transition_time = 0.5f;
@@ -262,7 +264,7 @@ void GameStateMachine::RenderLevel(Widget* /*_widget*/, BlittableRect** _rect, s
 	{
 		PuzzleLevel pl(rel_path_ + "/" + _name, Vector2f(6, 6));
 
-		//72x54
+		//72x60
 		SDL_Surface* surface = SDL_CreateRGBSurface(SDL_GetVideoSurface()->flags, 6 * 13, 6 * 10, SDL_GetVideoSurface()->format->BytesPerPixel * 8, SDL_GetVideoSurface()->format->Rmask, SDL_GetVideoSurface()->format->Gmask, SDL_GetVideoSurface()->format->Bmask, SDL_GetVideoSurface()->format->Amask);
 		SDL_Surface* conv_surface = SDL_DisplayFormatAlpha(surface);
 		SDL_FreeSurface(surface);
@@ -923,6 +925,42 @@ void GameStateMachine::EditorSaveClick(Widget* /*_widget*/)
 /* Server Browser */
 void GameStateMachine::SetupServerBrowser()
 {
+	Widget* join = new Widget("Blank128x64.png");
+	join->SetPosition(Vector2i(2,2));
+	join->SetText("Join", TextAlignment::Centre);
+
+	Widget* back = new Widget("Blank128x64.png");
+	back->SetPosition(Vector2i(2, SDL_GetVideoSurface()->h - 66));
+	back->SetText("Back", TextAlignment::Centre);
+	back->OnClick.connect(boost::bind(&GameStateMachine::ServerBrowserBackCallback, this, _1));
+
+	Widget* entry_bar = new Widget("IPBar.png");
+	entry_bar->SetPosition(Vector2i(132, 2));
+	entry_bar->SetRejectsFocus(true);
+
+	Widget* ip_area = new Widget("IPArea.png");
+	ip_area->SetPosition(Vector2i(8, 8));
+	ip_area->SetText("127.0.0.1", TextAlignment::Left);
+	ip_area->SetEditable(true);
+	entry_bar->AddChild(ip_area);
+	
+
+	Widget* port_area = new Widget("PortArea.png");
+	port_area->SetPosition(Vector2i(336, 8));
+	port_area->SetText("9020", TextAlignment::Left);
+	port_area->SetEditable(true);
+	entry_bar->AddChild(port_area);
+
+	std::vector<std::string> server_list;
+	server_list.push_back("127.0.0.1:9020");
+	server_list.push_back("localhost:9020");
+	
+	
+	ItemBrowserWidget* servers = new ItemBrowserWidget(server_list, Vector2i(SDL_GetVideoSurface()->w-132, SDL_GetVideoSurface()->h-132) / Vector2i(78, 60), Vector2i(78, 60));
+	servers->SetPosition(Vector2i(132, 68));
+	servers->OnItemRender.connect(boost::bind(&GameStateMachine::ServerBrowserListRender, this, _1, _2, _3));
+	servers->PerformItemLayout();
+	
 }
 
 void GameStateMachine::ProcessServerBrowser(float _timespan)
@@ -934,7 +972,50 @@ void GameStateMachine::TeardownServerBrowser()
 	Widget::ClearRoot();
 }
 /* Server Browser event handling */
+void GameStateMachine::ServerBrowserBackCallback(Widget* _widget)
+{
+	pend_mode_ = Mode::Menu;
+	mode_timer_ = 1.0f;
+	FadeInOut(2.0f);
+}
 
+void GameStateMachine::ServerBrowserListRender(Widget* _widget, BlittableRect** _rect, std::string _name)
+{
+	string s;
+	*_rect = new BlittableRect("ServerIcon.png");
+
+	boost::char_separator<char> sep(":");
+	boost::tokenizer<boost::char_separator<char> > tokens(_name, sep);
+
+	std::vector<std::string> lines;
+	for (boost::tokenizer<boost::char_separator<char> >::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
+	{
+		//Maxiumum line length is (78 - 16) / 10 = 7 characters
+		int len_used = 0;
+		while(len_used < tok_iter->length())
+		{
+			int start = len_used;
+			len_used += 7;
+			if(len_used > tok_iter->length()) len_used = tok_iter->length();
+
+			string substr = tok_iter->substr(start, len_used);
+			lines.push_back(substr);
+		}
+		
+	}
+
+	(*_rect)->SetTextSize(TextSize::Small);
+	(*_rect)->BlitTextLines(lines, TextAlignment::Centre);
+	
+	//TODO overlay favourites here
+	/*SDLAnimationFrame::screen_ = surface;
+	pl.grid_animation_->GetCurrentFrame()->Draw(Vector2f(3, 3));
+	if(Progress::GetProgress(rel_path_ + "/" + _name).completed)
+	{
+		BlittableRect overlay("Tick.png");
+		overlay.Blit(Vector2i(surface->w - overlay.GetSize().x - 4, surface->h - overlay.GetSize().y - 4), *_rect);
+	}*/
+}
 
 /* Multiplayer */
 void GameStateMachine::SetupMultiplayer()

@@ -9,6 +9,7 @@ int BlittableRect::depth_ = 32;
 unsigned int BlittableRect::bytes_used = 0;
 
 SDL_Surface* font = NULL;
+SDL_Surface* font_small = NULL;
 
 /* SDL interprets each pixel as a 32-bit number, so our masks must depend
    on the endianness (byte order) of the machine */
@@ -101,14 +102,14 @@ namespace
 
 
 BlittableRect::BlittableRect(SDL_Surface* _surface, bool _dont_free_surface)
-: size_(Vector2i(_surface->w, _surface->h)), surface_(_surface), dont_free_(_dont_free_surface), error_occurred_(false)
+: size_(Vector2i(_surface->w, _surface->h)), surface_(_surface), dont_free_(_dont_free_surface), error_occurred_(false), text_size_(TextSize::Normal)
 {
 	bytes_used += surface_->w * _surface->h * _surface->format->BytesPerPixel;
 }
 
 
 BlittableRect::BlittableRect(Vector2i _size)
-	: size_(_size)
+	: size_(_size), text_size_(TextSize::Normal)
 {
 	error_occurred_ = false;
 	dont_free_ = false;
@@ -125,7 +126,7 @@ BlittableRect::BlittableRect(Vector2i _size)
 	bytes_used += surface_->w * surface_->h * surface_->format->BytesPerPixel;
 }
 
-BlittableRect::BlittableRect(std::string _filename)
+BlittableRect::BlittableRect(std::string _filename) : text_size_(TextSize::Normal)
 {
 	error_occurred_ = false;
 	dont_free_ = false;
@@ -144,7 +145,7 @@ BlittableRect::BlittableRect(std::string _filename)
 	bytes_used += surface_->w * surface_->h * surface_->format->BytesPerPixel;
 }
 
-BlittableRect::BlittableRect(std::string _filename, bool _dont_append_animations)
+BlittableRect::BlittableRect(std::string _filename, bool _dont_append_animations) : text_size_(TextSize::Normal)
 {
 	error_occurred_ = false;
 	dont_free_ = false;
@@ -166,7 +167,7 @@ BlittableRect::BlittableRect(std::string _filename, bool _dont_append_animations
 }
 
 BlittableRect::BlittableRect(std::string _filename, Vector2i _size) 
-: size_(_size)
+: size_(_size), text_size_(TextSize::Normal)
 {
 	error_occurred_ = false;
 	dont_free_ = false;
@@ -304,6 +305,20 @@ void BlittableRect::MeasureText(std::string _text, TextAlignment::Enum _alignmen
 
 void BlittableRect::BlitText(std::string _text, TextAlignment::Enum _alignment)
 {
+	int font_width;
+	int font_height;
+	switch(text_size_)
+	{
+	case TextSize::Small:
+		font_width = 10;
+		font_height = 12;
+		break;
+	case TextSize::Normal:
+		font_width = 16;
+		font_height = 24;
+		break;
+	}
+
 	if(!font)
 	{
 		font = IMG_Load("Animations/Font.png");
@@ -314,10 +329,19 @@ void BlittableRect::BlitText(std::string _text, TextAlignment::Enum _alignment)
 		Logger::ErrorOut() << "Unable to font image  Animation/Font.png\n";
 		return;
 	}
+	if(!font_small)
+	{
+		font_small = IMG_Load("Animations/Font_small.png");
+	}
+	if(!font_small || font_small->w != 160 || font_small->h != 72)
+	{
+		//TODO error
+		Logger::ErrorOut() << "Unable to font_small image  Animation/Font_small.png\n";
+		return;
+	}
 	int out_x = 0;
 	int out_y = 0;
-	const int font_width = 16;
-	const int font_height = 24;
+
 	switch(_alignment)
 	{
 	case TextAlignment::TopLeft:
@@ -377,12 +401,33 @@ void BlittableRect::BlitText(std::string _text, TextAlignment::Enum _alignment)
 		dest_rect.y = static_cast<Sint16>(out_y);
 		dest_rect.w = font_width;
 		dest_rect.h = font_height;
-		SDL_BlitSurface(font, &src_rect, surface_, &dest_rect);
-		out_x += 16;
+		switch(text_size_)
+		{
+		case TextSize::Small:
+			SDL_BlitSurface(font_small, &src_rect, surface_, &dest_rect);
+			break;
+		case TextSize::Normal:
+			SDL_BlitSurface(font, &src_rect, surface_, &dest_rect);
+			break;
+		}
+		out_x += font_width;
 	}
 }
 void BlittableRect::BlitTextLines(std::vector<std::string> _text_lines, TextAlignment::Enum _alignment)
 {
+	int font_width;
+	int font_height;
+	switch(text_size_)
+	{
+	case TextSize::Small:
+		font_width = 10;
+		font_height = 12;
+		break;
+	case TextSize::Normal:
+		font_width = 16;
+		font_height = 24;
+		break;
+	}
 	if(!font)
 	{
 		font = IMG_Load("Animations/Font.png");
@@ -393,10 +438,20 @@ void BlittableRect::BlitTextLines(std::vector<std::string> _text_lines, TextAlig
 		Logger::ErrorOut() << "Unable to font image  Animation/Font.png\n";
 		return;
 	}
+	if(!font_small)
+	{
+		font_small = IMG_Load("Animations/Font_small.png");
+	}
+	if(!font_small || font_small->w != 160 || font_small->h != 72)
+	{
+		//TODO error
+		Logger::ErrorOut() << "Unable to font_small image  Animation/Font_small.png\n";
+		return;
+	}
+
+
 	int init_out_x = 0;
 	int init_out_y = 0;
-	const int font_width = 16;
-	const int font_height = 24;
 	int longest_line = 0;
 	for(std::vector<std::string>::iterator it = _text_lines.begin(); it != _text_lines.end(); ++it)
 	{
@@ -482,7 +537,15 @@ void BlittableRect::BlitTextLines(std::vector<std::string> _text_lines, TextAlig
 			dest_rect.y = static_cast<Sint16>(out_y);
 			dest_rect.w = static_cast<Uint16>(font_width);
 			dest_rect.h = static_cast<Uint16>(font_height);
-			SDL_BlitSurface(font, &src_rect, surface_, &dest_rect);
+			switch(text_size_)
+			{
+			case TextSize::Small:
+				SDL_BlitSurface(font_small, &src_rect, surface_, &dest_rect);
+				break;
+			case TextSize::Normal:
+				SDL_BlitSurface(font, &src_rect, surface_, &dest_rect);
+				break;
+			}
 			out_x += font_width;
 		}
 		out_y += font_height;

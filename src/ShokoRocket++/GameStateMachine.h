@@ -150,6 +150,8 @@ private:
 	void ProcessServerBrowser(float _timespan);
 	void TeardownServerBrowser();
 	/* ServerBrowser event handling */
+	void ServerBrowserBackCallback(Widget* _widget);
+	void ServerBrowserListRender(Widget* _widget, BlittableRect** _rect, std::string _name);
 
 	/* Multiplayer members */
 	/* Multiplayer methods */
