@@ -110,8 +110,12 @@ void GameStateMachine::SetupMenu()
 	Widget* options = new Widget("Blank128x32.png");
 	options->SetPosition(Vector2i(2, 70));
 	options->SetText("Options", TextAlignment::Centre);
+	Widget* multiplayer = new Widget("Blank128x64.png");
+	multiplayer->SetPosition(Vector2i(2, 104));
+	multiplayer->SetText("Play\nOnline", TextAlignment::Centre);
+
 	Widget* exit = new Widget("Blank128x32.png");
-	exit->SetPosition(Vector2i(2, 104));
+	exit->SetPosition(Vector2i(2, 170));
 	exit->SetText("Exit", TextAlignment::Centre);
 	puzzle_index_ = -1;
 	
@@ -174,7 +178,7 @@ void GameStateMachine::SetupMenu()
 	options->OnClick.connect(boost::bind(&GameStateMachine::MenuOptionsCallback, this, _1));
 	puzzle->OnClick.connect(boost::bind(&GameStateMachine::MenuPuzzleCallback, this, _1));
 	editor->OnClick.connect(boost::bind(&GameStateMachine::MenuEditorCallback, this, _1));
-
+	multiplayer->OnClick.connect(boost::bind(&GameStateMachine::MenuPlayOnlineCallback, this, _1));
 	sub_mode_ = Submode::None;
 	pend_sub_mode_ = Submode::LevelList;
 	sub_mode_timer_ = 1.0f;
@@ -377,6 +381,15 @@ void GameStateMachine::MenuOptionsCallback(Widget* /*_widget*/)
 	}
 }
 
+void GameStateMachine::MenuPlayOnlineCallback(Widget* /*_widget*/)
+{
+	if(sub_mode_ == pend_sub_mode_)
+	{
+		pend_mode_ = Mode::ServerBrowser;
+		mode_timer_ = 1.0f;
+		FadeInOut(2.0f);
+	}
+}
 void GameStateMachine::OptionsInputmethodCallback(Widget* _widget)
 {
 	switch(input_method_)
@@ -907,6 +920,39 @@ void GameStateMachine::EditorSaveClick(Widget* /*_widget*/)
 		editor_level_->Save(std::string("Editor - ") + editor_level_->GetName() + ".Level");
 }
 
+/* Server Browser */
+void GameStateMachine::SetupServerBrowser()
+{
+}
+
+void GameStateMachine::ProcessServerBrowser(float _timespan)
+{
+}
+
+void GameStateMachine::TeardownServerBrowser()
+{
+	Widget::ClearRoot();
+}
+/* Server Browser event handling */
+
+
+/* Multiplayer */
+void GameStateMachine::SetupMultiplayer()
+{
+}
+
+void GameStateMachine::ProcessMultiplayer(float _timespan)
+{
+}
+
+void GameStateMachine::TeardownMultiplayer()
+{
+	Widget::ClearRoot();
+}
+
+
+/* Multiplayer event handling */
+
 /* Main methods */
 void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_affected)
 {
@@ -1000,6 +1046,12 @@ bool GameStateMachine::Tick(float _timespan)
 		case Mode::Puzzle:
 			TeardownPuzzle();
 			break;
+		case Mode::ServerBrowser:
+			TeardownServerBrowser();
+			break;
+		case Mode::Multiplayer:
+			TeardownMultiplayer();
+			break;
 		}		
 
 		switch(pend_mode_)
@@ -1015,6 +1067,12 @@ bool GameStateMachine::Tick(float _timespan)
 			break;
 		case Mode::Editor:
 			SetupEditor();
+			break;
+		case Mode::ServerBrowser:
+			SetupServerBrowser();
+			break;
+		case Mode::Multiplayer:
+			SetupMultiplayer();
 			break;
 		case Mode::Exit:
 			break;
@@ -1041,6 +1099,12 @@ bool GameStateMachine::Tick(float _timespan)
 		break;
 	case Mode::Editor:
 		ProcessEditor(_timespan);
+		break;
+	case Mode::ServerBrowser:
+		ProcessServerBrowser(_timespan);
+		break;
+	case Mode::Multiplayer:
+		ProcessMultiplayer(_timespan);
 		break;
 	case Mode::Exit:
 		return true;

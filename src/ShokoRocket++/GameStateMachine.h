@@ -14,7 +14,7 @@ namespace Mode
 {
 	enum Enum
 	{
-		Intro, Menu, Puzzle, Editor, Exit
+		Intro, Menu, Puzzle, Editor, ServerBrowser, Multiplayer, Exit
 	};
 }
 
@@ -84,6 +84,7 @@ private:
 	void MenuEditExistingCallback(Widget* _widget);
 	void MenuOptionsCallback(Widget* _widget);
 	void MenuLevelBrowerPageChange(Widget* _widget, int _old_page, int _new_page);
+	void MenuPlayOnlineCallback(Widget* _widget);
 	void OptionsInputmethodCallback(Widget* _widget);
 
 	/* Puzzle members */
@@ -141,7 +142,21 @@ private:
 	void EditorHoleMode(Widget* _widget);
 	void EditorRocketMode(Widget* _widget);
 	void EditorArrowMode(Widget* _widget);
+
 	
+	/* ServerBrowser members */
+	/* ServerBrowser methods */
+	void SetupServerBrowser();
+	void ProcessServerBrowser(float _timespan);
+	void TeardownServerBrowser();
+	/* ServerBrowser event handling */
+
+	/* Multiplayer members */
+	/* Multiplayer methods */
+	void SetupMultiplayer();
+	void ProcessMultiplayer(float _timespan);
+	void TeardownMultiplayer();
+	/* Multiplayer event handling */
 
 	/* Transition times */
 	static const float sub_mode_widget_transition_time;
