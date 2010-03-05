@@ -171,6 +171,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ServerWorld.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SPWorld.cpp"
 				>
 			</File>
@@ -242,6 +246,10 @@
 			</File>
 			<File
 				RelativePath=".\MPWorld.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ServerWorld.h"
 				>
 			</File>
 			<File

@@ -779,6 +779,26 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\ServerWorldCollisions.Level"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="Level copier"
+						Levelset=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\SpawnersLoad.Level"
 				>
 				<FileConfiguration

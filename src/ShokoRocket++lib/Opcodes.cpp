@@ -86,7 +86,7 @@ namespace Opcodes
 			opcode = new ArrowSpawn(ArrowSpawn::ARROW_CLEAR, Vector2<unsigned char>(), ArrowSpawn::DIRECTION_EAST, 0);
 			break;
 		case KillWalker::OPCODE:
-			opcode = new KillWalker(Vector2f(), 0);
+			opcode = new KillWalker(Vector2f(), 0, false);
 			break;
 		case PlayerName::OPCODE:
 			opcode = new PlayerName("", 0);

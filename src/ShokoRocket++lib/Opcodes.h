@@ -108,13 +108,18 @@ namespace Opcodes
 	{
 		static const unsigned char OPCODE = 4;
 	public:
-		KillWalker(Vector2f _position, unsigned int _uid)
+		KillWalker(Vector2f _position, unsigned int _uid, bool _death)
 		{
 			opcode_ = OPCODE;
 			position_ = _position;
 			uid_ = _uid;
+			if(_death)
+				death_ = 1;
+			else
+				death_ = 0;
 		}
 		Vector2f position_;
+		unsigned char death_;
 		unsigned int uid_;
 	};
 
@@ -189,11 +194,11 @@ namespace Opcodes
 	{
 		static const unsigned char OPCODE = 2;
 		typedef unsigned char Action;
-		static const Action ACT_WEST = 1;
-		static const Action ACT_RIGHT = 1;
 		static const Action ACT_NORTH = 1;
-		static const Action ACT_SOUTH = 1;
-		static const Action ACT_CLEAR = 1;
+		static const Action ACT_SOUTH = 2;
+		static const Action ACT_WEST = 3;
+		static const Action ACT_EAST = 4;
+		static const Action ACT_CLEAR = 5;
 	public:
 		SendInput(Vector2<unsigned char> _position, Action _action)
 		{
