@@ -13,6 +13,10 @@
 #include "Progress.h"
 #include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
+#include "Client.h"
+#include "Server.h"
+#include "MPWorld.h"
+#include "ServerWorld.h"
 
 
 /* Consts */
@@ -44,6 +48,12 @@ GameStateMachine::GameStateMachine()
 	scroll_right_widget_ = NULL;
 	scroll_up_widget_ = NULL;
 	scroll_down_widget_ = NULL;
+
+	client_ = NULL;
+	server_ = NULL;
+	client_world_ = NULL;
+	server_world_ = NULL;
+
 
 	Widget::OnGlobalKeyUp.connect(boost::bind(&GameStateMachine::KeyboardCallback, this, _1, _2));
 	state_indicator_level_ = boost::shared_ptr<StatusLevel>(new StatusLevel(Settings::GetGridSize()));
@@ -925,9 +935,15 @@ void GameStateMachine::EditorSaveClick(Widget* /*_widget*/)
 /* Server Browser */
 void GameStateMachine::SetupServerBrowser()
 {
-	Widget* join = new Widget("Blank128x64.png");
-	join->SetPosition(Vector2i(2,2));
-	join->SetText("Join", TextAlignment::Centre);
+	join_server_ = new Widget("Blank128x64.png");
+	join_server_->SetPosition(Vector2i(2,2));
+	join_server_->SetText("Join", TextAlignment::Centre);
+	join_server_->OnClick.connect(boost::bind(&GameStateMachine::JoinServerCallback, this, _1));
+
+	start_server_ = new Widget("Blank128x64.png");
+	start_server_->SetPosition(Vector2i(2,68));
+	start_server_->SetText("Start\nServer", TextAlignment::Centre);
+	start_server_->OnClick.connect(boost::bind(&GameStateMachine::StartServerCallback, this, _1));
 
 	Widget* back = new Widget("Blank128x64.png");
 	back->SetPosition(Vector2i(2, SDL_GetVideoSurface()->h - 66));
@@ -938,18 +954,18 @@ void GameStateMachine::SetupServerBrowser()
 	entry_bar->SetPosition(Vector2i(132, 2));
 	entry_bar->SetRejectsFocus(true);
 
-	Widget* ip_area = new Widget("IPArea.png");
-	ip_area->SetPosition(Vector2i(8, 8));
-	ip_area->SetText("127.0.0.1", TextAlignment::Left);
-	ip_area->SetEditable(true);
-	entry_bar->AddChild(ip_area);
+	ip_area_ = new Widget("IPArea.png");
+	ip_area_->SetPosition(Vector2i(8, 8));
+	ip_area_->SetText("127.0.0.1", TextAlignment::Left);
+	ip_area_->SetEditable(true);
+	entry_bar->AddChild(ip_area_);
 	
 
-	Widget* port_area = new Widget("PortArea.png");
-	port_area->SetPosition(Vector2i(336, 8));
-	port_area->SetText("9020", TextAlignment::Left);
-	port_area->SetEditable(true);
-	entry_bar->AddChild(port_area);
+	port_area_ = new Widget("PortArea.png");
+	port_area_->SetPosition(Vector2i(336, 8));
+	port_area_->SetText("9020", TextAlignment::Left);
+	port_area_->SetEditable(true);
+	entry_bar->AddChild(port_area_);
 
 	std::vector<std::string> server_list;
 	server_list.push_back("127.0.0.1:9020");
@@ -960,15 +976,70 @@ void GameStateMachine::SetupServerBrowser()
 	servers->SetPosition(Vector2i(132, 68));
 	servers->OnItemRender.connect(boost::bind(&GameStateMachine::ServerBrowserListRender, this, _1, _2, _3));
 	servers->PerformItemLayout();
+	servers->OnItemSelectedChanged.connect(boost::bind(&GameStateMachine::ServerBrowserItemHighlightCallback, this, _1, _2));
+
 	
 }
 
 void GameStateMachine::ProcessServerBrowser(float _timespan)
 {
+	Widget* clicked = NULL;
+	if(server_)
+	{
+		clicked = start_server_;	
+	} else if(client_)
+	{
+		clicked = join_server_;
+	}
+
+	if(client_)
+	{
+		if(client_->GetState() == ClientState::Connecting)
+		{
+			float dot_timer = fmodf(abs(mode_timer_), 0.6f);
+			if(dot_timer < 0.2f)
+			{
+				clicked->SetText("  .", TextAlignment::Left);
+			} else if(dot_timer < 0.4f)
+			{
+				clicked->SetText("  ..", TextAlignment::Left);
+			} else
+			{
+				clicked->SetText("  ...", TextAlignment::Left);
+			}
+		}
+		if(client_->GetState() == ClientState::NotConnected)
+		{
+			delete client_;
+			client_ = NULL;
+			clicked->SetModal(false);
+			clicked->SetRejectsFocus(false);
+			join_server_->SetText("Join", TextAlignment::Centre);
+			start_server_->SetText("Start\nServer", TextAlignment::Centre);
+			if(server_)
+			{
+				delete server_;
+				server_ = NULL;
+			}
+		} else if(client_->GetState() == ClientState::Connected && pend_mode_ == Mode::ServerBrowser)
+		{
+			clicked->SetText("Connected", TextAlignment::Centre);
+			mode_timer_ = 1.0f;
+			FadeInOut(2.0f);
+			pend_mode_ = Mode::Multiplayer;
+		}
+	}
 }
 
 void GameStateMachine::TeardownServerBrowser()
 {
+	if(pend_mode_ == Mode::Menu)
+	{
+		delete client_;
+		delete server_;
+		delete client_world_;
+		delete server_world_;
+	}
 	Widget::ClearRoot();
 }
 /* Server Browser event handling */
@@ -1017,6 +1088,39 @@ void GameStateMachine::ServerBrowserListRender(Widget* _widget, BlittableRect** 
 	}*/
 }
 
+void GameStateMachine::ServerBrowserItemHighlightCallback(Widget* _widget, std::string _name)
+{
+	boost::char_separator<char> sep(":");
+	boost::tokenizer<boost::char_separator<char> > tokens(_name, sep);
+
+	int i = 0;
+	boost::tokenizer<boost::char_separator<char> >::iterator tok_iter = tokens.begin();
+	ip_area_->SetText(*tok_iter, TextAlignment::Left);
+	tok_iter++;
+	port_area_->SetText(*tok_iter, TextAlignment::Left);
+
+}
+void GameStateMachine::JoinServerCallback(Widget* _widget)
+{
+	if(!client_)
+	{
+		client_ = new Client();
+		client_->Connect(ip_area_->GetText(), boost::lexical_cast<unsigned int, std::string>(port_area_->GetText()));
+		join_server_->SetModal(true);
+		join_server_->SetRejectsFocus(true);
+	}
+}
+void GameStateMachine::StartServerCallback(Widget* _widget)
+{
+	if(!server_ && !client_)
+	{
+		server_ = new Server();
+		client_ = new Client();
+		client_->Connect("localhost", 9020);
+		start_server_->SetModal(true);
+		start_server_->SetRejectsFocus(true);
+	}
+}
 /* Multiplayer */
 void GameStateMachine::SetupMultiplayer()
 {

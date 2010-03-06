@@ -10,6 +10,11 @@ class BlittableRect;
 #include <event.h>
 #include <GameGridWidget.h>
 
+class Client;
+class Server;
+class MPWorld;
+class ServerWorld;
+
 namespace Mode
 {
 	enum Enum
@@ -144,7 +149,17 @@ private:
 	void EditorArrowMode(Widget* _widget);
 
 	
+	/* Common multiplayer members */
+	Client* client_;
+	Server* server_;
+	MPWorld* client_world_;
+	ServerWorld* server_world_;
+
 	/* ServerBrowser members */
+	Widget* ip_area_;
+	Widget* port_area_;
+	Widget* join_server_;
+	Widget* start_server_;
 	/* ServerBrowser methods */
 	void SetupServerBrowser();
 	void ProcessServerBrowser(float _timespan);
@@ -152,6 +167,9 @@ private:
 	/* ServerBrowser event handling */
 	void ServerBrowserBackCallback(Widget* _widget);
 	void ServerBrowserListRender(Widget* _widget, BlittableRect** _rect, std::string _name);
+	void ServerBrowserItemHighlightCallback(Widget* _widget, std::string _name);
+	void JoinServerCallback(Widget* _widget);
+	void StartServerCallback(Widget* _widget);
 
 	/* Multiplayer members */
 	/* Multiplayer methods */
