@@ -331,6 +331,46 @@ TEST(ServerGeneratesResponseOpcodesToCollisions)
 	delete sworld;
 }
 
+TEST(RepeatMessagesOK)
+{
+	Server* s = new Server();
+	Client* c = new Client();
+
+	c->Connect("localhost", 9020);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
+	CHECK_EQUAL(ClientState::Connected, c->GetState());
+
+	c->GetOpcodes(); //Throw away new opcodes
+
+	s->SendOpcodeToAll(new Opcodes::ChatMessage("ElectricBoogaloo", Opcodes::ChatMessage::SENDER_SERVER));
+	s->SendOpcodeToAll(new Opcodes::ChatMessage("ElectricBoogaloo2", Opcodes::ChatMessage::SENDER_SERVER));
+	s->SendOpcodeToAll(new Opcodes::ChatMessage("ElectricBoogaloo3", Opcodes::ChatMessage::SENDER_SERVER));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
+	vector<Opcodes::ServerOpcode*> opcodes = c->GetOpcodes();
+	CHECK_EQUAL(3, opcodes.size());
+
+	s->GetOpcodes();
+	c->SendOpcode(new Opcodes::SetName("Edward"));
+	c->SendOpcode(new Opcodes::SetName("Edward"));
+	c->SendOpcode(new Opcodes::SetName("Edward"));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
+	CHECK_EQUAL(3, s->GetOpcodes()[0].size());
+	c->SendOpcode(new Opcodes::SendChatMessage("Hey dude"));
+	c->SendOpcode(new Opcodes::SetName("Edward"));
+	c->SendOpcode(new Opcodes::UpdateCursor(Vector2<unsigned short>()));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
+	CHECK_EQUAL(3, s->GetOpcodes()[0].size());
+
+	s->SendOpcodeToAll(new Opcodes::PlayerName("Edward", 0));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
+	opcodes = c->GetOpcodes();
+	
+	CHECK_EQUAL(1, opcodes.size());
+
+	delete c;
+	delete s;
+}
+
 TEST(MPWorldCanHandleArrowInputOpcodes)
 {
 }

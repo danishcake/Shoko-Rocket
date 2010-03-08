@@ -150,6 +150,7 @@ namespace Opcodes
 		PlayerName(std::string _name, unsigned char _player)
 		{
 			opcode_ = OPCODE;
+			player_ = _player;
 			//Construct message carefully
 			std::size_t len = _name.size();
 			len = len > 31 ? 31 : len;

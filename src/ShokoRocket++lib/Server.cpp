@@ -70,8 +70,8 @@ void Server::ConnectionAccepted(ServerConnection* _connection, boost::system::er
 		{
 			Logger::DiagnosticOut() << "Server: Connection accepted\n";
 			_connection->Start();
-			StartConnection();
 			players_count_++;
+			StartConnection();
 		}
 		else
 		{
@@ -85,7 +85,6 @@ void Server::PeriodicTidyup(boost::system::error_code _error)
 {
 	if(mutex_.timed_lock(boost::posix_time::microseconds(100)))
 	{
-		Logger::DiagnosticOut() << "Periodic tidyup at server\n";
 		//TODO use a predicate here
 		vector<ServerConnection*> dead_connections;
 		for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
@@ -118,7 +117,7 @@ bool Server::Tick()
 void Server::HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode)
 {
 	//No need to lock mutex as will already be locked by calling method
-	if(opcodes_.size() <= _player_id)
+	while(opcodes_.size() <= _player_id)
 	{
 		opcodes_.push_back(vector<Opcodes::ClientOpcode*>());
 	}
@@ -133,4 +132,16 @@ vector<vector<Opcodes::ClientOpcode*> > Server::GetOpcodes()
 	opcodes_.clear();
 	mutex_.unlock();
 	return opcodes_copy;
+}
+
+void Server::SendOpcodeToAll(Opcodes::ServerOpcode* _opcode)
+{
+	for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+	{
+		if((*it)->GetConnected())
+		{
+			(*it)->SendOpcode(_opcode);
+		}
+	}
+	delete _opcode;
 }

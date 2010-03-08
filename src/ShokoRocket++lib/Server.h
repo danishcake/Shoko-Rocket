@@ -58,6 +58,8 @@ public:
 	void PeriodicTidyup(boost::system::error_code _error);
 	void HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode);
 
+	void SendOpcodeToAll(Opcodes::ServerOpcode* _opcode);
+
 	boost::mutex& GetMutex(){return mutex_;}
 
 	vector<vector<Opcodes::ClientOpcode*> > GetOpcodes();

@@ -76,7 +76,6 @@ void Client::ConnectHandler(const boost::system::error_code& error)
 			Logger::DiagnosticOut() << "Client: Connected successfully\n";
 			state_ = ClientState::Connected;
 			boost::shared_ptr<Opcodes::ClientOpcode> opcode = boost::shared_ptr<Opcodes::ClientOpcode>(new Opcodes::SetName(name_));
-			
 			socket_.async_send(boost::asio::buffer((char*)opcode.get(), sizeof(Opcodes::SetName)), boost::bind(&Client::WriteFinished, this, boost::asio::placeholders::error, opcode));
 
 			CBuffer_ptr read_buffer = CBuffer_ptr(new CBuffer());
@@ -172,4 +171,10 @@ vector<Opcodes::ServerOpcode*> Client::GetOpcodes()
 	opcodes_.clear();
 	mutex_.unlock();
 	return opcodes_copy;
+}
+
+void Client::SendOpcode(Opcodes::ClientOpcode* _opcode)
+{
+	boost::shared_ptr<Opcodes::ClientOpcode> opcode = boost::shared_ptr<Opcodes::ClientOpcode>(_opcode);
+	socket_.async_send(boost::asio::buffer((char*)opcode.get(), Opcodes::GetBodySize(_opcode) + Opcodes::ClientOpcode::HEADERSIZE), boost::bind(&Client::WriteFinished, this, boost::asio::placeholders::error, opcode));
 }

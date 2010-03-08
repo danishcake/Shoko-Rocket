@@ -60,6 +60,7 @@ protected:
 	bool allow_edit_;
 
 	WidgetText widget_text_;
+	TextSize::Enum font_size_;
 	std::string tag_;			//Stores some related name or useful data
 
 	static float screen_fade_;
@@ -115,6 +116,7 @@ public:
 	MouseEvent  OnMouseMove;
 	WidgetEvent OnGainFocus;
 	WidgetEvent OnLostFocus;
+	WidgetEvent OnEditFinish;
 	KeyEvent    OnKeyUp;
 	DrawEvent   OnDraw;
 	
@@ -204,6 +206,7 @@ public:
 	bool HasEditting();
 	void SetEditting(bool _editting);
 	std::string GetText(){return widget_text_.GetText();}
+	void SetTextSize(TextSize::Enum _text_size){font_size_ = _text_size;}
 	
 
 	/* Screen fading */

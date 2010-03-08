@@ -1,4 +1,5 @@
 #include "Opcodes.h"
+#include "Logger.h"
 
 namespace Opcodes
 {
@@ -21,11 +22,15 @@ namespace Opcodes
 		case DriveCursor::OPCODE:
 			return sizeof(DriveCursor) - ServerOpcode::HEADERSIZE;
 			break;
+		case PlayerName::OPCODE:
+			return sizeof(PlayerName) - ServerOpcode::HEADERSIZE;
+			break;
 		case StateTransition::OPCODE:
 			return sizeof(StateTransition) - ServerOpcode::HEADERSIZE;
 			break;
 		default:
 			//TODO warnings here
+			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
 			return 0;
 			break;
 		}
@@ -49,6 +54,7 @@ namespace Opcodes
 			break;
 		default:
 			//TODO warnings here
+			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
 			return 0;
 			break;
 		}
@@ -73,6 +79,7 @@ namespace Opcodes
 			break;
 		default:
 			//TODO warnings here
+			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
 			break;
 		}
 		return opcode;
@@ -106,6 +113,7 @@ namespace Opcodes
 			break;
 		default:
 			//TODO warnings here
+			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
 			break;
 		}
 		return opcode;

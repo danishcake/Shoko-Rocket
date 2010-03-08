@@ -15,15 +15,18 @@ ServerConnection::ServerConnection(io_service& _io_service, Server* _server, int
 	//socket_.io_control(command);
 	//Does this actually do anything?
 	client_opcode_ = NULL;
+	connected_ = false;
 }
 
 ServerConnection::~ServerConnection(void)
 {
+	connected_ = false;
 	socket_.close();
 }
 
 void ServerConnection::Start()
 {
+	connected_ = true;
 	//Start an async write
 	SBuffer send_buffer = SBuffer(new boost::array<char, 512>());
 	Opcodes::ChatMessage cm("Welcome to ShokoRocket", Opcodes::ChatMessage::SENDER_SERVER);
@@ -61,8 +64,9 @@ void ServerConnection::ReadHeaderFinished(boost::system::error_code error, SBuff
 			Logger::DiagnosticOut() << "Server: Error during header read: " << error.message() << "\n";
 		else
 		{
-			Logger::DiagnosticOut() << "Server: Read header finished\n";
+			
 			int body_size = Opcodes::GetBodySize((Opcodes::ClientOpcode*)_buffer->c_array());
+			Logger::DiagnosticOut() << "Server: Read header finished, looking for body size " << body_size << "\n";
 			client_opcode_ = Opcodes::GetClientOpcode((Opcodes::ClientOpcode*)_buffer->c_array());
 			SBuffer read_buffer = SBuffer(new boost::array<char, 512>());
 			boost::asio::async_read(socket_, boost::asio::buffer(*read_buffer, body_size), boost::bind(&ServerConnection::ReadBodyFinished, this, boost::asio::placeholders::error, read_buffer));
@@ -96,4 +100,14 @@ void ServerConnection::ReadBodyFinished(boost::system::error_code error, SBuffer
 		client_opcode_ = NULL;
 		server_->GetMutex().unlock();
 	} else Logger::DiagnosticOut() << "ServerConnection::ReadBodyFinished: Unable to lock, probably being shutdown\n";
+}
+
+void ServerConnection::SendOpcode(Opcodes::ServerOpcode* _opcode)
+{
+	SBuffer send_buffer = SBuffer(new boost::array<char, 512>());
+	
+	int bytes_to_send = Opcodes::GetBodySize(_opcode) + Opcodes::ServerOpcode::HEADERSIZE;
+	memcpy(send_buffer->c_array(), _opcode, bytes_to_send);
+
+	socket_.async_send(boost::asio::buffer(*send_buffer, bytes_to_send), boost::bind(&ServerConnection::WriteFinished, this, boost::asio::placeholders::error, send_buffer));
 }

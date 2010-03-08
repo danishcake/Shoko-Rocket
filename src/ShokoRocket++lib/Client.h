@@ -72,5 +72,6 @@ public:
 	bool Tick();
 
 	vector<Opcodes::ServerOpcode*> GetOpcodes();
+	void SendOpcode(Opcodes::ClientOpcode* _opcode);
 
 };

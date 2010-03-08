@@ -61,6 +61,7 @@ Widget::Widget(void)
 	allow_edit_ = false;
 	z_order_ = 0;
 	deletion_due_ = false;
+	font_size_ = TextSize::Normal;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -98,6 +99,7 @@ Widget::Widget(std::string _filename)
 	allow_edit_ = false;
 	z_order_ = 0;
 	deletion_due_ = false;
+	font_size_ = TextSize::Normal;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -135,6 +137,7 @@ Widget::Widget(BlittableRect* _blittable)
 	allow_edit_ = false;
 	z_order_ = 0;
 	deletion_due_ = false;
+	font_size_ = TextSize::Normal;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -186,6 +189,7 @@ Widget::Widget(VerticalTile _tiles, int _height)
 	allow_edit_ = false;
 	z_order_ = 0;
 	deletion_due_ = false;
+	font_size_ = TextSize::Normal;
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -237,6 +241,8 @@ Widget::Widget(HorizontalTile _tiles, int _width)
 	allow_edit_ = false;
 	z_order_ = 0;
 	deletion_due_ = false;
+	font_size_ = TextSize::Normal;
+
 	if(event_lock_)
 	{
 		pending_root_.push_back(this);
@@ -637,6 +643,7 @@ void Widget::Redraw()
 	//Draw self - puts backbuffer onto front buffer. Use raw blit to copy alpha
 	back_rect_->RawBlit(Vector2i(0,0), blit_rect_);
 	//Superimpose text
+	blit_rect_->SetTextSize(font_size_);
 	blit_rect_->BlitTextLines(widget_text_.GetTextLines(), widget_text_.GetAlignment());
 	//Do any custom hooked drawing
 	OnDraw(this, blit_rect_);
@@ -1092,5 +1099,8 @@ void Widget::SetEditting(bool _editting)
 	if(_editting && allow_edit_)
 		widget_with_edit_ = this;
 	else if(widget_with_edit_ == this)
+	{
 		widget_with_edit_ = NULL;
+		OnEditFinish(this);
+	}
 }

@@ -11,6 +11,7 @@ typedef boost::shared_ptr<boost::array<char, 512> > SBuffer;
 namespace Opcodes
 {
 	struct ClientOpcode;
+	struct ServerOpcode;
 }
 
 class ServerConnection
@@ -21,6 +22,7 @@ protected:
 	boost::system::error_code error_;
 	Server* server_;
 	int player_id_;
+	bool connected_;
 	Opcodes::ClientOpcode* client_opcode_;
 
 public:
@@ -34,7 +36,10 @@ public:
 	void Start();
 	void WriteFinished(boost::system::error_code error, SBuffer _buffer);
 	void Close(){socket_.close();}
+	void SendOpcode(Opcodes::ServerOpcode* _opcode);
 
 	void ReadHeaderFinished(boost::system::error_code error, SBuffer _buffer);
 	void ReadBodyFinished(boost::system::error_code error, SBuffer _buffer);
+
+	bool GetConnected(){return connected_;}
 };

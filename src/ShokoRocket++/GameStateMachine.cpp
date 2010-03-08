@@ -1026,7 +1026,9 @@ void GameStateMachine::ProcessServerBrowser(float _timespan)
 			clicked->SetText("Connected", TextAlignment::Centre);
 			mode_timer_ = 1.0f;
 			FadeInOut(2.0f);
-			pend_mode_ = Mode::Multiplayer;
+			pend_mode_ = Mode::Lobby;
+			player_names_.clear();
+			player_names_[255] = "Server";
 		}
 	}
 }
@@ -1121,6 +1123,154 @@ void GameStateMachine::StartServerCallback(Widget* _widget)
 		start_server_->SetRejectsFocus(true);
 	}
 }
+/* Lobby */
+void GameStateMachine::SetupLobby()
+{
+	Widget* back = new Widget("Blank128x64.png");
+	back->SetPosition(Vector2i(2, 2));
+	back->SetText("Back", TextAlignment::Centre);
+	back->OnClick.connect(boost::bind(&GameStateMachine::LobbyReturnToBrowser, this, _1));
+
+	Widget* name_text = new Widget("Blank96x32.png");
+	name_text->SetPosition(Vector2i(134, 2));
+	name_text->SetText("Name:", TextAlignment::Centre);
+	name_text->SetRejectsFocus(true);
+
+	Widget* name = new Widget("Blank364x32.png");
+	name->SetPosition(Vector2i(232, 2));
+	name->SetText("Player", TextAlignment::Centre);
+	name->SetEditable(true);
+	name->OnEditFinish.connect(boost::bind(&GameStateMachine::LobbyNameChange, this, _1));
+
+	chat_widget_ = new Widget("Blank384x384.png");
+	chat_widget_->SetPosition(Vector2i(134, 34));
+	chat_widget_->SetTextSize(TextSize::Small);
+	chat_widget_->SetRejectsFocus(true);
+	chat_hist_ = "";
+
+	Widget* chat_entry = new Widget("Blank384x32.png");
+	chat_entry->SetPosition(Vector2i(134, 420));
+	chat_entry->SetEditable(true);
+	chat_entry->SetText("", TextAlignment::Left);
+	chat_entry->OnKeyUp.connect(boost::bind(&GameStateMachine::LobbyChatEntry, this, _1, _2));
+}
+
+void GameStateMachine::ProcessLobby(float _timespan)
+{
+	//Handle opcodes to server
+	if(server_)
+	{
+		unsigned char player_id = 0;
+		std::vector<std::vector<Opcodes::ClientOpcode*> > client_opcodes = server_->GetOpcodes();
+		for(std::vector<std::vector<Opcodes::ClientOpcode*> >::iterator it = client_opcodes.begin(); it != client_opcodes.end(); ++it)
+		{
+			for(std::vector<Opcodes::ClientOpcode*>::iterator opcode = it->begin(); opcode != it->end(); opcode++)
+			{
+				switch((*opcode)->opcode_)
+				{
+				case Opcodes::SendChatMessage::OPCODE:
+					{
+						Opcodes::ChatMessage* msg = new Opcodes::ChatMessage(((Opcodes::SendChatMessage*)*opcode)->message_, player_id);
+						//relay chat to all clients
+						server_->SendOpcodeToAll(msg);
+					}
+					break;
+				case Opcodes::SetName::OPCODE:
+					{
+						Opcodes::PlayerName* msg = new Opcodes::PlayerName(((Opcodes::SetName*)*opcode)->name_, player_id);
+						//relay chat to all clients
+						server_->SendOpcodeToAll(msg);
+					}
+					break;
+				}
+				delete *opcode;
+			}
+			player_id++;
+		}
+	}
+
+	//Handle opcodes to client
+	std::vector<Opcodes::ServerOpcode*> server_opcodes = client_->GetOpcodes();
+	for(std::vector<Opcodes::ServerOpcode*>::iterator opcode = server_opcodes.begin(); opcode != server_opcodes.end(); ++opcode)
+	{
+		switch((*opcode)->opcode_)
+		{
+		case Opcodes::ChatMessage::OPCODE:
+			{
+				std::string name = "Unknown player";
+
+				if(player_names_.find(((Opcodes::ChatMessage*)*opcode)->sender_) != player_names_.end())
+				{
+					name = player_names_[((Opcodes::ChatMessage*)*opcode)->sender_];
+				}
+				chat_hist_ = chat_hist_ + "\n" + name + " says " + ((Opcodes::ChatMessage*)*opcode)->message_;
+				chat_widget_->SetText(chat_hist_, TextAlignment::BottomLeft);
+			}
+			break;
+		case Opcodes::PlayerName::OPCODE:
+			{
+				Logger::DiagnosticOut() << "Player " << ((Opcodes::PlayerName*)*opcode)->player_ << " name=" << ((Opcodes::PlayerName*)*opcode)->name_ << "\n";
+				bool no_old_name = true;
+				std::string old_name;
+				if(player_names_.find(((Opcodes::PlayerName*)*opcode)->player_) != player_names_.end())
+				{
+					old_name = player_names_[((Opcodes::PlayerName*)*opcode)->player_];
+					no_old_name = false;
+				}
+				player_names_[((Opcodes::PlayerName*)*opcode)->player_] = ((Opcodes::PlayerName*)*opcode)->name_;
+				if(!no_old_name)
+				{
+					chat_hist_ = chat_hist_ + "\n" + old_name + " change name to " + ((Opcodes::PlayerName*)*opcode)->name_;
+					chat_widget_->SetText(chat_hist_, TextAlignment::BottomLeft);
+				} else
+				{
+					chat_hist_ = chat_hist_ + "\n" + ((Opcodes::PlayerName*)*opcode)->name_ + " joined the server";
+					chat_widget_->SetText(chat_hist_, TextAlignment::BottomLeft);
+				}
+			}
+			break;
+		}
+		delete *opcode;
+	}
+
+}
+
+void GameStateMachine::TeardownLobby()
+{
+	Widget::ClearRoot();
+	delete client_;
+	client_ = NULL;
+	delete server_;
+	server_ = NULL;
+}
+/* Lobby event handling */
+void GameStateMachine::LobbyReturnToBrowser(Widget* _widget)
+{
+	pend_mode_ = Mode::ServerBrowser;
+	mode_timer_ = 1.0f;
+	FadeInOut(2.0f);
+}
+
+void GameStateMachine::LobbyChatEntry(Widget* _widget, KeyPressEventArgs _event_args)
+{
+	if(_event_args.key_code == SDLK_RETURN)
+	{
+		std::string text = _widget->GetText();
+		if(text.length() > 0)
+		{
+			Opcodes::SendChatMessage* cm = new Opcodes::SendChatMessage(text);
+			client_->SendOpcode(cm);
+		}
+		_widget->SetText("", TextAlignment::Left);
+		_widget->SetEditting(true);
+	}
+}
+
+void GameStateMachine::LobbyNameChange(Widget* _widget)
+{
+	client_->SendOpcode(new Opcodes::SetName(_widget->GetText()));
+}
+
 /* Multiplayer */
 void GameStateMachine::SetupMultiplayer()
 {
@@ -1234,6 +1384,9 @@ bool GameStateMachine::Tick(float _timespan)
 		case Mode::ServerBrowser:
 			TeardownServerBrowser();
 			break;
+		case Mode::Lobby:
+			TeardownLobby();
+			break;
 		case Mode::Multiplayer:
 			TeardownMultiplayer();
 			break;
@@ -1255,6 +1408,9 @@ bool GameStateMachine::Tick(float _timespan)
 			break;
 		case Mode::ServerBrowser:
 			SetupServerBrowser();
+			break;
+		case Mode::Lobby:
+			SetupLobby();
 			break;
 		case Mode::Multiplayer:
 			SetupMultiplayer();
@@ -1287,6 +1443,9 @@ bool GameStateMachine::Tick(float _timespan)
 		break;
 	case Mode::ServerBrowser:
 		ProcessServerBrowser(_timespan);
+		break;
+	case Mode::Lobby:
+		ProcessLobby(_timespan);
 		break;
 	case Mode::Multiplayer:
 		ProcessMultiplayer(_timespan);

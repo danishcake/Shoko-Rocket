@@ -19,7 +19,7 @@ namespace Mode
 {
 	enum Enum
 	{
-		Intro, Menu, Puzzle, Editor, ServerBrowser, Multiplayer, Exit
+		Intro, Menu, Puzzle, Editor, ServerBrowser, Lobby, Multiplayer, Exit
 	};
 }
 
@@ -154,6 +154,7 @@ private:
 	Server* server_;
 	MPWorld* client_world_;
 	ServerWorld* server_world_;
+	std::map<int, std::string> player_names_;
 
 	/* ServerBrowser members */
 	Widget* ip_area_;
@@ -170,6 +171,18 @@ private:
 	void ServerBrowserItemHighlightCallback(Widget* _widget, std::string _name);
 	void JoinServerCallback(Widget* _widget);
 	void StartServerCallback(Widget* _widget);
+
+	/* Lobby members */
+	Widget* chat_widget_;
+	std::string chat_hist_;
+	/* Lobby methods */
+	void SetupLobby();
+	void ProcessLobby(float _timespan);
+	void TeardownLobby();
+	/* Lobby event handling */
+	void LobbyReturnToBrowser(Widget* _widget);
+	void LobbyChatEntry(Widget* _widget, KeyPressEventArgs _event_args);
+	void LobbyNameChange(Widget* _widget);
 
 	/* Multiplayer members */
 	/* Multiplayer methods */
