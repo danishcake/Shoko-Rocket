@@ -155,6 +155,7 @@ private:
 	MPWorld* client_world_;
 	ServerWorld* server_world_;
 	std::map<int, std::string> player_names_;
+	MPWorld* mp_world_;
 
 	/* ServerBrowser members */
 	Widget* ip_area_;
@@ -179,6 +180,8 @@ private:
 	void SetupLobby();
 	void ProcessLobby(float _timespan);
 	void TeardownLobby();
+
+	void LobbyChatAppend(std::string _chat);
 	/* Lobby event handling */
 	void LobbyReturnToBrowser(Widget* _widget);
 	void LobbyChatEntry(Widget* _widget, KeyPressEventArgs _event_args);
@@ -189,6 +192,8 @@ private:
 	void SetupMultiplayer();
 	void ProcessMultiplayer(float _timespan);
 	void TeardownMultiplayer();
+
+	void MultiplayerChatAppend(std::string _chat);
 	/* Multiplayer event handling */
 
 	/* Transition times */

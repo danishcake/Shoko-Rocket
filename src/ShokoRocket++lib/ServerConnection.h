@@ -22,7 +22,9 @@ protected:
 	boost::system::error_code error_;
 	Server* server_;
 	int player_id_;
+	std::string player_name_;
 	bool connected_;
+	bool player_name_set_;
 	Opcodes::ClientOpcode* client_opcode_;
 
 public:
@@ -42,4 +44,9 @@ public:
 	void ReadBodyFinished(boost::system::error_code error, SBuffer _buffer);
 
 	bool GetConnected(){return connected_;}
+	int GetPlayerID(){return player_id_;}
+
+	void SetPlayerName(std::string _player_name){player_name_ = _player_name; player_name_set_ = true;}
+	std::string GetPlayerName(){return player_name_;}
+	bool GetPlayerNameSet(){return player_name_set_;}
 };

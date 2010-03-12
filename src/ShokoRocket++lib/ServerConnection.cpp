@@ -11,11 +11,10 @@ ServerConnection::ServerConnection(io_service& _io_service, Server* _server, int
 : io_service_(_io_service), socket_(_io_service), player_id_(_player_id)
 {
 	server_ = _server;
-	//boost::asio::socket_base::non_blocking_io command(true);
-	//socket_.io_control(command);
-	//Does this actually do anything?
+	player_name_ = "Unknown player";
 	client_opcode_ = NULL;
 	connected_ = false;
+	player_name_set_ = false;
 }
 
 ServerConnection::~ServerConnection(void)

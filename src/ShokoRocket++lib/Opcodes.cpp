@@ -28,6 +28,9 @@ namespace Opcodes
 		case StateTransition::OPCODE:
 			return sizeof(StateTransition) - ServerOpcode::HEADERSIZE;
 			break;
+		case ClientDisconnection::OPCODE:
+			return sizeof(ClientDisconnection) - ServerOpcode::HEADERSIZE;
+			break;
 		default:
 			//TODO warnings here
 			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
@@ -109,7 +112,10 @@ namespace Opcodes
 			opcode = new PlayerName("", 0);
 			break;
 		case StateTransition::OPCODE:
-			opcode = new StateTransition(StateTransition::STATE_GAME);
+			opcode = new StateTransition(StateTransition::STATE_GAME, "");
+			break;
+		case ClientDisconnection::OPCODE:
+			opcode = new ClientDisconnection(0);
 			break;
 		default:
 			//TODO warnings here

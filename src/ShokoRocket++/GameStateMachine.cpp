@@ -1160,6 +1160,7 @@ void GameStateMachine::ProcessLobby(float _timespan)
 	//Handle opcodes to server
 	if(server_)
 	{
+		server_->SetCurrentTime(0);
 		unsigned char player_id = 0;
 		std::vector<std::vector<Opcodes::ClientOpcode*> > client_opcodes = server_->GetOpcodes();
 		for(std::vector<std::vector<Opcodes::ClientOpcode*> >::iterator it = client_opcodes.begin(); it != client_opcodes.end(); ++it)
@@ -1168,19 +1169,7 @@ void GameStateMachine::ProcessLobby(float _timespan)
 			{
 				switch((*opcode)->opcode_)
 				{
-				case Opcodes::SendChatMessage::OPCODE:
-					{
-						Opcodes::ChatMessage* msg = new Opcodes::ChatMessage(((Opcodes::SendChatMessage*)*opcode)->message_, player_id);
-						//relay chat to all clients
-						server_->SendOpcodeToAll(msg);
-					}
-					break;
-				case Opcodes::SetName::OPCODE:
-					{
-						Opcodes::PlayerName* msg = new Opcodes::PlayerName(((Opcodes::SetName*)*opcode)->name_, player_id);
-						//relay chat to all clients
-						server_->SendOpcodeToAll(msg);
-					}
+				default:
 					break;
 				}
 				delete *opcode;
@@ -1198,18 +1187,15 @@ void GameStateMachine::ProcessLobby(float _timespan)
 		case Opcodes::ChatMessage::OPCODE:
 			{
 				std::string name = "Unknown player";
-
 				if(player_names_.find(((Opcodes::ChatMessage*)*opcode)->sender_) != player_names_.end())
 				{
 					name = player_names_[((Opcodes::ChatMessage*)*opcode)->sender_];
 				}
-				chat_hist_ = chat_hist_ + "\n" + name + " says " + ((Opcodes::ChatMessage*)*opcode)->message_;
-				chat_widget_->SetText(chat_hist_, TextAlignment::BottomLeft);
+				LobbyChatAppend(name + " says " + ((Opcodes::ChatMessage*)*opcode)->message_);
 			}
 			break;
 		case Opcodes::PlayerName::OPCODE:
 			{
-				Logger::DiagnosticOut() << "Player " << ((Opcodes::PlayerName*)*opcode)->player_ << " name=" << ((Opcodes::PlayerName*)*opcode)->name_ << "\n";
 				bool no_old_name = true;
 				std::string old_name;
 				if(player_names_.find(((Opcodes::PlayerName*)*opcode)->player_) != player_names_.end())
@@ -1220,28 +1206,62 @@ void GameStateMachine::ProcessLobby(float _timespan)
 				player_names_[((Opcodes::PlayerName*)*opcode)->player_] = ((Opcodes::PlayerName*)*opcode)->name_;
 				if(!no_old_name)
 				{
-					chat_hist_ = chat_hist_ + "\n" + old_name + " change name to " + ((Opcodes::PlayerName*)*opcode)->name_;
-					chat_widget_->SetText(chat_hist_, TextAlignment::BottomLeft);
+					LobbyChatAppend(old_name + " change name to " + ((Opcodes::PlayerName*)*opcode)->name_);
 				} else
 				{
-					chat_hist_ = chat_hist_ + "\n" + ((Opcodes::PlayerName*)*opcode)->name_ + " joined the server";
-					chat_widget_->SetText(chat_hist_, TextAlignment::BottomLeft);
+					LobbyChatAppend(std::string(((Opcodes::PlayerName*)*opcode)->name_) + " joined the server");
 				}
+			}
+			break;
+		case Opcodes::StateTransition::OPCODE:
+			{
+				//Should only get statetransition to game
+				Opcodes::StateTransition* client_state_transition = (Opcodes::StateTransition*)*opcode;
+				if(client_state_transition->state_ == Opcodes::StateTransition::STATE_GAME)
+				{
+					mode_timer_ = 1.0f;
+					FadeInOut(2.0f);
+					pend_mode_ = Mode::Multiplayer;
+					mp_world_ = new MPWorld(client_state_transition->level_);
+					if(server_)
+					{
+						server_world_ = new ServerWorld(client_state_transition->level_);
+					}
+				}
+			}
+			break;
+		case Opcodes::ClientDisconnection::OPCODE:
+			{
+				LobbyChatAppend(player_names_[((Opcodes::ClientDisconnection*)*opcode)->client_id_] + " disconnected");
 			}
 			break;
 		}
 		delete *opcode;
 	}
 
+	if(client_->GetState() != ClientState::Connected)
+	{
+		delete client_;
+		delete server_;
+		client_ = NULL;
+		server_ = NULL;
+		Logger::DiagnosticOut() << "Connection lost, returning to Server Browser\n";
+		mode_timer_ = 1.0f;
+		FadeInOut(2.0f);
+		pend_mode_ = Mode::ServerBrowser;
+	}
 }
 
 void GameStateMachine::TeardownLobby()
 {
 	Widget::ClearRoot();
-	delete client_;
-	client_ = NULL;
-	delete server_;
-	server_ = NULL;
+}
+
+void GameStateMachine::LobbyChatAppend(std::string _chat)
+{
+	chat_hist_ = chat_hist_ + "\n" + _chat;
+	//TODO limit chat length
+	chat_widget_->SetText(chat_hist_, TextAlignment::BottomLeft);
 }
 /* Lobby event handling */
 void GameStateMachine::LobbyReturnToBrowser(Widget* _widget)
@@ -1274,10 +1294,172 @@ void GameStateMachine::LobbyNameChange(Widget* _widget)
 /* Multiplayer */
 void GameStateMachine::SetupMultiplayer()
 {
+	//CreateRenderArea(mp_world_->GetLevelSize(), Mode::Puzzle);
 }
 
 void GameStateMachine::ProcessMultiplayer(float _timespan)
 {
+	//If running the server
+	if(server_)
+	{
+		unsigned char player_id = 0;
+		std::vector<std::vector<Opcodes::ClientOpcode*> > client_opcodes = server_->GetOpcodes();
+		server_world_->HandleOpcodes(client_opcodes);
+		/*
+		for(std::vector<std::vector<Opcodes::ClientOpcode*> >::iterator it = client_opcodes.begin(); it != client_opcodes.end(); ++it)
+		{
+			for(std::vector<Opcodes::ClientOpcode*>::iterator opcode = it->begin(); opcode != it->end(); opcode++)
+			{
+				switch((*opcode)->opcode_)
+				{
+				case Opcodes::SendInput::OPCODE:
+					
+					//server_world_->HandleInputOpcode(player_id, (Opcodes::SendInput*)*opcode);
+					break;
+				default:
+					break;
+				}
+				delete *opcode;
+			}
+			player_id++;
+		}*/
+		server_world_->Tick(_timespan);
+		server_->SetCurrentTime(server_world_->GetTime());
+	}
+
+	//Send client input to server
+	Opcodes::SendInput::Action action = Opcodes::SendInput::ACT_NONE;
+	switch(input_.action)
+	{
+	case Action::Cancel:
+	case Action::ClearSquare:
+		action = Opcodes::SendInput::ACT_CLEAR;
+		break;
+	case Action::PlaceNorthArrow:
+		action = Opcodes::SendInput::ACT_NORTH;
+		break;
+	case Action::PlaceSouthArrow:
+		action = Opcodes::SendInput::ACT_SOUTH;
+		break;
+	case Action::PlaceEastArrow:
+		action = Opcodes::SendInput::ACT_EAST;
+		break;
+	case Action::PlaceWestArrow:
+		action = Opcodes::SendInput::ACT_WEST;
+		break;
+
+	}
+
+	if(action != Opcodes::SendInput::ACT_NONE)
+		client_->SendOpcode(new Opcodes::SendInput(input_.position, action));
+
+	//Handle server commands
+	std::vector<Opcodes::ServerOpcode*> server_opcodes = client_->GetOpcodes();
+	for(std::vector<Opcodes::ServerOpcode*>::iterator opcode = server_opcodes.begin(); opcode != server_opcodes.end(); opcode++)
+	{
+		switch((*opcode)->opcode_)
+		{
+		case Opcodes::ChatMessage::OPCODE:
+			{
+				std::string name = "Unknown player";
+				if(player_names_.find(((Opcodes::ChatMessage*)*opcode)->sender_) != player_names_.end())
+				{
+					name = player_names_[((Opcodes::ChatMessage*)*opcode)->sender_];
+				}
+				MultiplayerChatAppend(name + " says " + ((Opcodes::ChatMessage*)*opcode)->message_);
+			}
+			break;
+		case Opcodes::DriveCursor::OPCODE:
+			break;
+		case Opcodes::PlayerName::OPCODE:
+			break;
+		case Opcodes::WalkerSpawn::OPCODE:
+			{
+				Opcodes::WalkerSpawn* walker_spawn = (Opcodes::WalkerSpawn*)*opcode;
+				
+				Direction::Enum direction;
+				Vector2f position = walker_spawn->position_;
+				switch(walker_spawn->direction_)
+				{
+				case Opcodes::WalkerSpawn::DIRECTION_NORTH:
+					direction = Direction::North;
+					break;
+				case Opcodes::WalkerSpawn::DIRECTION_SOUTH:
+					direction = Direction::South;
+					break;
+				case Opcodes::WalkerSpawn::DIRECTION_EAST:
+					direction = Direction::East;
+					break;
+				case Opcodes::WalkerSpawn::DIRECTION_WEST:
+					direction = Direction::West;
+					break;
+				}
+				
+				switch(walker_spawn->walker_type_)
+				{
+				case Opcodes::WalkerSpawn::WALKER_CAT:
+					mp_world_->CreateCat(walker_spawn->uid_, position, direction, walker_spawn->time_);
+					break;
+				case Opcodes::WalkerSpawn::WALKER_MOUSE:
+					mp_world_->CreateMouse(walker_spawn->uid_, position, direction, walker_spawn->time_);
+					break;
+				}
+			}
+			break;
+		case Opcodes::KillWalker::OPCODE:
+			{
+			}
+			break;
+		case Opcodes::ArrowSpawn::OPCODE:
+			{
+				Opcodes::ArrowSpawn* arrow_spawn = (Opcodes::ArrowSpawn*)*opcode;
+				Vector2i position = arrow_spawn->position_;
+				int player_id = (int)arrow_spawn->player_;
+				PlayerArrowLevel::Enum arrow_level;
+				
+				Direction::Enum direction;
+
+				switch(arrow_spawn->direction_)
+				{
+				case Opcodes::ArrowSpawn::DIRECTION_NORTH:
+					direction = Direction::North;
+					break;
+				case Opcodes::ArrowSpawn::DIRECTION_SOUTH:
+					direction = Direction::South;
+					break;
+				case Opcodes::ArrowSpawn::DIRECTION_EAST:
+					direction = Direction::East;
+					break;
+				case Opcodes::ArrowSpawn::DIRECTION_WEST:
+					direction = Direction::West;
+					break;
+				}
+				switch(arrow_spawn->arrow_state_)
+				{
+				case Opcodes::ArrowSpawn::ARROW_FULL:
+					arrow_level = PlayerArrowLevel::FullArrow;
+					break;
+				case Opcodes::ArrowSpawn::ARROW_HALF:
+					arrow_level = PlayerArrowLevel::HalfArrow;
+					break;
+				case Opcodes::ArrowSpawn::ARROW_CLEAR:
+					arrow_level = PlayerArrowLevel::Clear;
+					break;
+				}
+
+
+				mp_world_->SetPlayerArrow(position, direction, player_id, arrow_level);
+			}
+			break;
+		default:
+			break;
+		}
+		delete *opcode;
+	}
+	mp_world_->Tick(_timespan);
+
+
+	input_ = Input();
 }
 
 void GameStateMachine::TeardownMultiplayer()
@@ -1286,6 +1468,11 @@ void GameStateMachine::TeardownMultiplayer()
 }
 
 
+
+void GameStateMachine::MultiplayerChatAppend(std::string _chat)
+{
+
+}
 /* Multiplayer event handling */
 
 /* Main methods */

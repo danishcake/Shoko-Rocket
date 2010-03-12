@@ -12,6 +12,10 @@ namespace Opcodes
 	{
 		static const unsigned int HEADERSIZE = 5;
 	public:
+		ServerOpcode()
+		{
+			time_ = 0;
+		}
 		unsigned char opcode_;
 		unsigned int time_;
 	};
@@ -174,12 +178,35 @@ namespace Opcodes
 		static const NewState STATE_LOBBY = 1;
 		static const NewState STATE_GAME = 2;
 	public:
-		StateTransition(NewState _state)
+		StateTransition(NewState _state, std::string _level)
 		{
 			opcode_ = OPCODE;
 			state_ = _state;
+			std::size_t len = _level.size();
+			len = len > 255 ? 255 : len;
+			memset(&level_, 0, 256);
+			memcpy(&level_, _level.c_str(), len);
 		}
 		NewState state_;
+		char level_[256];
+	};
+
+
+
+
+	/*
+	 * ClientDisconnect
+	 */
+	struct ClientDisconnection : public ServerOpcode
+	{
+		static const unsigned OPCODE = 8;
+	public:
+		ClientDisconnection(unsigned char _client_id)
+		{
+			opcode_ = OPCODE;
+			client_id_ = _client_id;
+		}
+		unsigned char client_id_;
 	};
 
 
@@ -222,6 +249,7 @@ namespace Opcodes
 		static const Action ACT_WEST = 3;
 		static const Action ACT_EAST = 4;
 		static const Action ACT_CLEAR = 5;
+		static const Action ACT_NONE = 5;
 	public:
 		SendInput(Vector2<unsigned char> _position, Action _action)
 		{

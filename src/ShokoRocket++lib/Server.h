@@ -38,15 +38,20 @@ protected:
 	boost::thread* thread_;
 	boost::mutex mutex_;
 	boost::asio::deadline_timer timer_;
+	boost::asio::deadline_timer start_timer_;
 
 	tcp::acceptor acceptor_;
 	void StartConnection();
 	void ConnectionAccepted(ServerConnection* _connection, boost::system::error_code ec);
+	void StartGameCallback(boost::system::error_code _error_code);
 
 	vector<ServerConnection*> connections_;
 	vector<vector<Opcodes::ClientOpcode*> > opcodes_;
 	bool closing_;
 	int players_count_;
+	int required_players_;
+	int start_counter_;
+	unsigned int current_time_;
 public:
 	Server(void);
 	~Server(void);
@@ -59,6 +64,7 @@ public:
 	void HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode);
 
 	void SendOpcodeToAll(Opcodes::ServerOpcode* _opcode);
+	void SetCurrentTime(unsigned int _current_time){current_time_ = _current_time;}
 
 	boost::mutex& GetMutex(){return mutex_;}
 

@@ -12,9 +12,13 @@ void ServerThread::operator()()
 }
 
 Server::Server(void) : io_(), acceptor_(io_, tcp::endpoint(tcp::v4(), 9020)),
-					    timer_(io_, boost::posix_time::milliseconds(100)), closing_(false)
+					    timer_(io_, boost::posix_time::milliseconds(100)), 
+						start_timer_(io_, boost::posix_time::milliseconds(1000)), 
+						closing_(false)
 {
 	players_count_ = 0;
+	required_players_ = 2;
+	current_time_ = 0;
 	thread_ = new boost::thread(ServerThread(this));
 	timer_.async_wait(boost::bind(&Server::PeriodicTidyup, this, boost::asio::placeholders::error));
 	work_ = new boost::asio::io_service::work(io_);
@@ -36,6 +40,8 @@ Server::~Server(void)
 	connections_.clear();
 	acceptor_.close();
 	timer_.cancel();
+	start_timer_.cancel();
+
 	//Should rejoin as all connections will throw errors
 	thread_->join();
 
@@ -51,7 +57,25 @@ Server::~Server(void)
 void Server::StartConnection()
 {
 	//Starts listening for a new connection
-	ServerConnection* connection = new ServerConnection(io_, this, players_count_);
+	//Find first empty slot
+	int last_id = -1;
+	int empty_id = 0;
+
+	for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+	{
+		empty_id = last_id + 1;
+		if((*it)->GetPlayerID() != last_id + 1)
+		{
+			break;
+		} else
+		{
+			empty_id++;
+		}
+		last_id++;
+	}
+	
+
+	ServerConnection* connection = new ServerConnection(io_, this, empty_id);
 	connections_.push_back(connection);
 
 	//Start listening for connection
@@ -70,8 +94,25 @@ void Server::ConnectionAccepted(ServerConnection* _connection, boost::system::er
 		{
 			Logger::DiagnosticOut() << "Server: Connection accepted\n";
 			_connection->Start();
+			//Send names
+			for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+			{
+				if((*it)->GetPlayerNameSet())
+				{
+					Opcodes::PlayerName* pn = new Opcodes::PlayerName((*it)->GetPlayerName(), (*it)->GetPlayerID());
+					pn->time_ = current_time_;
+					_connection->SendOpcode(pn);
+				}
+			}
 			players_count_++;
 			StartConnection();
+
+			if(players_count_ >= required_players_)
+			{
+				start_timer_.async_wait(boost::bind(&Server::StartGameCallback, this, boost::asio::placeholders::error));
+				start_counter_ = 5;
+				SendOpcodeToAll(new Opcodes::ChatMessage("Starting in 5", Opcodes::ChatMessage::SENDER_SERVER));
+			}
 		}
 		else
 		{
@@ -87,6 +128,7 @@ void Server::PeriodicTidyup(boost::system::error_code _error)
 	{
 		//TODO use a predicate here
 		vector<ServerConnection*> dead_connections;
+		vector<int> disconnected_client_ids;
 		for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
 		{
 			if((*it)->GetError())
@@ -94,9 +136,18 @@ void Server::PeriodicTidyup(boost::system::error_code _error)
 		}
 		for(vector<ServerConnection*>::iterator it = dead_connections.begin(); it != dead_connections.end(); ++it)
 		{
+			players_count_--;
+			disconnected_client_ids.push_back((*it)->GetPlayerID());
 			delete *it;
 			connections_.erase(std::remove(connections_.begin(), connections_.end(), *it), connections_.end());
 		}
+		for(vector<int>::iterator it = disconnected_client_ids.begin(); it != disconnected_client_ids.end(); ++it)
+		{
+			unsigned char pid = *it;
+			Logger::DiagnosticOut() << "Sending disconnection message for client " << pid << "\n";
+			SendOpcodeToAll(new Opcodes::ClientDisconnection(pid));
+		}
+
 		//Schedule another cleanup in 100ms
 		if(!closing_)
 		{
@@ -122,6 +173,25 @@ void Server::HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode)
 		opcodes_.push_back(vector<Opcodes::ClientOpcode*>());
 	}
 	opcodes_[_player_id].push_back(_opcode);
+
+	//Handle some basic opcodes common to Lobby and game, eg chat, name changes
+	switch(_opcode->opcode_)
+	{
+	case Opcodes::SendChatMessage::OPCODE:
+		{
+			Opcodes::SendChatMessage* client_msg = static_cast<Opcodes::SendChatMessage*>(_opcode);
+			Opcodes::ChatMessage* msg = new Opcodes::ChatMessage(client_msg->message_, _player_id);
+			SendOpcodeToAll(msg);
+		}
+		break;
+	case Opcodes::SetName::OPCODE:
+		{
+			Opcodes::SetName* client_setname = static_cast<Opcodes::SetName*>(_opcode);
+			Opcodes::PlayerName* msg = new Opcodes::PlayerName(client_setname->name_, _player_id);
+			SendOpcodeToAll(msg);
+		}
+		break;
+	}
 }
 
 vector<vector<Opcodes::ClientOpcode*> > Server::GetOpcodes()
@@ -136,6 +206,10 @@ vector<vector<Opcodes::ClientOpcode*> > Server::GetOpcodes()
 
 void Server::SendOpcodeToAll(Opcodes::ServerOpcode* _opcode)
 {
+	if(_opcode->time_ == 0)
+	{
+		_opcode->time_ = current_time_;
+	}
 	for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
 	{
 		if((*it)->GetConnected())
@@ -144,4 +218,27 @@ void Server::SendOpcodeToAll(Opcodes::ServerOpcode* _opcode)
 		}
 	}
 	delete _opcode;
+}
+
+
+void Server::StartGameCallback(boost::system::error_code _error_code)
+{
+	start_counter_--;
+	if(start_counter_ == 0)
+	{
+		if(players_count_ >= required_players_)
+		{
+			SendOpcodeToAll(new Opcodes::ChatMessage("Starting game!", Opcodes::ChatMessage::SENDER_SERVER));
+			SendOpcodeToAll(new Opcodes::StateTransition(Opcodes::StateTransition::STATE_GAME, "Multiplayer/Glass.Level"));
+		} else
+		{
+			SendOpcodeToAll(new Opcodes::ChatMessage("Start aborted due to players leaving", Opcodes::ChatMessage::SENDER_SERVER));
+		}
+
+	} else
+	{
+		start_timer_.expires_from_now(boost::posix_time::milliseconds(1000));
+		start_timer_.async_wait(boost::bind(&Server::StartGameCallback, this, boost::asio::placeholders::error));
+		SendOpcodeToAll(new Opcodes::ChatMessage("Starting in " + boost::lexical_cast<string, int>(start_counter_), Opcodes::ChatMessage::SENDER_SERVER));
+	}
 }
