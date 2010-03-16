@@ -1,0 +1,204 @@
+<AnimationSet>
+  <Animation Name="Stopped">
+    <Frame Width="1" Height="1" Top="0" Left="0" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="SF0">
+    <Frame Width="32" Height="32" Top="0" Left="0" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WF0">
+    <Frame Width="32" Height="32" Top="0" Left="32" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EF0">
+    <Frame Width="32" Height="32" Top="0" Left="64" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NF0">
+    <Frame Width="32" Height="32" Top="0" Left="96" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="SH0">
+    <Frame Width="32" Height="32" Top="0" Left="128" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WH0">
+    <Frame Width="32" Height="32" Top="0" Left="160" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EH0">
+    <Frame Width="32" Height="32" Top="0" Left="192" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NH0">
+    <Frame Width="32" Height="32" Top="0" Left="224" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  
+  <Animation Name="SF1">
+    <Frame Width="32" Height="32" Top="32" Left="0" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WF1">
+    <Frame Width="32" Height="32" Top="32" Left="32" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EF1">
+    <Frame Width="32" Height="32" Top="32" Left="64" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NF1">
+    <Frame Width="32" Height="32" Top="32" Left="96" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="SH1">
+    <Frame Width="32" Height="32" Top="32" Left="128" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WH1">
+    <Frame Width="32" Height="32" Top="32" Left="160" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EH1">
+    <Frame Width="32" Height="32" Top="32" Left="192" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NH1">
+    <Frame Width="32" Height="32" Top="32" Left="224" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  
+  <Animation Name="SF2">
+    <Frame Width="32" Height="32" Top="64" Left="0" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WF2">
+    <Frame Width="32" Height="32" Top="64" Left="32" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EF2">
+    <Frame Width="32" Height="32" Top="64" Left="64" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NF2">
+    <Frame Width="32" Height="32" Top="64" Left="96" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="SH2">
+    <Frame Width="32" Height="32" Top="64" Left="128" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WH2">
+    <Frame Width="32" Height="32" Top="64" Left="160" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EH2">
+    <Frame Width="32" Height="32" Top="64" Left="192" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NH2">
+    <Frame Width="32" Height="32" Top="64" Left="224" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  
+  <Animation Name="SF3">
+    <Frame Width="32" Height="32" Top="96" Left="0" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WF3">
+    <Frame Width="32" Height="32" Top="96" Left="32" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EF3">
+    <Frame Width="32" Height="32" Top="96" Left="64" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NF3">
+    <Frame Width="32" Height="32" Top="96" Left="96" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="SH3">
+    <Frame Width="32" Height="32" Top="96" Left="128" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WH3">
+    <Frame Width="32" Height="32" Top="96" Left="160" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EH3">
+    <Frame Width="32" Height="32" Top="96" Left="192" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NH3">
+    <Frame Width="32" Height="32" Top="96" Left="224" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  
+  <Animation Name="SF4">
+    <Frame Width="32" Height="32" Top="128" Left="0" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WF4">
+    <Frame Width="32" Height="32" Top="128" Left="32" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EF4">
+    <Frame Width="32" Height="32" Top="128" Left="64" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NF4">
+    <Frame Width="32" Height="32" Top="128" Left="96" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="SH4">
+    <Frame Width="32" Height="32" Top="128" Left="128" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WH4">
+    <Frame Width="32" Height="32" Top="128" Left="160" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EH4">
+    <Frame Width="32" Height="32" Top="128" Left="192" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NH4">
+    <Frame Width="32" Height="32" Top="128" Left="224" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  
+  <Animation Name="SF5">
+    <Frame Width="32" Height="32" Top="160" Left="0" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WF5">
+    <Frame Width="32" Height="32" Top="160" Left="32" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EF5">
+    <Frame Width="32" Height="32" Top="160" Left="64" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NF5">
+    <Frame Width="32" Height="32" Top="160" Left="96" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="SH5">
+    <Frame Width="32" Height="32" Top="160" Left="128" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WH5">
+    <Frame Width="32" Height="32" Top="160" Left="160" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EH5">
+    <Frame Width="32" Height="32" Top="160" Left="192" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NH5">
+    <Frame Width="32" Height="32" Top="160" Left="224" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  
+  <Animation Name="SF6">
+    <Frame Width="32" Height="32" Top="192" Left="0" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WF6">
+    <Frame Width="32" Height="32" Top="192" Left="32" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EF6">
+    <Frame Width="32" Height="32" Top="192" Left="64" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NF6">
+    <Frame Width="32" Height="32" Top="192" Left="96" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="SH6">
+    <Frame Width="32" Height="32" Top="192" Left="128" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WH6">
+    <Frame Width="32" Height="32" Top="192" Left="160" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EH6">
+    <Frame Width="32" Height="32" Top="192" Left="192" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NH6">
+    <Frame Width="32" Height="32" Top="192" Left="224" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  
+  <Animation Name="SF7">
+    <Frame Width="32" Height="32" Top="224" Left="0" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WF7">
+    <Frame Width="32" Height="32" Top="224" Left="32" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EF7">
+    <Frame Width="32" Height="32" Top="224" Left="64" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NF7">
+    <Frame Width="32" Height="32" Top="224" Left="96" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="SH7">
+    <Frame Width="32" Height="32" Top="224" Left="128" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="WH7">
+    <Frame Width="32" Height="32" Top="224" Left="160" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="EH7">
+    <Frame Width="32" Height="32" Top="224" Left="192" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="NH7">
+    <Frame Width="32" Height="32" Top="224" Left="224" File="MPArrows.png" Time="0.5"/>
+  </Animation>
+</AnimationSet>

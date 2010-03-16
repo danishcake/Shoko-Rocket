@@ -794,6 +794,14 @@
 					RelativePath=".\Sprites\HalfArrows.png"
 					>
 				</File>
+				<File
+					RelativePath=".\Sprites\MPArrows.animation"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\MPArrows.png"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Ring"

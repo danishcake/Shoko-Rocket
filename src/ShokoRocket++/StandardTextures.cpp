@@ -7,6 +7,7 @@
 #include <SDL.h>
 #include "Settings.h"
 #include "SDLAnimationFrame.h"
+#include <boost/lexical_cast.hpp>
 
 namespace StandardTextures
 {
@@ -27,6 +28,9 @@ namespace StandardTextures
 	Animation* win_animation = 0;
 	Animation* fail_animation = 0;
 	Animation* exclamation_animation = 0;
+
+	Animation* mp_arrows[8][5];
+	Animation* mp_half_arrows[8][5];
 	
 
 	void LoadTextures()
@@ -165,6 +169,30 @@ namespace StandardTextures
 		{
 			Logger::ErrorOut() << "Unable to load exclamation animation\n";
 		}
+
+		AnimationSet* mp_arrow_set = SDLTextureManager::GetAnimationSet("MPArrows.animation");
+		if(mp_arrow_set)
+		{
+			for(int i = 0; i < 8; i++)
+			{
+				mp_arrows[i][Direction::North] = mp_arrow_set->GetAnimation("NF" + boost::lexical_cast<std::string, int>(i));
+				mp_arrows[i][Direction::South] = mp_arrow_set->GetAnimation("SF" + boost::lexical_cast<std::string, int>(i));
+				mp_arrows[i][Direction::East] = mp_arrow_set->GetAnimation("EF" + boost::lexical_cast<std::string, int>(i));
+				mp_arrows[i][Direction::West] = mp_arrow_set->GetAnimation("WF" + boost::lexical_cast<std::string, int>(i));
+				mp_arrows[i][Direction::Stopped] = mp_arrow_set->GetAnimation("Stopped");
+
+				mp_half_arrows[i][Direction::North] = mp_arrow_set->GetAnimation("NH" + boost::lexical_cast<std::string, int>(i));
+				mp_half_arrows[i][Direction::South] = mp_arrow_set->GetAnimation("SH" + boost::lexical_cast<std::string, int>(i));
+				mp_half_arrows[i][Direction::East] = mp_arrow_set->GetAnimation("EH" + boost::lexical_cast<std::string, int>(i));
+				mp_half_arrows[i][Direction::West] = mp_arrow_set->GetAnimation("WH" + boost::lexical_cast<std::string, int>(i));
+				mp_half_arrows[i][Direction::Stopped] = mp_arrow_set->GetAnimation("Stopped");
+				//TODO error logging
+			}
+		} else
+		{
+			Logger::ErrorOut() << "Unable to load MPArrows animations\n";
+		}
+
 		//TODO blastoff
 	}
 

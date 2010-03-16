@@ -188,9 +188,9 @@ std::vector<RenderItem> MPLevel::Draw()
 		ri.position_ = it->position;
 		ri.depth = below;
 		if(it->halved)
-			ri.frame_ = StandardTextures::half_arrows[it->direction]->GetCurrentFrame();
+			ri.frame_ = StandardTextures::mp_half_arrows[it->player_id][it->direction]->GetCurrentFrame();
 		else
-			ri.frame_ = StandardTextures::arrows[it->direction]->GetCurrentFrame();
+			ri.frame_ = StandardTextures::mp_arrows[it->player_id][it->direction]->GetCurrentFrame();
 		draw_list.push_back(ri);
 	}
 
