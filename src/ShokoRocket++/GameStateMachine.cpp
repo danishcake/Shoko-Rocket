@@ -15,7 +15,7 @@
 #include <boost/tokenizer.hpp>
 #include "Client.h"
 #include "Server.h"
-#include "MPWorld.h"
+#include "MPLevel.h"
 #include "ServerWorld.h"
 
 
@@ -51,7 +51,6 @@ GameStateMachine::GameStateMachine()
 
 	client_ = NULL;
 	server_ = NULL;
-	client_world_ = NULL;
 	server_world_ = NULL;
 
 
@@ -1039,8 +1038,10 @@ void GameStateMachine::TeardownServerBrowser()
 	{
 		delete client_;
 		delete server_;
-		delete client_world_;
 		delete server_world_;
+		client_ = NULL;
+		server_ = NULL;
+		server_world_ = NULL;
 	}
 	Widget::ClearRoot();
 }
@@ -1222,7 +1223,7 @@ void GameStateMachine::ProcessLobby(float _timespan)
 					mode_timer_ = 1.0f;
 					FadeInOut(2.0f);
 					pend_mode_ = Mode::Multiplayer;
-					mp_world_ = new MPWorld(client_state_transition->level_);
+					mp_level_ = boost::shared_ptr<MPLevel>(new MPLevel(Settings::GetGridSize(), client_state_transition->level_));
 					if(server_)
 					{
 						server_world_ = new ServerWorld(client_state_transition->level_);
@@ -1294,7 +1295,7 @@ void GameStateMachine::LobbyNameChange(Widget* _widget)
 /* Multiplayer */
 void GameStateMachine::SetupMultiplayer()
 {
-	//CreateRenderArea(mp_world_->GetLevelSize(), Mode::Puzzle);
+	CreateRenderArea(mp_level_->GetLevelSize(), Mode::Multiplayer);
 }
 
 void GameStateMachine::ProcessMultiplayer(float _timespan)
@@ -1305,25 +1306,13 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 		unsigned char player_id = 0;
 		std::vector<std::vector<Opcodes::ClientOpcode*> > client_opcodes = server_->GetOpcodes();
 		server_world_->HandleOpcodes(client_opcodes);
-		/*
-		for(std::vector<std::vector<Opcodes::ClientOpcode*> >::iterator it = client_opcodes.begin(); it != client_opcodes.end(); ++it)
-		{
-			for(std::vector<Opcodes::ClientOpcode*>::iterator opcode = it->begin(); opcode != it->end(); opcode++)
-			{
-				switch((*opcode)->opcode_)
-				{
-				case Opcodes::SendInput::OPCODE:
-					
-					//server_world_->HandleInputOpcode(player_id, (Opcodes::SendInput*)*opcode);
-					break;
-				default:
-					break;
-				}
-				delete *opcode;
-			}
-			player_id++;
-		}*/
 		server_world_->Tick(_timespan);
+		std::vector<Opcodes::ServerOpcode*> response_opcodes = server_world_->GetOpcodes();
+		for(std::vector<Opcodes::ServerOpcode*>::iterator it = response_opcodes.begin(); it != response_opcodes.end(); ++it)
+		{
+			server_->SendOpcodeToAll(*it);
+		}
+		
 		server_->SetCurrentTime(server_world_->GetTime());
 	}
 
@@ -1355,6 +1344,7 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 
 	//Handle server commands
 	std::vector<Opcodes::ServerOpcode*> server_opcodes = client_->GetOpcodes();
+	mp_level_->HandleOpcodes(server_opcodes);
 	for(std::vector<Opcodes::ServerOpcode*>::iterator opcode = server_opcodes.begin(); opcode != server_opcodes.end(); opcode++)
 	{
 		switch((*opcode)->opcode_)
@@ -1373,91 +1363,12 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 			break;
 		case Opcodes::PlayerName::OPCODE:
 			break;
-		case Opcodes::WalkerSpawn::OPCODE:
-			{
-				Opcodes::WalkerSpawn* walker_spawn = (Opcodes::WalkerSpawn*)*opcode;
-				
-				Direction::Enum direction;
-				Vector2f position = walker_spawn->position_;
-				switch(walker_spawn->direction_)
-				{
-				case Opcodes::WalkerSpawn::DIRECTION_NORTH:
-					direction = Direction::North;
-					break;
-				case Opcodes::WalkerSpawn::DIRECTION_SOUTH:
-					direction = Direction::South;
-					break;
-				case Opcodes::WalkerSpawn::DIRECTION_EAST:
-					direction = Direction::East;
-					break;
-				case Opcodes::WalkerSpawn::DIRECTION_WEST:
-					direction = Direction::West;
-					break;
-				}
-				
-				switch(walker_spawn->walker_type_)
-				{
-				case Opcodes::WalkerSpawn::WALKER_CAT:
-					mp_world_->CreateCat(walker_spawn->uid_, position, direction, walker_spawn->time_);
-					break;
-				case Opcodes::WalkerSpawn::WALKER_MOUSE:
-					mp_world_->CreateMouse(walker_spawn->uid_, position, direction, walker_spawn->time_);
-					break;
-				}
-			}
-			break;
-		case Opcodes::KillWalker::OPCODE:
-			{
-			}
-			break;
-		case Opcodes::ArrowSpawn::OPCODE:
-			{
-				Opcodes::ArrowSpawn* arrow_spawn = (Opcodes::ArrowSpawn*)*opcode;
-				Vector2i position = arrow_spawn->position_;
-				int player_id = (int)arrow_spawn->player_;
-				PlayerArrowLevel::Enum arrow_level;
-				
-				Direction::Enum direction;
-
-				switch(arrow_spawn->direction_)
-				{
-				case Opcodes::ArrowSpawn::DIRECTION_NORTH:
-					direction = Direction::North;
-					break;
-				case Opcodes::ArrowSpawn::DIRECTION_SOUTH:
-					direction = Direction::South;
-					break;
-				case Opcodes::ArrowSpawn::DIRECTION_EAST:
-					direction = Direction::East;
-					break;
-				case Opcodes::ArrowSpawn::DIRECTION_WEST:
-					direction = Direction::West;
-					break;
-				}
-				switch(arrow_spawn->arrow_state_)
-				{
-				case Opcodes::ArrowSpawn::ARROW_FULL:
-					arrow_level = PlayerArrowLevel::FullArrow;
-					break;
-				case Opcodes::ArrowSpawn::ARROW_HALF:
-					arrow_level = PlayerArrowLevel::HalfArrow;
-					break;
-				case Opcodes::ArrowSpawn::ARROW_CLEAR:
-					arrow_level = PlayerArrowLevel::Clear;
-					break;
-				}
-
-
-				mp_world_->SetPlayerArrow(position, direction, player_id, arrow_level);
-			}
-			break;
 		default:
 			break;
 		}
 		delete *opcode;
 	}
-	mp_world_->Tick(_timespan);
-
+	mp_level_->Tick(_timespan);
 
 	input_ = Input();
 }
@@ -1495,11 +1406,14 @@ void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_a
 	scroll_limit_ = _level_size - render_area_size;
 	switch(_mode_affected)
 	{
-	case Mode::Puzzle: //TODO puzzle scrolling
+	case Mode::Puzzle:
 		puzzle_level_->SetScrollLimit(scroll_limit_);
 		break;
 	case Mode::Editor:
 		editor_level_->SetScrollLimit(scroll_limit_);
+		break;
+	case Mode::Multiplayer:
+		mp_level_->SetScrollLimit(scroll_limit_);
 		break;
 	}
 
@@ -1674,6 +1588,12 @@ void GameStateMachine::Draw(SDL_Surface* _target)
 			if(puzzle_level_.get() != NULL)
 			{
 				render_items = puzzle_level_->Draw();
+			}
+			break;
+		case Mode::Multiplayer:
+			if(mp_level_.get() != NULL)
+			{
+				render_items = mp_level_->Draw();
 			}
 			break;
 		}

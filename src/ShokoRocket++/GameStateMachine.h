@@ -12,7 +12,7 @@ class BlittableRect;
 
 class Client;
 class Server;
-class MPWorld;
+class MPLevel;
 class ServerWorld;
 
 namespace Mode
@@ -152,10 +152,9 @@ private:
 	/* Common multiplayer members */
 	Client* client_;
 	Server* server_;
-	MPWorld* client_world_;
 	ServerWorld* server_world_;
 	std::map<int, std::string> player_names_;
-	MPWorld* mp_world_;
+	boost::shared_ptr<MPLevel> mp_level_;
 
 	/* ServerBrowser members */
 	Widget* ip_area_;

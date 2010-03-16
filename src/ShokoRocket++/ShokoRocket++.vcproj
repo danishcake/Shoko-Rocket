@@ -220,6 +220,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MPLevel.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Progress.cpp"
 				>
 			</File>
@@ -271,6 +275,10 @@
 			</File>
 			<File
 				RelativePath=".\Input.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MPLevel.h"
 				>
 			</File>
 			<File
