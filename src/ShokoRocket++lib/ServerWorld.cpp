@@ -6,10 +6,12 @@
 
 ServerWorld::ServerWorld() : MPWorld()
 {
+	arrow_limit_ = 3;
 }
 
 ServerWorld::ServerWorld(string _filename) : MPWorld(_filename)
 {
+	arrow_limit_ = 3;
 }
 
 WorldState::Enum ServerWorld::Tick(float _dt)
@@ -270,7 +272,7 @@ void ServerWorld::HandleInputOpcode(int _player_id, Opcodes::SendInput* _input)
 					GenerateArrowOpcode(_player_id, _input->position_, Direction::North, PlayerArrowLevel::FullArrow);
 				}
 			}
-		} else
+		} else if(CountArrows(_player_id) < arrow_limit_)
 		{//New arrow
 			SetPlayerArrow(_input->position_, Direction::North, _player_id, PlayerArrowLevel::FullArrow);
 			GenerateArrowOpcode(_player_id, _input->position_, Direction::North, PlayerArrowLevel::FullArrow);
@@ -292,7 +294,7 @@ void ServerWorld::HandleInputOpcode(int _player_id, Opcodes::SendInput* _input)
 					GenerateArrowOpcode(_player_id, _input->position_, Direction::South, PlayerArrowLevel::FullArrow);
 				}
 			}
-		} else
+		} else if(CountArrows(_player_id) < arrow_limit_)
 		{//New arrow
 			SetPlayerArrow(_input->position_, Direction::South, _player_id, PlayerArrowLevel::FullArrow);
 			GenerateArrowOpcode(_player_id, _input->position_, Direction::South, PlayerArrowLevel::FullArrow);
@@ -314,7 +316,7 @@ void ServerWorld::HandleInputOpcode(int _player_id, Opcodes::SendInput* _input)
 					GenerateArrowOpcode(_player_id, _input->position_, Direction::East, PlayerArrowLevel::FullArrow);
 				}
 			}
-		} else
+		} else if(CountArrows(_player_id) < arrow_limit_)
 		{//New arrow
 			SetPlayerArrow(_input->position_, Direction::East, _player_id, PlayerArrowLevel::FullArrow);
 			GenerateArrowOpcode(_player_id, _input->position_, Direction::East, PlayerArrowLevel::FullArrow);
@@ -336,7 +338,7 @@ void ServerWorld::HandleInputOpcode(int _player_id, Opcodes::SendInput* _input)
 					GenerateArrowOpcode(_player_id, _input->position_, Direction::West, PlayerArrowLevel::FullArrow);
 				}
 			}
-		} else
+		} else if(CountArrows(_player_id) < arrow_limit_)
 		{//New arrow
 			SetPlayerArrow(_input->position_, Direction::West, _player_id, PlayerArrowLevel::FullArrow);
 			GenerateArrowOpcode(_player_id, _input->position_, Direction::West, PlayerArrowLevel::FullArrow);
@@ -363,3 +365,13 @@ vector<Opcodes::ServerOpcode*> ServerWorld::GetOpcodes()
 	return opcodes_copy;
 }
 
+
+int ServerWorld::CountArrows(int _player_id)
+{
+	int count = 0;
+	for(std::vector<PlayerArrow>::iterator it = player_arrows_.begin(); it != player_arrows_.end(); ++it)
+	{
+		if(it->player_id == _player_id) count++;
+	}
+	return count;
+}

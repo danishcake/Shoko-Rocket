@@ -10,6 +10,10 @@ protected:
 	void GenerateArrowOpcode(int _player_id, Vector2i _position, Direction::Enum _direction, PlayerArrowLevel::Enum _arrow_state);
 	void GenerateWalkerDeath(int _uid, Vector2f _position, bool _death);
 	vector<Opcodes::ServerOpcode*> opcodes_to_clients_;
+
+	int CountArrows(int _player_id);
+	int arrow_limit_;
+
 public:
 	//Constructors
 	ServerWorld();
