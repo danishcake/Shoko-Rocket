@@ -71,6 +71,7 @@ protected:
 	void InsertPending();
 	void DeleteInternal();
 	static void RemoveEventLock();
+	static bool InheritsDeleteDue(Widget* _widget);
 public:
 	/* Typedefs etc */
 	typedef boost::signal<void (Widget*)> WidgetEvent;

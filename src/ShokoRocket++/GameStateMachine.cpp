@@ -1156,6 +1156,9 @@ void GameStateMachine::SetupLobby()
 	chat_entry->OnKeyUp.connect(boost::bind(&GameStateMachine::LobbyChatEntry, this, _1, _2));
 }
 
+void test()
+{
+}
 void GameStateMachine::ProcessLobby(float _timespan)
 {
 	//Handle opcodes to server
@@ -1178,78 +1181,78 @@ void GameStateMachine::ProcessLobby(float _timespan)
 			player_id++;
 		}
 	}
-
-	//Handle opcodes to client
-	std::vector<Opcodes::ServerOpcode*> server_opcodes = client_->GetOpcodes();
-	for(std::vector<Opcodes::ServerOpcode*>::iterator opcode = server_opcodes.begin(); opcode != server_opcodes.end(); ++opcode)
+	if(client_)
 	{
-		switch((*opcode)->opcode_)
+		//Handle opcodes to client
+		std::vector<Opcodes::ServerOpcode*> server_opcodes = client_->GetOpcodes();
+		for(std::vector<Opcodes::ServerOpcode*>::iterator opcode = server_opcodes.begin(); opcode != server_opcodes.end(); ++opcode)
 		{
-		case Opcodes::ChatMessage::OPCODE:
+			switch((*opcode)->opcode_)
 			{
-				std::string name = "Unknown player";
-				if(player_names_.find(((Opcodes::ChatMessage*)*opcode)->sender_) != player_names_.end())
+			case Opcodes::ChatMessage::OPCODE:
 				{
-					name = player_names_[((Opcodes::ChatMessage*)*opcode)->sender_];
-				}
-				LobbyChatAppend(name + " says " + ((Opcodes::ChatMessage*)*opcode)->message_);
-			}
-			break;
-		case Opcodes::PlayerName::OPCODE:
-			{
-				bool no_old_name = true;
-				std::string old_name;
-				if(player_names_.find(((Opcodes::PlayerName*)*opcode)->player_) != player_names_.end())
-				{
-					old_name = player_names_[((Opcodes::PlayerName*)*opcode)->player_];
-					no_old_name = false;
-				}
-				player_names_[((Opcodes::PlayerName*)*opcode)->player_] = ((Opcodes::PlayerName*)*opcode)->name_;
-				if(!no_old_name)
-				{
-					LobbyChatAppend(old_name + " change name to " + ((Opcodes::PlayerName*)*opcode)->name_);
-				} else
-				{
-					LobbyChatAppend(std::string(((Opcodes::PlayerName*)*opcode)->name_) + " joined the server");
-				}
-			}
-			break;
-		case Opcodes::StateTransition::OPCODE:
-			{
-				//Should only get statetransition to game
-				Opcodes::StateTransition* client_state_transition = (Opcodes::StateTransition*)*opcode;
-				if(client_state_transition->state_ == Opcodes::StateTransition::STATE_GAME)
-				{
-					mode_timer_ = 1.0f;
-					FadeInOut(2.0f);
-					pend_mode_ = Mode::Multiplayer;
-					mp_level_ = boost::shared_ptr<MPLevel>(new MPLevel(Settings::GetGridSize(), client_state_transition->level_));
-					if(server_)
+					std::string name = "Unknown player";
+					if(player_names_.find(((Opcodes::ChatMessage*)*opcode)->sender_) != player_names_.end())
 					{
-						server_world_ = new ServerWorld(client_state_transition->level_);
+						name = player_names_[((Opcodes::ChatMessage*)*opcode)->sender_];
+					}
+					LobbyChatAppend(name + " says " + ((Opcodes::ChatMessage*)*opcode)->message_);
+				}
+				break;
+			case Opcodes::PlayerName::OPCODE:
+				{
+					bool no_old_name = true;
+					std::string old_name;
+					if(player_names_.find(((Opcodes::PlayerName*)*opcode)->player_) != player_names_.end())
+					{
+						old_name = player_names_[((Opcodes::PlayerName*)*opcode)->player_];
+						no_old_name = false;
+					}
+					player_names_[((Opcodes::PlayerName*)*opcode)->player_] = ((Opcodes::PlayerName*)*opcode)->name_;
+					if(!no_old_name)
+					{
+						LobbyChatAppend(old_name + " change name to " + ((Opcodes::PlayerName*)*opcode)->name_);
+					} else
+					{
+						LobbyChatAppend(std::string(((Opcodes::PlayerName*)*opcode)->name_) + " joined the server");
 					}
 				}
+				break;
+			case Opcodes::StateTransition::OPCODE:
+				{
+					//Should only get statetransition to game
+					Opcodes::StateTransition* client_state_transition = (Opcodes::StateTransition*)*opcode;
+					if(client_state_transition->state_ == Opcodes::StateTransition::STATE_GAME)
+					{
+						mode_timer_ = 1.0f;
+						FadeInOut(2.0f);
+						pend_mode_ = Mode::Multiplayer;
+						mp_level_ = boost::shared_ptr<MPLevel>(new MPLevel(Settings::GetGridSize(), client_state_transition->level_));
+						if(server_)
+						{
+							server_world_ = new ServerWorld(client_state_transition->level_);
+						}
+					}
+				}
+				break;
+			case Opcodes::ClientDisconnection::OPCODE:
+				{
+					LobbyChatAppend(player_names_[((Opcodes::ClientDisconnection*)*opcode)->client_id_] + " disconnected");
+				}
+				break;
 			}
-			break;
-		case Opcodes::ClientDisconnection::OPCODE:
-			{
-				LobbyChatAppend(player_names_[((Opcodes::ClientDisconnection*)*opcode)->client_id_] + " disconnected");
-			}
-			break;
+			delete *opcode;
 		}
-		delete *opcode;
-	}
 
-	if(client_->GetState() != ClientState::Connected)
-	{
-		delete client_;
-		delete server_;
-		client_ = NULL;
-		server_ = NULL;
-		Logger::DiagnosticOut() << "Connection lost, returning to Server Browser\n";
-		mode_timer_ = 1.0f;
-		FadeInOut(2.0f);
-		pend_mode_ = Mode::ServerBrowser;
+		if(client_->GetState() != ClientState::Connected)
+		{
+			delete client_;
+			delete server_;
+			client_ = NULL;
+			server_ = NULL;
+			Logger::DiagnosticOut() << "Connection lost, returning to Server Browser\n";
+			ShowMessageBox("Connection lost", boost::bind(&GameStateMachine::DisconnectAcknowledgeCallback, this));
+		}
 	}
 }
 
@@ -1316,61 +1319,74 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 		server_->SetCurrentTime(server_world_->GetTime());
 	}
 
-	//Send client input to server
-	Opcodes::SendInput::Action action = Opcodes::SendInput::ACT_NONE;
-	switch(input_.action)
+	if(client_)
 	{
-	case Action::Cancel:
-	case Action::ClearSquare:
-		action = Opcodes::SendInput::ACT_CLEAR;
-		break;
-	case Action::PlaceNorthArrow:
-		action = Opcodes::SendInput::ACT_NORTH;
-		break;
-	case Action::PlaceSouthArrow:
-		action = Opcodes::SendInput::ACT_SOUTH;
-		break;
-	case Action::PlaceEastArrow:
-		action = Opcodes::SendInput::ACT_EAST;
-		break;
-	case Action::PlaceWestArrow:
-		action = Opcodes::SendInput::ACT_WEST;
-		break;
-
-	}
-
-	if(action != Opcodes::SendInput::ACT_NONE)
-		client_->SendOpcode(new Opcodes::SendInput(input_.position, action));
-
-	//Handle server commands
-	std::vector<Opcodes::ServerOpcode*> server_opcodes = client_->GetOpcodes();
-	mp_level_->HandleOpcodes(server_opcodes);
-	for(std::vector<Opcodes::ServerOpcode*>::iterator opcode = server_opcodes.begin(); opcode != server_opcodes.end(); opcode++)
-	{
-		switch((*opcode)->opcode_)
+		//Send client input to server
+		Opcodes::SendInput::Action action = Opcodes::SendInput::ACT_NONE;
+		switch(input_.action)
 		{
-		case Opcodes::ChatMessage::OPCODE:
-			{
-				std::string name = "Unknown player";
-				if(player_names_.find(((Opcodes::ChatMessage*)*opcode)->sender_) != player_names_.end())
-				{
-					name = player_names_[((Opcodes::ChatMessage*)*opcode)->sender_];
-				}
-				MultiplayerChatAppend(name + " says " + ((Opcodes::ChatMessage*)*opcode)->message_);
-			}
+		case Action::Cancel:
+		case Action::ClearSquare:
+			action = Opcodes::SendInput::ACT_CLEAR;
 			break;
-		case Opcodes::DriveCursor::OPCODE:
+		case Action::PlaceNorthArrow:
+			action = Opcodes::SendInput::ACT_NORTH;
 			break;
-		case Opcodes::PlayerName::OPCODE:
+		case Action::PlaceSouthArrow:
+			action = Opcodes::SendInput::ACT_SOUTH;
 			break;
-		default:
+		case Action::PlaceEastArrow:
+			action = Opcodes::SendInput::ACT_EAST;
 			break;
-		}
-		delete *opcode;
-	}
-	mp_level_->Tick(_timespan);
+		case Action::PlaceWestArrow:
+			action = Opcodes::SendInput::ACT_WEST;
+			break;
 
-	input_ = Input();
+		}
+
+		if(action != Opcodes::SendInput::ACT_NONE)
+			client_->SendOpcode(new Opcodes::SendInput(input_.position, action));
+
+		//Handle server commands
+		std::vector<Opcodes::ServerOpcode*> server_opcodes = client_->GetOpcodes();
+		mp_level_->HandleOpcodes(server_opcodes);
+		for(std::vector<Opcodes::ServerOpcode*>::iterator opcode = server_opcodes.begin(); opcode != server_opcodes.end(); opcode++)
+		{
+			switch((*opcode)->opcode_)
+			{
+			case Opcodes::ChatMessage::OPCODE:
+				{
+					std::string name = "Unknown player";
+					if(player_names_.find(((Opcodes::ChatMessage*)*opcode)->sender_) != player_names_.end())
+					{
+						name = player_names_[((Opcodes::ChatMessage*)*opcode)->sender_];
+					}
+					MultiplayerChatAppend(name + " says " + ((Opcodes::ChatMessage*)*opcode)->message_);
+				}
+				break;
+			case Opcodes::DriveCursor::OPCODE:
+				break;
+			case Opcodes::PlayerName::OPCODE:
+				break;
+			default:
+				break;
+			}
+			delete *opcode;
+		}
+		mp_level_->Tick(_timespan);
+
+		input_ = Input();
+
+		if(client_->GetState() != ClientState::Connected)
+		{
+			delete client_;
+			delete server_;
+			client_ = NULL;
+			server_ = NULL;
+			Logger::DiagnosticOut() << "Connection lost, returning to Server Browser\n";
+			ShowMessageBox("Connection lost", boost::bind(&GameStateMachine::DisconnectAcknowledgeCallback, this));
+		}
+	}
 }
 
 void GameStateMachine::TeardownMultiplayer()
@@ -1747,4 +1763,35 @@ void GameStateMachine::GamegridMouseMoveCallback(Widget* /*_widget*/, MouseEvent
 {
 	last_grid_position_.x = _args.x / Settings::GetGridSize().x;
 	last_grid_position_.y = _args.y / Settings::GetGridSize().y;
+}
+void GameStateMachine::ShowMessageBox(std::string _message, const MessageBoxEvent::slot_type& _event)
+{
+	message_box_ = new Widget("Blank384x384.png");
+	message_box_->SetPosition(Vector2i((SDL_GetVideoSurface()->w - 384)/2, (SDL_GetVideoSurface()->h - 384) /2));
+	message_box_->SetText(_message, TextAlignment::TopLeft);
+
+	Widget* msgbox_OK = new Widget("Blank128x32.png");
+	msgbox_OK->SetPosition(Vector2i(128,340));
+	msgbox_OK->SetText("OK", TextAlignment::Centre);
+	msgbox_OK->OnClick.connect(boost::bind(&GameStateMachine::MessageBoxOKClickCallback, this, _1));
+	message_box_->AddChild(msgbox_OK);
+
+	message_box_->SetModal(true);
+
+	acknowledge_action_.disconnect_all_slots();
+	acknowledge_action_.connect(_event);
+}
+
+void GameStateMachine::MessageBoxOKClickCallback(Widget* _widget)
+{
+	acknowledge_action_();
+	message_box_->Delete();
+	message_box_ = NULL;
+}
+
+void GameStateMachine::DisconnectAcknowledgeCallback()
+{
+	mode_timer_ = 1.0f;
+	FadeInOut(2.0f);
+	pend_mode_ = Mode::ServerBrowser;
 }

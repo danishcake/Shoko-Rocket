@@ -1045,6 +1045,22 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 	RemoveEventLock();
 }
 
+bool Widget::InheritsDeleteDue(Widget* _widget)
+{
+	bool result = false;
+	Widget* parent = _widget->GetParent();
+	while(parent)
+	{
+		if(parent->deletion_due_)
+		{
+			result = true;
+			break;
+		}
+		parent = parent->GetParent();
+	}
+	return result;
+}
+
 void Widget::RemoveEventLock()
 {
 	event_lock_ = false;
@@ -1063,10 +1079,18 @@ void Widget::RemoveEventLock()
 	pending_root_.clear();
 
 	vector<Widget*> all_copy = all_;
+
+	/*BUG:
+	 * When widget deleted it's children are also deleted, which fills them with crap data
+	 * This causes their deletion_due_ to be set, so they are double freed
+	 * Solution: Remove entries which inherit deletion_due_ before calling DeleteInternal()
+	 */
+	all_copy.erase(std::remove_if(all_copy.begin(), all_copy.end(), &InheritsDeleteDue), all_copy.end());
 	for(vector<Widget*>::iterator it = all_copy.begin(); it != all_copy.end(); ++it)
 	{
 		if((*it)->deletion_due_)
 			(*it)->DeleteInternal();
+
 	}
 }
 

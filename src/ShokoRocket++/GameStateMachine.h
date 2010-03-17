@@ -156,6 +156,9 @@ private:
 	std::map<int, std::string> player_names_;
 	boost::shared_ptr<MPLevel> mp_level_;
 
+	/* Common multiplayer event handling */
+	void DisconnectAcknowledgeCallback();
+
 	/* ServerBrowser members */
 	Widget* ip_area_;
 	Widget* port_area_;
@@ -217,6 +220,13 @@ private:
 	Widget* scroll_down_widget_;
 
 	boost::shared_ptr<StatusLevel> state_indicator_level_;
+
+	//MessageBox
+	typedef boost::signal<void ()> MessageBoxEvent;
+	void ShowMessageBox(std::string _message, const MessageBoxEvent::slot_type& _event);
+	MessageBoxEvent acknowledge_action_;
+	Widget* message_box_;
+	void MessageBoxOKClickCallback(Widget* _widget);
 public:
 	/* Constructors */
 	GameStateMachine();
