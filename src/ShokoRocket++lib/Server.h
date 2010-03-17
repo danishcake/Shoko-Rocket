@@ -52,6 +52,7 @@ protected:
 	int required_players_;
 	int start_counter_;
 	unsigned int current_time_;
+	int max_players_;
 public:
 	Server(void);
 	~Server(void);

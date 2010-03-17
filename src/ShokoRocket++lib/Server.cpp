@@ -19,6 +19,7 @@ Server::Server(void) : io_(), acceptor_(io_, tcp::endpoint(tcp::v4(), 9020)),
 	players_count_ = 0;
 	required_players_ = 2;
 	current_time_ = 0;
+	max_players_ = 8;
 	thread_ = new boost::thread(ServerThread(this));
 	timer_.async_wait(boost::bind(&Server::PeriodicTidyup, this, boost::asio::placeholders::error));
 	work_ = new boost::asio::io_service::work(io_);
@@ -93,26 +94,33 @@ void Server::ConnectionAccepted(ServerConnection* _connection, boost::system::er
 		if(!ec)
 		{
 			Logger::DiagnosticOut() << "Server: Connection accepted\n";
-			_connection->Start();
-			//Send names
-			for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+			if(players_count_ < max_players_)
 			{
-				if((*it)->GetPlayerNameSet())
+				_connection->Start();
+				//Send names
+				for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
 				{
-					Opcodes::PlayerName* pn = new Opcodes::PlayerName((*it)->GetPlayerName(), (*it)->GetPlayerID());
-					pn->time_ = current_time_;
-					_connection->SendOpcode(pn);
+					if((*it)->GetPlayerNameSet())
+					{
+						Opcodes::PlayerName* pn = new Opcodes::PlayerName((*it)->GetPlayerName(), (*it)->GetPlayerID());
+						pn->time_ = current_time_;
+						_connection->SendOpcode(pn);
+					}
 				}
-			}
-			players_count_++;
-			StartConnection();
+				players_count_++;
+				StartConnection();
 
-			if(players_count_ >= required_players_)
-			{
-				start_timer_.async_wait(boost::bind(&Server::StartGameCallback, this, boost::asio::placeholders::error));
-				start_counter_ = 5;
-				SendOpcodeToAll(new Opcodes::ChatMessage("Starting in 5", Opcodes::ChatMessage::SENDER_SERVER));
+				if(players_count_ >= required_players_)
+				{
+					start_timer_.async_wait(boost::bind(&Server::StartGameCallback, this, boost::asio::placeholders::error));
+					start_counter_ = 5;
+					SendOpcodeToAll(new Opcodes::ChatMessage("Starting in 5", Opcodes::ChatMessage::SENDER_SERVER));
+				}
+			} else
+			{ //Too many players, immediately send a kick message
+				_connection->SendOpcode(new Opcodes::KickClient("Sorry, server full"));
 			}
+
 		}
 		else
 		{

@@ -15,6 +15,7 @@ ServerConnection::ServerConnection(io_service& _io_service, Server* _server, int
 	client_opcode_ = NULL;
 	connected_ = false;
 	player_name_set_ = false;
+	disconnecting_ = false;
 }
 
 ServerConnection::~ServerConnection(void)
@@ -51,6 +52,12 @@ void ServerConnection::WriteFinished(boost::system::error_code error, SBuffer _b
 		if(error) error_ = error;
 		server_->GetMutex().unlock();
 	} else Logger::DiagnosticOut() << "ServerConnection::WriteFinished: Unable to lock, probably being shutdown\n";
+	if(disconnecting_)
+	{
+		socket_.close();
+		connected_ = false;
+		error_ = boost::asio::error::eof;
+	}
 }
 
 void ServerConnection::ReadHeaderFinished(boost::system::error_code error, SBuffer _buffer)

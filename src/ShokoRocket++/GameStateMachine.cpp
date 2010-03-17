@@ -1156,9 +1156,6 @@ void GameStateMachine::SetupLobby()
 	chat_entry->OnKeyUp.connect(boost::bind(&GameStateMachine::LobbyChatEntry, this, _1, _2));
 }
 
-void test()
-{
-}
 void GameStateMachine::ProcessLobby(float _timespan)
 {
 	//Handle opcodes to server
@@ -1240,11 +1237,24 @@ void GameStateMachine::ProcessLobby(float _timespan)
 					LobbyChatAppend(player_names_[((Opcodes::ClientDisconnection*)*opcode)->client_id_] + " disconnected");
 				}
 				break;
+			case Opcodes::KickClient::OPCODE:
+				{
+					Opcodes::KickClient* kick_client_opcode = (Opcodes::KickClient*)*opcode;
+					
+					delete client_;
+					delete server_;
+					client_ = NULL;
+					server_ = NULL;
+					Logger::DiagnosticOut() << "Kicked from server, returning to Server Browser\n";
+					ShowMessageBox(std::string("Kicked:\n") + kick_client_opcode->msg_, boost::bind(&GameStateMachine::DisconnectAcknowledgeCallback, this));
+				}
+				break;
 			}
 			delete *opcode;
 		}
 
-		if(client_->GetState() != ClientState::Connected)
+		//Client may have already been kicked
+		if(client_ && client_->GetState() != ClientState::Connected)
 		{
 			delete client_;
 			delete server_;
@@ -1270,6 +1280,10 @@ void GameStateMachine::LobbyChatAppend(std::string _chat)
 /* Lobby event handling */
 void GameStateMachine::LobbyReturnToBrowser(Widget* _widget)
 {
+	delete server_;
+	delete client_;
+	client_ = NULL;
+	server_ = NULL;
 	pend_mode_ = Mode::ServerBrowser;
 	mode_timer_ = 1.0f;
 	FadeInOut(2.0f);
@@ -1368,6 +1382,18 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 				break;
 			case Opcodes::PlayerName::OPCODE:
 				break;
+			case Opcodes::KickClient::OPCODE:
+				{
+					Opcodes::KickClient* kick_client_opcode = (Opcodes::KickClient*)*opcode;
+					
+					delete client_;
+					delete server_;
+					client_ = NULL;
+					server_ = NULL;
+					Logger::DiagnosticOut() << "Kicked from server, returning to Server Browser\n";
+					ShowMessageBox(std::string("Kicked:\n") + kick_client_opcode->msg_, boost::bind(&GameStateMachine::DisconnectAcknowledgeCallback, this));
+				}
+				break;
 			default:
 				break;
 			}
@@ -1377,7 +1403,7 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 
 		input_ = Input();
 
-		if(client_->GetState() != ClientState::Connected)
+		if(client_ && client_->GetState() != ClientState::Connected)
 		{
 			delete client_;
 			delete server_;

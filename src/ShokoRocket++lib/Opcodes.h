@@ -209,6 +209,20 @@ namespace Opcodes
 		unsigned char client_id_;
 	};
 
+	struct KickClient : public ServerOpcode
+	{
+		static const unsigned OPCODE = 9;
+	public:
+		KickClient(std::string _message)
+		{
+			opcode_ = OPCODE;
+			std::size_t len = _message.size();
+			len = len > 255 ? 255 : len;
+			memset(&msg_, 0, 256);
+			memcpy(&msg_, _message.c_str(), len);
+		}
+		char msg_[256];
+	};
 
 
 

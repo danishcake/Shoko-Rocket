@@ -31,6 +31,9 @@ namespace Opcodes
 		case ClientDisconnection::OPCODE:
 			return sizeof(ClientDisconnection) - ServerOpcode::HEADERSIZE;
 			break;
+		case KickClient::OPCODE:
+			return sizeof(KickClient) - ServerOpcode::HEADERSIZE;
+			break;
 		default:
 			//TODO warnings here
 			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
@@ -116,6 +119,9 @@ namespace Opcodes
 			break;
 		case ClientDisconnection::OPCODE:
 			opcode = new ClientDisconnection(0);
+			break;
+		case KickClient::OPCODE:
+			opcode = new KickClient("");
 			break;
 		default:
 			//TODO warnings here

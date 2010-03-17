@@ -25,6 +25,7 @@ protected:
 	std::string player_name_;
 	bool connected_;
 	bool player_name_set_;
+	bool disconnecting_;
 	Opcodes::ClientOpcode* client_opcode_;
 
 public:
@@ -49,4 +50,7 @@ public:
 	void SetPlayerName(std::string _player_name){player_name_ = _player_name; player_name_set_ = true;}
 	std::string GetPlayerName(){return player_name_;}
 	bool GetPlayerNameSet(){return player_name_set_;}
+
+	//Triggers the connection to close when write finished
+	void SetDisconnecting(){disconnecting_ = true;}
 };
