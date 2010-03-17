@@ -177,6 +177,7 @@ private:
 
 	/* Lobby members */
 	Widget* chat_widget_;
+	Widget* ready_widget_;
 	std::string chat_hist_;
 	/* Lobby methods */
 	void SetupLobby();
@@ -188,6 +189,7 @@ private:
 	void LobbyReturnToBrowser(Widget* _widget);
 	void LobbyChatEntry(Widget* _widget, KeyPressEventArgs _event_args);
 	void LobbyNameChange(Widget* _widget);
+	void LobbyReadyClick(Widget* _widget);
 
 	/* Multiplayer members */
 	/* Multiplayer methods */

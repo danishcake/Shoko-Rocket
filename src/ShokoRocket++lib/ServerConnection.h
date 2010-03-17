@@ -26,6 +26,7 @@ protected:
 	bool connected_;
 	bool player_name_set_;
 	bool disconnecting_;
+	bool ready_;
 	Opcodes::ClientOpcode* client_opcode_;
 
 public:
@@ -53,4 +54,6 @@ public:
 
 	//Triggers the connection to close when write finished
 	void SetDisconnecting(){disconnecting_ = true;}
+	void SetReady(bool _ready){ready_ = _ready;}
+	bool GetReady(){return ready_;}
 };

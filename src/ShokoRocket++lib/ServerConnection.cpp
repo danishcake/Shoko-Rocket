@@ -16,6 +16,7 @@ ServerConnection::ServerConnection(io_service& _io_service, Server* _server, int
 	connected_ = false;
 	player_name_set_ = false;
 	disconnecting_ = false;
+	ready_ = false;
 }
 
 ServerConnection::~ServerConnection(void)
@@ -96,7 +97,7 @@ void ServerConnection::ReadBodyFinished(boost::system::error_code error, SBuffer
 
 			memcpy(((char*)client_opcode_) + Opcodes::ClientOpcode::HEADERSIZE, _buffer->c_array(),  Opcodes::GetBodySize(client_opcode_));
 			//Pass newly created opcode to server, which is then responsible for freeing it
-			server_->HandleOpcode(player_id_, client_opcode_);
+			server_->HandleOpcode(this, player_id_, client_opcode_);
 
 			Logger::DiagnosticOut() << "Server: Read body finished, looking for header again\n";
 			SBuffer read_buffer = SBuffer(new boost::array<char, 512>());

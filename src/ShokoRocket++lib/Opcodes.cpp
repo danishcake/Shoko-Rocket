@@ -58,6 +58,9 @@ namespace Opcodes
 		case SendChatMessage::OPCODE:
 			return sizeof(SendChatMessage) - ClientOpcode::HEADERSIZE;
 			break;
+		case SetReady::OPCODE:
+			return sizeof(SetReady) - ClientOpcode::HEADERSIZE;
+			break;
 		default:
 			//TODO warnings here
 			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
@@ -82,6 +85,9 @@ namespace Opcodes
 			break;
 		case SendChatMessage::OPCODE:
 			opcode = new SendChatMessage("");
+			break;
+		case SetReady::OPCODE:
+			opcode = new SetReady(false);
 			break;
 		default:
 			//TODO warnings here

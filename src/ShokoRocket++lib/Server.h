@@ -53,6 +53,7 @@ protected:
 	int start_counter_;
 	unsigned int current_time_;
 	int max_players_;
+	bool ingame_;
 public:
 	Server(void);
 	~Server(void);
@@ -62,7 +63,7 @@ public:
 
 	bool Tick();
 	void PeriodicTidyup(boost::system::error_code _error);
-	void HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode);
+	void HandleOpcode(ServerConnection* _connection, int _player_id, Opcodes::ClientOpcode* _opcode);
 
 	void SendOpcodeToAll(Opcodes::ServerOpcode* _opcode);
 	void SetCurrentTime(unsigned int _current_time){current_time_ = _current_time;}

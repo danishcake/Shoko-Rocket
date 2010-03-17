@@ -20,10 +20,12 @@ Server::Server(void) : io_(), acceptor_(io_, tcp::endpoint(tcp::v4(), 9020)),
 	required_players_ = 2;
 	current_time_ = 0;
 	max_players_ = 8;
+	start_counter_ = 0;
 	thread_ = new boost::thread(ServerThread(this));
 	timer_.async_wait(boost::bind(&Server::PeriodicTidyup, this, boost::asio::placeholders::error));
 	work_ = new boost::asio::io_service::work(io_);
 	StartConnection();
+	ingame_ = false;
 }
 
 Server::~Server(void)
@@ -109,13 +111,6 @@ void Server::ConnectionAccepted(ServerConnection* _connection, boost::system::er
 				}
 				players_count_++;
 				StartConnection();
-
-				if(players_count_ >= required_players_)
-				{
-					start_timer_.async_wait(boost::bind(&Server::StartGameCallback, this, boost::asio::placeholders::error));
-					start_counter_ = 5;
-					SendOpcodeToAll(new Opcodes::ChatMessage("Starting in 5", Opcodes::ChatMessage::SENDER_SERVER));
-				}
 			} else
 			{ //Too many players, immediately send a kick message
 				_connection->SendOpcode(new Opcodes::KickClient("Sorry, server full"));
@@ -156,12 +151,28 @@ void Server::PeriodicTidyup(boost::system::error_code _error)
 			SendOpcodeToAll(new Opcodes::ClientDisconnection(pid));
 		}
 
+		if(players_count_ >= required_players_)
+		{
+			int ready_count = 0;
+			for(std::vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+			{
+				if((*it)->GetReady()) ready_count++;
+			}
+			if(ready_count == players_count_ && !ingame_ && start_counter_ == 0)
+			{
+				start_timer_.async_wait(boost::bind(&Server::StartGameCallback, this, boost::asio::placeholders::error));
+				start_counter_ = 5;
+				SendOpcodeToAll(new Opcodes::ChatMessage("Starting in 5", Opcodes::ChatMessage::SENDER_SERVER));
+			}
+		}
+
 		//Schedule another cleanup in 100ms
 		if(!closing_)
 		{
 			timer_.expires_from_now(boost::posix_time::milliseconds(100));	
 			timer_.async_wait(boost::bind(&Server::PeriodicTidyup, this, boost::asio::placeholders::error));
 		}
+
 		mutex_.unlock();
 	} else Logger::DiagnosticOut() << "Server: Unable to acquire mutex, must be shutting down\n";
 }
@@ -173,7 +184,7 @@ bool Server::Tick()
 	return closing_;
 }
 
-void Server::HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode)
+void Server::HandleOpcode(ServerConnection* _connection, int _player_id, Opcodes::ClientOpcode* _opcode)
 {
 	//No need to lock mutex as will already be locked by calling method
 	while(opcodes_.size() <= _player_id)
@@ -197,6 +208,21 @@ void Server::HandleOpcode(int _player_id, Opcodes::ClientOpcode* _opcode)
 			Opcodes::SetName* client_setname = static_cast<Opcodes::SetName*>(_opcode);
 			Opcodes::PlayerName* msg = new Opcodes::PlayerName(client_setname->name_, _player_id);
 			SendOpcodeToAll(msg);
+			_connection->SetPlayerName(client_setname->name_);
+		}
+		break;
+	case Opcodes::SetReady::OPCODE:
+		{
+			Opcodes::SetReady* client_ready = static_cast<Opcodes::SetReady*>(_opcode);
+			if(client_ready->ready_)
+			{
+				_connection->SetReady(true);
+				SendOpcodeToAll(new Opcodes::ChatMessage("Ready!", _player_id));
+			} else
+			{
+				_connection->SetReady(true);
+				SendOpcodeToAll(new Opcodes::ChatMessage("Not ready!", _player_id));
+			}
 		}
 		break;
 	}
@@ -236,13 +262,17 @@ void Server::StartGameCallback(boost::system::error_code _error_code)
 	{
 		if(players_count_ >= required_players_)
 		{
+			ingame_ = true;
 			SendOpcodeToAll(new Opcodes::ChatMessage("Starting game!", Opcodes::ChatMessage::SENDER_SERVER));
 			SendOpcodeToAll(new Opcodes::StateTransition(Opcodes::StateTransition::STATE_GAME, "Multiplayer/Glass.Level"));
 		} else
 		{
 			SendOpcodeToAll(new Opcodes::ChatMessage("Start aborted due to players leaving", Opcodes::ChatMessage::SENDER_SERVER));
 		}
-
+		for(std::vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+		{
+			(*it)->SetReady(false);
+		}
 	} else
 	{
 		start_timer_.expires_from_now(boost::posix_time::milliseconds(1000));

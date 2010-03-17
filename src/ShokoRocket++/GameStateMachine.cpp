@@ -1154,6 +1154,12 @@ void GameStateMachine::SetupLobby()
 	chat_entry->SetEditable(true);
 	chat_entry->SetText("", TextAlignment::Left);
 	chat_entry->OnKeyUp.connect(boost::bind(&GameStateMachine::LobbyChatEntry, this, _1, _2));
+
+	ready_widget_ = new Widget("Blank128x64.png");
+	ready_widget_->SetTextSize(TextSize::Small);
+	ready_widget_->SetPosition(Vector2i(2, 68));
+	ready_widget_->SetText("Not Ready", TextAlignment::Centre);
+	ready_widget_->OnClick.connect(boost::bind(&GameStateMachine::LobbyReadyClick, this, _1));
 }
 
 void GameStateMachine::ProcessLobby(float _timespan)
@@ -1291,24 +1297,42 @@ void GameStateMachine::LobbyReturnToBrowser(Widget* _widget)
 
 void GameStateMachine::LobbyChatEntry(Widget* _widget, KeyPressEventArgs _event_args)
 {
-	if(_event_args.key_code == SDLK_RETURN)
+	if(client_)
 	{
-		std::string text = _widget->GetText();
-		if(text.length() > 0)
+		if(_event_args.key_code == SDLK_RETURN)
 		{
-			Opcodes::SendChatMessage* cm = new Opcodes::SendChatMessage(text);
-			client_->SendOpcode(cm);
+			std::string text = _widget->GetText();
+			if(text.length() > 0)
+			{
+				Opcodes::SendChatMessage* cm = new Opcodes::SendChatMessage(text);
+				client_->SendOpcode(cm);
+			}
+			_widget->SetText("", TextAlignment::Left);
+			_widget->SetEditting(true);
 		}
-		_widget->SetText("", TextAlignment::Left);
-		_widget->SetEditting(true);
 	}
 }
 
 void GameStateMachine::LobbyNameChange(Widget* _widget)
 {
-	client_->SendOpcode(new Opcodes::SetName(_widget->GetText()));
+	if(client_)	client_->SendOpcode(new Opcodes::SetName(_widget->GetText()));
 }
 
+void GameStateMachine::LobbyReadyClick(Widget* _widget)
+{
+	if(client_)
+	{
+		if(_widget->GetText() == "Not Ready")
+		{
+			_widget->SetText("Ready", TextAlignment::Centre);
+			client_->SendOpcode(new Opcodes::SetReady(true));
+		} else
+		{
+			_widget->SetText("Not Ready", TextAlignment::Centre);
+			client_->SendOpcode(new Opcodes::SetReady(false));
+		}
+	}
+}
 /* Multiplayer */
 void GameStateMachine::SetupMultiplayer()
 {

@@ -195,7 +195,7 @@ namespace Opcodes
 
 
 	/*
-	 * ClientDisconnect
+	 * ClientDisconnect - informs other clients of a dropout
 	 */
 	struct ClientDisconnection : public ServerOpcode
 	{
@@ -208,7 +208,9 @@ namespace Opcodes
 		}
 		unsigned char client_id_;
 	};
-
+	/*
+	 * ClientDisconnect - politely tells a client why they're being disconnected
+	 */
 	struct KickClient : public ServerOpcode
 	{
 		static const unsigned OPCODE = 9;
@@ -312,6 +314,21 @@ namespace Opcodes
 			
 		}
 		char message_[256];
+	};
+
+	/* 
+	 * Represents a message sent to toggle ready state. Game states when all ready
+	 */
+	struct SetReady : public ClientOpcode
+	{
+		static const unsigned char OPCODE = 5;
+	public:
+		SetReady(bool _ready)
+		{
+			opcode_ = OPCODE;
+			ready_ = _ready;
+		}
+		bool ready_;
 	};
 
 	unsigned int GetBodySize(ServerOpcode* _header);
