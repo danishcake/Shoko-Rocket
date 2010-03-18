@@ -294,7 +294,11 @@ void Widget::Delete()
 	{
 		deletion_due_ = true;
 	} else
+	{
+		if(parent_)
+			parent_->RemoveChild(this); //Puts this into root
 		delete this;
+	}
 }
 
 void Widget::DeleteInternal()

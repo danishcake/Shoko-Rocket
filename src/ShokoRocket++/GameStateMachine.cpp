@@ -1160,6 +1160,11 @@ void GameStateMachine::SetupLobby()
 	ready_widget_->SetPosition(Vector2i(2, 68));
 	ready_widget_->SetText("Not Ready", TextAlignment::Centre);
 	ready_widget_->OnClick.connect(boost::bind(&GameStateMachine::LobbyReadyClick, this, _1));
+
+	players_list_widget_ = new Widget("Blank120x384.png");
+	players_list_widget_->SetTextSize(TextSize::Small);
+	players_list_widget_->SetPosition(Vector2i(134+384+2, 34));
+	players_list_widget_->SetRejectsFocus(true);
 }
 
 void GameStateMachine::ProcessLobby(float _timespan)
@@ -1206,19 +1211,22 @@ void GameStateMachine::ProcessLobby(float _timespan)
 				{
 					bool no_old_name = true;
 					std::string old_name;
+					std::string new_name = ((Opcodes::PlayerName*)*opcode)->name_;
 					if(player_names_.find(((Opcodes::PlayerName*)*opcode)->player_) != player_names_.end())
 					{
 						old_name = player_names_[((Opcodes::PlayerName*)*opcode)->player_];
 						no_old_name = false;
 					}
-					player_names_[((Opcodes::PlayerName*)*opcode)->player_] = ((Opcodes::PlayerName*)*opcode)->name_;
+					player_names_[((Opcodes::PlayerName*)*opcode)->player_] = new_name;
 					if(!no_old_name)
 					{
-						LobbyChatAppend(old_name + " change name to " + ((Opcodes::PlayerName*)*opcode)->name_);
+						LobbyChatAppend(old_name + " change name to " + new_name);
 					} else
 					{
-						LobbyChatAppend(std::string(((Opcodes::PlayerName*)*opcode)->name_) + " joined the server");
+						LobbyChatAppend(new_name + " joined the server");
 					}
+					//Update players list in very inefficient way - TODO improve!
+					LobbyUpdatePlayerListName(((Opcodes::PlayerName*)*opcode)->player_, new_name);
 				}
 				break;
 			case Opcodes::StateTransition::OPCODE:
@@ -1241,6 +1249,7 @@ void GameStateMachine::ProcessLobby(float _timespan)
 			case Opcodes::ClientDisconnection::OPCODE:
 				{
 					LobbyChatAppend(player_names_[((Opcodes::ClientDisconnection*)*opcode)->client_id_] + " disconnected");
+					LobbyUpdatePlayerListDisconnect(((Opcodes::ClientDisconnection*)*opcode)->client_id_);
 				}
 				break;
 			case Opcodes::KickClient::OPCODE:
@@ -1253,6 +1262,15 @@ void GameStateMachine::ProcessLobby(float _timespan)
 					server_ = NULL;
 					Logger::DiagnosticOut() << "Kicked from server, returning to Server Browser\n";
 					ShowMessageBox(std::string("Kicked:\n") + kick_client_opcode->msg_, boost::bind(&GameStateMachine::DisconnectAcknowledgeCallback, this));
+				}
+				break;
+			case Opcodes::ReadyState::OPCODE:
+				{
+					Opcodes::ReadyState* readiness_opcode = (Opcodes::ReadyState*)*opcode;
+
+					player_readiness_[readiness_opcode->sender_] = readiness_opcode->ready_;
+
+					LobbyUpdatePlayerListStatus(readiness_opcode->sender_, readiness_opcode->ready_);
 				}
 				break;
 			}
@@ -1283,6 +1301,71 @@ void GameStateMachine::LobbyChatAppend(std::string _chat)
 	//TODO limit chat length
 	chat_widget_->SetText(chat_hist_, TextAlignment::BottomLeft);
 }
+void GameStateMachine::LobbyUpdatePlayerListName(int _id, std::string _name)
+{
+	//Remove existing widget and replace, or just add new one if old one not present
+	std::vector<Widget*> players = players_list_widget_->GetChildren();
+	for(std::vector<Widget*>::iterator it = players.begin(); it != players.end(); ++it)
+	{
+		if((*it)->GetTag() == boost::lexical_cast<std::string, int>(_id))
+		{
+			(*it)->Delete();
+			//delete *it;
+		}
+	}
+	Widget* player_name;
+	if(player_readiness_[_id])
+		player_name = new Widget("BlankTagReady.png");
+	else
+		player_name = new Widget("BlankTagNotReady.png");
+	player_name->SetTag(boost::lexical_cast<std::string, int>(_id));
+	player_name->SetTextSize(TextSize::Small);
+	player_name->SetText(_name, TextAlignment::Left);
+	player_name->SetPosition(Vector2i(5, _id * 22 + 14));
+	players_list_widget_->AddChild(player_name);
+}
+
+void GameStateMachine::LobbyUpdatePlayerListStatus(int _id, bool _status)
+{
+	//Remove existing widget and replace, or just add new one if old one not present
+	std::vector<Widget*> players = players_list_widget_->GetChildren();
+	for(std::vector<Widget*>::iterator it = players.begin(); it != players.end(); ++it)
+	{
+		if((*it)->GetTag() == boost::lexical_cast<std::string, int>(_id))
+		{
+			(*it)->Delete();
+			//delete *it;
+		}
+	}
+	if(player_names_.find(_id) != player_names_.end())
+	{
+		Widget* player_name;
+		if(player_readiness_[_id])
+			player_name = new Widget("BlankTagReady.png");
+		else
+			player_name = new Widget("BlankTagNotReady.png");
+		player_name->SetTag(boost::lexical_cast<std::string, int>(_id));
+		player_name->SetTextSize(TextSize::Small);
+		player_name->SetText(player_names_[_id], TextAlignment::Left);
+		player_name->SetPosition(Vector2i(5, _id * 22 + 14));
+		players_list_widget_->AddChild(player_name);
+	}
+}
+
+void GameStateMachine::LobbyUpdatePlayerListDisconnect(int _id)
+{
+	//Remove existing widget and replace, or just add new one if old one not present
+	std::vector<Widget*> players = players_list_widget_->GetChildren();
+	for(std::vector<Widget*>::iterator it = players.begin(); it != players.end(); ++it)
+	{
+		if((*it)->GetTag() == boost::lexical_cast<std::string, int>(_id))
+		{
+			(*it)->Delete();
+			//delete *it;
+		}
+	}
+}
+
 /* Lobby event handling */
 void GameStateMachine::LobbyReturnToBrowser(Widget* _widget)
 {

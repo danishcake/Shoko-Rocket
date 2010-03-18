@@ -34,6 +34,9 @@ namespace Opcodes
 		case KickClient::OPCODE:
 			return sizeof(KickClient) - ServerOpcode::HEADERSIZE;
 			break;
+		case ReadyState::OPCODE:
+			return sizeof(ReadyState) - ServerOpcode::HEADERSIZE;
+			break;
 		default:
 			//TODO warnings here
 			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
@@ -128,6 +131,9 @@ namespace Opcodes
 			break;
 		case KickClient::OPCODE:
 			opcode = new KickClient("");
+			break;
+		case ReadyState::OPCODE:
+			opcode = new ReadyState(false, 0);
 			break;
 		default:
 			//TODO warnings here

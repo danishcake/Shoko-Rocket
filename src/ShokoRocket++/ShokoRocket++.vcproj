@@ -439,6 +439,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Sprites\GUI\Blank120x384.png"
+					>
+				</File>
+				<File
 					RelativePath=".\Sprites\GUI\Blank128x32.png"
 					>
 				</File>
@@ -468,6 +472,22 @@
 				</File>
 				<File
 					RelativePath=".\Sprites\GUI\Blank96x32.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\Blank96x384.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\BlankTag.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\BlankTagNotReady.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\BlankTagReady.png"
 					>
 				</File>
 				<File

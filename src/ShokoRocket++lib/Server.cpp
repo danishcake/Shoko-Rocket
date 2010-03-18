@@ -104,6 +104,8 @@ void Server::ConnectionAccepted(ServerConnection* _connection, boost::system::er
 				{
 					if((*it)->GetPlayerNameSet())
 					{
+						Opcodes::ReadyState* rs = new Opcodes::ReadyState((*it)->GetReady(), (*it)->GetPlayerID());
+						_connection->SendOpcode(rs);
 						Opcodes::PlayerName* pn = new Opcodes::PlayerName((*it)->GetPlayerName(), (*it)->GetPlayerID());
 						pn->time_ = current_time_;
 						_connection->SendOpcode(pn);
@@ -217,10 +219,12 @@ void Server::HandleOpcode(ServerConnection* _connection, int _player_id, Opcodes
 			if(client_ready->ready_)
 			{
 				_connection->SetReady(true);
+				SendOpcodeToAll(new Opcodes::ReadyState(true, _player_id));
 				SendOpcodeToAll(new Opcodes::ChatMessage("Ready!", _player_id));
 			} else
 			{
-				_connection->SetReady(true);
+				_connection->SetReady(false);
+				SendOpcodeToAll(new Opcodes::ReadyState(false, _player_id));
 				SendOpcodeToAll(new Opcodes::ChatMessage("Not ready!", _player_id));
 			}
 		}

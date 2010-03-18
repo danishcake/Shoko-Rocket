@@ -179,12 +179,17 @@ private:
 	Widget* chat_widget_;
 	Widget* ready_widget_;
 	std::string chat_hist_;
+	Widget* players_list_widget_;
+	std::map<int, bool> player_readiness_;
 	/* Lobby methods */
 	void SetupLobby();
 	void ProcessLobby(float _timespan);
 	void TeardownLobby();
 
 	void LobbyChatAppend(std::string _chat);
+	void LobbyUpdatePlayerListName(int _id, std::string _name);
+	void LobbyUpdatePlayerListStatus(int _id, bool _status);
+	void LobbyUpdatePlayerListDisconnect(int _id);
 	/* Lobby event handling */
 	void LobbyReturnToBrowser(Widget* _widget);
 	void LobbyChatEntry(Widget* _widget, KeyPressEventArgs _event_args);

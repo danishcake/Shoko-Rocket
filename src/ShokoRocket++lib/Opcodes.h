@@ -226,6 +226,22 @@ namespace Opcodes
 		char msg_[256];
 	};
 
+	/*
+	 * Client ready status
+	 */
+	struct ReadyState : public ServerOpcode
+	{
+		static const unsigned OPCODE = 10;
+	public:
+		ReadyState(bool _ready, unsigned char _sender)
+		{
+			opcode_ = OPCODE;
+			ready_ = _ready;
+			sender_ = _sender;
+		}
+		bool ready_;
+		unsigned char sender_;
+	};
 
 
 	/*
