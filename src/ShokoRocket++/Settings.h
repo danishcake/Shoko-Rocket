@@ -31,6 +31,7 @@ private:
 	std::string half_arrows_sprite_;
 	std::string arrow_sets_;
 	std::string ring_sprite_;
+	std::string preferred_name_;
 	bool use_gestures_;
 
 public:
@@ -50,6 +51,9 @@ public:
 	
 	static bool GetUseGestures();
 	static void SetUseGestures(bool _use);
+
+	static void SetPreferredName(std::string _name);
+	static std::string GetPreferredName();
 
 	~Settings(void);
 

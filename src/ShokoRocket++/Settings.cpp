@@ -33,6 +33,7 @@ Settings::Settings(void)
 	half_arrows_sprite_ = "HalfArrows.animation";
 	arrow_sets_ = "ArrowSets.animation";
 	ring_sprite_ = "Ring.animation";
+	preferred_name_ = "Chu Chu";
 	use_gestures_ = true;
 
 
@@ -55,6 +56,7 @@ Settings::Settings(void)
 		TiXmlElement* grid_color_a_el = root->FirstChildElement("GridColorA");
 		TiXmlElement* grid_color_b_el = root->FirstChildElement("GridColorB");
 		TiXmlElement* use_gestures_el = root->FirstChildElement("UseGestures");
+		TiXmlElement* preferred_name = root->FirstChildElement("PreferredName");
 
 
 		if(!grid_size || (grid_size->QueryIntAttribute("x", &grid_size_.x) != TIXML_SUCCESS) ||
@@ -96,6 +98,9 @@ Settings::Settings(void)
 
 		if(!arrow_sets_animation || (arrow_sets_animation->QueryValueAttribute("File", &arrow_sets_) != TIXML_SUCCESS))
 			Logger::DiagnosticOut() << "Unable to find or parse ArrowSetsAnimation, defaulting to ArrowSets.animation\n";
+
+		if(!preferred_name || (preferred_name->QueryValueAttribute("Name", &preferred_name_) != TIXML_SUCCESS))
+			Logger::DiagnosticOut() << "Preferred name not found, defaulting to ChuChu\n";
 
 		int r = 247;
 		int g = 215;
@@ -177,6 +182,8 @@ Settings::~Settings(void)
 	TiXmlElement* ring_animation = new TiXmlElement("RingAnimation");
 	ring_animation->SetAttribute("File", ring_sprite_);
 
+	TiXmlElement* preferred_name = new TiXmlElement("PreferredName");
+	preferred_name->SetAttribute("Name", preferred_name_);
 
 	root->LinkEndChild(grid_size);
 	root->LinkEndChild(resolution);
@@ -192,6 +199,7 @@ Settings::~Settings(void)
 	root->LinkEndChild(half_arrows_animation);
 	root->LinkEndChild(arrow_sets_animation);
 	root->LinkEndChild(ring_animation);
+	root->LinkEndChild(preferred_name);
 
 	//TODO save new settings
 	doc.LinkEndChild(root);
@@ -277,4 +285,14 @@ std::string Settings::GetArrowSets()
 std::string Settings::GetRingSprite()
 {
 	return GetInstance().ring_sprite_;
+}
+
+void Settings::SetPreferredName(std::string _name)
+{
+	GetInstance().preferred_name_ = _name;
+}
+
+std::string Settings::GetPreferredName()
+{
+	return GetInstance().preferred_name_;
 }

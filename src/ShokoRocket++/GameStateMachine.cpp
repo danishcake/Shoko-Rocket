@@ -1029,6 +1029,7 @@ void GameStateMachine::ProcessServerBrowser(float _timespan)
 			pend_mode_ = Mode::Lobby;
 			player_names_.clear();
 			player_names_[255] = "Server";
+
 		}
 	}
 }
@@ -1109,6 +1110,7 @@ void GameStateMachine::JoinServerCallback(Widget* _widget)
 	if(!client_)
 	{
 		client_ = new Client();
+		client_->SetName(Settings::GetPreferredName());
 		client_->Connect(ip_area_->GetText(), boost::lexical_cast<unsigned int, std::string>(port_area_->GetText()));
 		join_server_->SetModal(true);
 		join_server_->SetRejectsFocus(true);
@@ -1120,6 +1122,7 @@ void GameStateMachine::StartServerCallback(Widget* _widget)
 	{
 		server_ = new Server();
 		client_ = new Client();
+		client_->SetName(Settings::GetPreferredName());
 		client_->Connect("localhost", 9020);
 		start_server_->SetModal(true);
 		start_server_->SetRejectsFocus(true);
@@ -1138,11 +1141,11 @@ void GameStateMachine::SetupLobby()
 	name_text->SetText("Name:", TextAlignment::Centre);
 	name_text->SetRejectsFocus(true);
 
-	Widget* name = new Widget("Blank364x32.png");
-	name->SetPosition(Vector2i(232, 2));
-	name->SetText("Player", TextAlignment::Centre);
-	name->SetEditable(true);
-	name->OnEditFinish.connect(boost::bind(&GameStateMachine::LobbyNameChange, this, _1));
+	name_widget_ = new Widget("Blank364x32.png");
+	name_widget_->SetPosition(Vector2i(232, 2));
+	name_widget_->SetText(Settings::GetPreferredName(), TextAlignment::Centre);
+	name_widget_->SetEditable(true);
+	name_widget_->OnEditFinish.connect(boost::bind(&GameStateMachine::LobbyNameChange, this, _1));
 
 	chat_widget_ = new Widget("Blank384x384.png");
 	chat_widget_->SetPosition(Vector2i(134, 34));
@@ -1228,6 +1231,7 @@ void GameStateMachine::ProcessLobby(float _timespan)
 					}
 					//Update players list in very inefficient way - TODO improve!
 					LobbyUpdatePlayerListName(((Opcodes::PlayerName*)*opcode)->player_, new_name);
+					name_widget_->SetText(new_name, TextAlignment::Centre);
 				}
 				break;
 			case Opcodes::StateTransition::OPCODE:
@@ -1399,7 +1403,9 @@ void GameStateMachine::LobbyChatEntry(Widget* _widget, KeyPressEventArgs _event_
 
 void GameStateMachine::LobbyNameChange(Widget* _widget)
 {
-	if(client_)	client_->SendOpcode(new Opcodes::SetName(_widget->GetText()));
+	std::string new_name = _widget->GetText();
+	if(client_)	client_->SendOpcode(new Opcodes::SetName(new_name));
+	Settings::SetPreferredName(new_name);
 }
 
 void GameStateMachine::LobbyReadyClick(Widget* _widget)
