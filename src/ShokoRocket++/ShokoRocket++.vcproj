@@ -543,11 +543,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Sprites\GUI\NotReadyButton.png"
+					>
+				</File>
+				<File
 					RelativePath=".\Sprites\GUI\Options.png"
 					>
 				</File>
 				<File
 					RelativePath=".\Sprites\GUI\PortArea.png"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\GUI\ReadyButton.png"
 					>
 				</File>
 				<File

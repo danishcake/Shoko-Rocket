@@ -22,7 +22,8 @@
 /* Consts */
 const float GameStateMachine::sub_mode_widget_transition_time = 0.5f;
 
-GameStateMachine::GameStateMachine()
+GameStateMachine::GameStateMachine() 
+: ready_img_("ReadyButton.png"), not_ready_img_("NotReadyButton.png")
 {
 	mode_timer_ = 0.01f;
 	sub_mode_timer_ = 0;
@@ -1155,10 +1156,10 @@ void GameStateMachine::SetupLobby()
 	chat_entry->SetText("", TextAlignment::Left);
 	chat_entry->OnKeyUp.connect(boost::bind(&GameStateMachine::LobbyChatEntry, this, _1, _2));
 
-	ready_widget_ = new Widget("Blank128x64.png");
+	ready_widget_ = new Widget("NotReadyButton.png");
 	ready_widget_->SetTextSize(TextSize::Small);
 	ready_widget_->SetPosition(Vector2i(2, 68));
-	ready_widget_->SetText("Not Ready", TextAlignment::Centre);
+	ready_widget_->SetText("Ready", TextAlignment::Left);
 	ready_widget_->OnClick.connect(boost::bind(&GameStateMachine::LobbyReadyClick, this, _1));
 
 	players_list_widget_ = new Widget("Blank120x384.png");
@@ -1405,14 +1406,16 @@ void GameStateMachine::LobbyReadyClick(Widget* _widget)
 {
 	if(client_)
 	{
-		if(_widget->GetText() == "Not Ready")
+		if(_widget->GetTag() == "Ready")
 		{
-			_widget->SetText("Ready", TextAlignment::Centre);
-			client_->SendOpcode(new Opcodes::SetReady(true));
+			not_ready_img_.RawBlit(Vector2i(), _widget->GetBackRect());
+			_widget->SetTag("Not Ready");
+			client_->SendOpcode(new Opcodes::SetReady(false));
 		} else
 		{
-			_widget->SetText("Not Ready", TextAlignment::Centre);
-			client_->SendOpcode(new Opcodes::SetReady(false));
+			ready_img_.RawBlit(Vector2i(), _widget->GetBackRect());
+			_widget->SetTag("Ready");
+			client_->SendOpcode(new Opcodes::SetReady(true));
 		}
 	}
 }

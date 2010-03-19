@@ -181,6 +181,8 @@ private:
 	std::string chat_hist_;
 	Widget* players_list_widget_;
 	std::map<int, bool> player_readiness_;
+	BlittableRect ready_img_;
+	BlittableRect not_ready_img_;
 	/* Lobby methods */
 	void SetupLobby();
 	void ProcessLobby(float _timespan);
