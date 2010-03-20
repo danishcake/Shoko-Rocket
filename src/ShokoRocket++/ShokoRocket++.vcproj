@@ -1486,6 +1486,30 @@
 						</FileConfiguration>
 					</File>
 				</Filter>
+				<Filter
+					Name="Multiplayer"
+					>
+					<File
+						RelativePath=".\Levels\Multiplayer\Multiplayer 1.Level"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Multiplayer"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="Level copier"
+								Levelset="Multiplayer"
+							/>
+						</FileConfiguration>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

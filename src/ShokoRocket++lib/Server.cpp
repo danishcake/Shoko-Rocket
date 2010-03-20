@@ -26,6 +26,7 @@ Server::Server(void) : io_(), acceptor_(io_, tcp::endpoint(tcp::v4(), 9020)),
 	work_ = new boost::asio::io_service::work(io_);
 	StartConnection();
 	ingame_ = false;
+	level_ = "Multiplayer/Multiplayer 1.Level";
 }
 
 Server::~Server(void)
@@ -291,7 +292,7 @@ void Server::StartGameCallback(boost::system::error_code _error_code)
 		{
 			ingame_ = true;
 			SendOpcodeToAll(new Opcodes::ChatMessage("Starting game!", Opcodes::ChatMessage::SENDER_SERVER));
-			SendOpcodeToAll(new Opcodes::StateTransition(Opcodes::StateTransition::STATE_GAME, "Multiplayer/Glass.Level"));
+			SendOpcodeToAll(new Opcodes::StateTransition(Opcodes::StateTransition::STATE_GAME, level_));
 		} else
 		{
 			SendOpcodeToAll(new Opcodes::ChatMessage("Start aborted due to players leaving", Opcodes::ChatMessage::SENDER_SERVER));

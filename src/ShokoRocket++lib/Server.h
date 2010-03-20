@@ -54,6 +54,7 @@ protected:
 	unsigned int current_time_;
 	int max_players_;
 	bool ingame_;
+	string level_;
 public:
 	Server(void);
 	~Server(void);
