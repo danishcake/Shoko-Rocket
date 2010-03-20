@@ -31,7 +31,8 @@ namespace StandardTextures
 
 	Animation* mp_arrows[8][5];
 	Animation* mp_half_arrows[8][5];
-	
+	Animation* mp_rockets[8];
+	Animation* mp_spawner;
 
 	void LoadTextures()
 	{
@@ -127,6 +128,7 @@ namespace StandardTextures
 			Logger::ErrorOut() << "Unable to load Arrow Sets animations\n";
 		}
 
+		mp_spawner = SDLTextureManager::GetAnimation("Spawner.animation");
 		hole_animation = SDLTextureManager::GetAnimation(Settings::GetHoleSprite());
 		ring_animation = SDLTextureManager::GetAnimation(Settings::GetRingSprite());
 		arrows_area = SDLTextureManager::GetAnimation("ArrowsArea.animation");
@@ -169,6 +171,10 @@ namespace StandardTextures
 		{
 			Logger::ErrorOut() << "Unable to load exclamation animation\n";
 		}
+		if(!mp_spawner)
+		{
+			Logger::ErrorOut() << "Unable to load exclamation animation\n";
+		}
 
 		AnimationSet* mp_arrow_set = SDLTextureManager::GetAnimationSet("MPArrows.animation");
 		if(mp_arrow_set)
@@ -191,6 +197,20 @@ namespace StandardTextures
 		} else
 		{
 			Logger::ErrorOut() << "Unable to load MPArrows animations\n";
+		}
+
+		AnimationSet* mp_rocket_set = SDLTextureManager::GetAnimationSet("MPRockets.animation");
+		if(mp_rocket_set)
+		{
+			for(int i = 0; i < 8; i++)
+			{
+				mp_rockets[i] = mp_rocket_set->GetAnimation("Rocket" + boost::lexical_cast<std::string, int>(i));
+				if(!mp_rockets[i])
+					Logger::ErrorOut() << "Unable to load MPRocket " << i << "\n";
+			}
+		} else
+		{
+			Logger::ErrorOut() << "Unable to load MPRockets animations\n";
 		}
 
 		//TODO blastoff

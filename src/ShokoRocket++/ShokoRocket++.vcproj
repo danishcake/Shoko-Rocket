@@ -387,6 +387,14 @@
 				Name="Rocket"
 				>
 				<File
+					RelativePath=".\Sprites\MPRockets.animation"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\MPRockets.png"
+					>
+				</File>
+				<File
 					RelativePath=".\Sprites\Rocket.animation"
 					>
 				</File>
@@ -868,6 +876,18 @@
 				</File>
 				<File
 					RelativePath=".\Sprites\WinAnimation.png"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Spawner"
+				>
+				<File
+					RelativePath=".\Sprites\Spawner.animation"
+					>
+				</File>
+				<File
+					RelativePath=".\Sprites\Spawner.png"
 					>
 				</File>
 			</Filter>

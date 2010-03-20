@@ -183,37 +183,40 @@ std::vector<RenderItem> MPLevel::Draw()
 	std::vector<PlayerArrow> player_arrows = world_->GetPlayerArrows();
 	for(std::vector<PlayerArrow>::iterator it = player_arrows.begin(); it != player_arrows.end(); ++it)
 	{
-		//TODO player IDs taken into account
-		RenderItem ri;
-		ri.position_ = it->position;
-		ri.depth = below;
-		if(it->halved)
-			ri.frame_ = StandardTextures::mp_half_arrows[it->player_id][it->direction]->GetCurrentFrame();
-		else
-			ri.frame_ = StandardTextures::mp_arrows[it->player_id][it->direction]->GetCurrentFrame();
-		draw_list.push_back(ri);
+		if(it->player_id >= 0 && it->player_id < 8)
+		{
+			RenderItem ri;
+			ri.position_ = it->position;
+			ri.depth = below;
+			if(it->halved)
+				ri.frame_ = StandardTextures::mp_half_arrows[it->player_id][it->direction]->GetCurrentFrame();
+			else
+				ri.frame_ = StandardTextures::mp_arrows[it->player_id][it->direction]->GetCurrentFrame();
+			draw_list.push_back(ri);
+		}
 	}
 
 	std::vector<PlayerRocket> player_rockets = world_->GetPlayerRockets();
 	for(std::vector<PlayerRocket>::iterator it = player_rockets.begin(); it != player_rockets.end(); ++it)
 	{
-		//TODO player IDs taken into account
-		RenderItem ri;
-		ri.position_ = it->position;
-		ri.depth = below;
-		ri.frame_ = StandardTextures::rocket_normal_animation->GetCurrentFrame();
-		draw_list.push_back(ri);
+		if(it->player_id >= 0 && it->player_id < 8)
+		{
+			RenderItem ri;
+			ri.position_ = it->position;
+			ri.depth = below;
+			ri.frame_ = StandardTextures::mp_rockets[it->player_id]->GetCurrentFrame();
+			draw_list.push_back(ri);
+		}
 	}
 
-	//TODO spawners
 	std::vector<Spawner> spawners = world_->GetSpawners();
-	for(std::vector<PlayerRocket>::iterator it = player_rockets.begin(); it != player_rockets.end(); ++it)
+	for(std::vector<Spawner>::iterator it = spawners.begin(); it != spawners.end(); ++it)
 	{
 		RenderItem ri;
 		ri.position_ = it->position;
 		ri.depth = below;
-		//ri.frame_ = StandardTextures::rocket_normal_animation->GetCurrentFrame();
-		//draw_list.push_back(ri);
+		ri.frame_ = StandardTextures::mp_spawner->GetCurrentFrame();
+		draw_list.push_back(ri);
 	}
 
 	for(int x = 0; x < world_->GetSize().x; x++)
