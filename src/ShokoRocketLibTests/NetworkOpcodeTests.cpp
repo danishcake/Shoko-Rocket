@@ -43,5 +43,5 @@ TEST(SetNameLengthLimited)
 {
 	SetName name("12345678901234567890123456789012" //32 characters
 				 "and then some more");
-	CHECK_EQUAL('\0', name.name_[31]);
+	CHECK_EQUAL('\0', name.name_[29]);
 }

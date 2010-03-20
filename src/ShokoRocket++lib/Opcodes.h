@@ -304,11 +304,11 @@ namespace Opcodes
 			opcode_ = OPCODE;
 			//Construct message carefully
 			std::size_t len = _name.size();
-			len = len > 31 ? 31 : len;
-			memset(&name_, 0, 32);
+			len = len > 29 ? 29 : len;
+			memset(&name_, 0, 30);
 			memcpy(&name_, _name.c_str(), len);
 		}
-		char name_[32];
+		char name_[30];
 	};
 
 	/*

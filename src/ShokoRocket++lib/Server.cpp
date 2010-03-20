@@ -208,9 +208,32 @@ void Server::HandleOpcode(ServerConnection* _connection, int _player_id, Opcodes
 	case Opcodes::SetName::OPCODE:
 		{
 			Opcodes::SetName* client_setname = static_cast<Opcodes::SetName*>(_opcode);
-			Opcodes::PlayerName* msg = new Opcodes::PlayerName(client_setname->name_, _player_id);
+			std::string newname = client_setname->name_;
+
+			for(int i = 0; i < 99; i++)
+			{
+				bool version_ok = true;
+				std::string name = newname;
+				if(i > 0) name = name + boost::lexical_cast<std::string, int>(i);
+				//Find a unique name - 
+				for(std::vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+				{
+					if(*it == _connection || !(*it)->GetConnected())
+						continue;
+					if((*it)->GetPlayerName() == name)
+					{
+						version_ok = false;
+					}
+				}
+				if(version_ok)
+				{
+					newname = name;
+					break;
+				}
+			}
+			Opcodes::PlayerName* msg = new Opcodes::PlayerName(newname, _player_id);
 			SendOpcodeToAll(msg);
-			_connection->SetPlayerName(client_setname->name_);
+			_connection->SetPlayerName(newname);
 		}
 		break;
 	case Opcodes::SetReady::OPCODE:
