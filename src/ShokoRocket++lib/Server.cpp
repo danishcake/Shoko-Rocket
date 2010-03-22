@@ -253,6 +253,12 @@ void Server::HandleOpcode(ServerConnection* _connection, int _player_id, Opcodes
 			}
 		}
 		break;
+	case Opcodes::RequestDownload::OPCODE:
+		{
+			Opcodes::RequestDownload* download_req = static_cast<Opcodes::RequestDownload*>(_opcode);
+			_connection->SendLevelToClient(download_req->level_);
+		}
+		break;
 	}
 }
 

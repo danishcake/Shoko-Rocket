@@ -19,7 +19,7 @@ protected:
 	Vector2f scroll_offset_;
 	Vector2i scroll_limit_;
 public:
-	MPLevel(Vector2f _grid_size, std::string _filename);
+	MPLevel(Vector2f _grid_size, MPWorld* _world);
 	~MPLevel(void);
 
 	void HandleOpcodes(std::vector<Opcodes::ServerOpcode*> _opcodes);

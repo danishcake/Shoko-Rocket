@@ -5,10 +5,10 @@
 #include <boost/foreach.hpp>
 #include "GridTextureCreator.h"
 
-MPLevel::MPLevel(Vector2f _grid_size, std::string _filename)
+MPLevel::MPLevel(Vector2f _grid_size, MPWorld* _world)
 {
 	grid_size_ = _grid_size;
-	world_ = boost::shared_ptr<MPWorld>(new MPWorld(_filename));
+	world_ = boost::shared_ptr<MPWorld>(_world);
 	grid_animation_ = CreateGridTexture(world_, grid_size_);
 }
 

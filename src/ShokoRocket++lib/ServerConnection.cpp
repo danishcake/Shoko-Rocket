@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include "ServerConnection.h"
 #include "Server.h"
+#include <boost/filesystem.hpp>
 
 using std::string;
 
@@ -117,4 +118,35 @@ void ServerConnection::SendOpcode(Opcodes::ServerOpcode* _opcode)
 	memcpy(send_buffer->c_array(), _opcode, bytes_to_send);
 
 	socket_.async_send(boost::asio::buffer(*send_buffer, bytes_to_send), boost::bind(&ServerConnection::WriteFinished, this, boost::asio::placeholders::error, send_buffer));
+}
+
+void ServerConnection::SendLevelToClient(std::string _level_name)
+{
+	//TODO lots of error checking here
+	//unsigned int filesize = boost::filesystem::file_size("Levels/" + _level_name);
+
+	//Read data into a vector
+	std::ifstream file(("Levels/" + _level_name).c_str());
+	if(file.is_open())
+	{
+ 		boost::shared_ptr<std::vector<char> > level_data = boost::shared_ptr<std::vector<char> >(new std::vector<char>());
+
+		file >> std::noskipws; //Turns off whitespace skipping
+		std::copy(std::istream_iterator<char>(file), std::istream_iterator<char>(),
+				  std::back_inserter(*level_data));
+
+		Opcodes::LevelDownload* level_download = new Opcodes::LevelDownload(_level_name, level_data->size());
+		SendOpcode(level_download);
+
+		//Send data to client
+		socket_.async_send(boost::asio::buffer(*level_data), boost::bind(&ServerConnection::WriteLevelFinished, this, boost::asio::placeholders::error, level_data));
+	} else
+	{
+		SendOpcode(new Opcodes::KickClient("Sorry, kicking you as server cannot send you the level for some reason"));
+	}
+}
+
+void ServerConnection::WriteLevelFinished(boost::system::error_code error, boost::shared_ptr<std::vector<char> > _data)
+{
+	Logger::DiagnosticOut() << "ServerConnection: Finished writing level to server, disposing of in memory copy (wrote " << _data->size() << " bytes) \n";
 }

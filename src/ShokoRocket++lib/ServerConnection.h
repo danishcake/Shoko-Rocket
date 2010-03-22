@@ -56,4 +56,9 @@ public:
 	void SetDisconnecting(){disconnecting_ = true;}
 	void SetReady(bool _ready){ready_ = _ready;}
 	bool GetReady(){return ready_;}
+
+	//Sends a level to a client
+	void SendLevelToClient(std::string _level_name);
+
+	void WriteLevelFinished(boost::system::error_code error, boost::shared_ptr<std::vector<char> > _data);
 };

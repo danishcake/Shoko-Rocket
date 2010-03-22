@@ -1169,6 +1169,8 @@ void GameStateMachine::SetupLobby()
 	players_list_widget_->SetTextSize(TextSize::Small);
 	players_list_widget_->SetPosition(Vector2i(134+384+2, 34));
 	players_list_widget_->SetRejectsFocus(true);
+
+	transition_due_ = false;
 }
 
 void GameStateMachine::ProcessLobby(float _timespan)
@@ -1240,14 +1242,50 @@ void GameStateMachine::ProcessLobby(float _timespan)
 					Opcodes::StateTransition* client_state_transition = (Opcodes::StateTransition*)*opcode;
 					if(client_state_transition->state_ == Opcodes::StateTransition::STATE_GAME)
 					{
-						mode_timer_ = 1.0f;
-						FadeInOut(2.0f);
-						pend_mode_ = Mode::Multiplayer;
-						mp_level_ = boost::shared_ptr<MPLevel>(new MPLevel(Settings::GetGridSize(), client_state_transition->level_));
-						if(server_)
+						MPWorld* world = new MPWorld(client_state_transition->level_);
+						if(server_) //Server should always be able to load
 						{
 							server_world_ = new ServerWorld(client_state_transition->level_);
 						}
+						if(!world->GetError())
+						{
+							mp_level_ = boost::shared_ptr<MPLevel>(new MPLevel(Settings::GetGridSize(), world));
+
+							mode_timer_ = 1.0f;
+							FadeInOut(2.0f);
+							pend_mode_ = Mode::Multiplayer;
+						} else
+						{
+							delete world;
+
+							client_->SendOpcode(new Opcodes::RequestDownload(client_state_transition->level_));
+							transition_due_ = true;
+						}
+					}
+				}
+				break;
+			case Opcodes::LevelDownloadData::OPCODE:
+				{
+					//Received a downloaded level, save & transition to game if due
+					Opcodes::LevelDownloadData* level = (Opcodes::LevelDownloadData*)*opcode;
+					std::ofstream out((std::string("Levels/") + std::string(level->level_name_)).c_str());
+					out.write(static_cast<char*>(&level->data_->at(0)), level->data_->size());
+					//std::copy(level->data_->begin(), level->data_->end(), out);
+//					std::copy(std::ostream_iterator<char>(file), std::ostream_iterator<char>(),
+//																 std::back_inserter(level->data_));
+					out.close();
+					if(transition_due_)
+					{				
+						MPWorld* world = new MPWorld(level->level_name_);
+						if(!world->GetError())
+						{
+							mp_level_ = boost::shared_ptr<MPLevel>(new MPLevel(Settings::GetGridSize(), world));
+							mode_timer_ = 1.0f;
+							FadeInOut(2.0f);
+							pend_mode_ = Mode::Multiplayer;
+						} 
+
+						transition_due_ = false;
 					}
 				}
 				break;

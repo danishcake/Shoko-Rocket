@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include "vmath.h"
+#include <boost/shared_ptr.hpp>
+#include <vector>
 using std::string;
 
 namespace Opcodes
@@ -245,6 +247,49 @@ namespace Opcodes
 
 
 	/*
+	 * Level Download
+	 */
+	struct LevelDownload : public ServerOpcode
+	{
+		static const unsigned OPCODE = 11;
+	public:
+		LevelDownload(std::string _level_name, unsigned int _level_size)
+		{
+			opcode_ = OPCODE;
+			std::size_t len = _level_name.size();
+			len = len > 255 ? 255 : len;
+			memset(&level_name_, 0, 256);
+			memcpy(&level_name_, _level_name.c_str(), len);		
+			level_size_ = _level_size;
+		}
+		unsigned int level_size_;
+		char level_name_[256];
+		//At the end of sending this send the level data too
+	};
+	/*
+	 * Level Download(extended)
+	 * Included received level data
+	 */
+	struct LevelDownloadData : public ServerOpcode
+	{
+		static const unsigned OPCODE = 11;
+	public:
+		LevelDownloadData(std::string _level_name, boost::shared_ptr<std::vector<char> > _data)
+		{
+			opcode_ = OPCODE;
+			std::size_t len = _level_name.size();
+			len = len > 255 ? 255 : len;
+			memset(&level_name_, 0, 256);
+			memcpy(&level_name_, _level_name.c_str(), len);		
+			data_ = _data;
+		}
+		boost::shared_ptr<std::vector<char> > data_;
+		char level_name_[256];
+		//At the end of sending this send the level data too
+	};
+
+
+	/*
 	 * Messages sent from client to server
 	 */
 	struct ClientOpcode
@@ -345,6 +390,24 @@ namespace Opcodes
 			ready_ = _ready;
 		}
 		bool ready_;
+	};
+
+	/* 
+	 * Asks the server to send the named level
+	 */
+	struct RequestDownload : public ClientOpcode
+	{
+		static const unsigned char OPCODE = 6;
+	public:
+		RequestDownload(std::string _level)
+		{
+			opcode_ = OPCODE;
+			std::size_t len = _level.size();
+			len = len > 255 ? 255 : len;
+			memset(&level_, 0, 256);
+			memcpy(&level_, _level.c_str(), len);		
+		}
+		char level_[256];
 	};
 
 	unsigned int GetBodySize(ServerOpcode* _header);

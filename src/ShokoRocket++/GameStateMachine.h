@@ -184,6 +184,7 @@ private:
 	std::map<int, bool> player_readiness_;
 	BlittableRect ready_img_;
 	BlittableRect not_ready_img_;
+	bool transition_due_;
 
 	/* Lobby methods */
 	void SetupLobby();

@@ -53,6 +53,7 @@ protected:
 	void ConnectHandler(const boost::system::error_code& error);
 	void ReadHeaderFinished(boost::system::error_code error, CBuffer_ptr _read_buffer);
 	void ReadBodyFinished(boost::system::error_code error, CBuffer_ptr _read_buffer);
+	void ReadLevelFinished(boost::system::error_code error, boost::shared_ptr<std::vector<char> > _level_data, std::string _filename);
 	void WriteFinished(boost::system::error_code error, boost::shared_ptr<Opcodes::ClientOpcode> _data);
 
 	bool closing_;

@@ -37,6 +37,9 @@ namespace Opcodes
 		case ReadyState::OPCODE:
 			return sizeof(ReadyState) - ServerOpcode::HEADERSIZE;
 			break;
+		case LevelDownload::OPCODE:
+			return sizeof(LevelDownload) - ServerOpcode::HEADERSIZE;
+			break;
 		default:
 			//TODO warnings here
 			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
@@ -63,6 +66,9 @@ namespace Opcodes
 			break;
 		case SetReady::OPCODE:
 			return sizeof(SetReady) - ClientOpcode::HEADERSIZE;
+			break;
+		case RequestDownload::OPCODE:
+			return sizeof(RequestDownload) - ClientOpcode::HEADERSIZE;
 			break;
 		default:
 			//TODO warnings here
@@ -91,6 +97,9 @@ namespace Opcodes
 			break;
 		case SetReady::OPCODE:
 			opcode = new SetReady(false);
+			break;
+		case RequestDownload::OPCODE:
+			opcode = new RequestDownload("");
 			break;
 		default:
 			//TODO warnings here
@@ -134,6 +143,9 @@ namespace Opcodes
 			break;
 		case ReadyState::OPCODE:
 			opcode = new ReadyState(false, 0);
+			break;
+		case LevelDownload::OPCODE:
+			opcode = new LevelDownload("", 0);
 			break;
 		default:
 			//TODO warnings here
