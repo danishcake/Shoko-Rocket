@@ -17,6 +17,7 @@
 #include "Server.h"
 #include "MPLevel.h"
 #include "ServerWorld.h"
+#include <FilesystemHelpers.h>
 
 
 /* Consts */
@@ -1268,6 +1269,7 @@ void GameStateMachine::ProcessLobby(float _timespan)
 				{
 					//Received a downloaded level, save & transition to game if due
 					Opcodes::LevelDownloadData* level = (Opcodes::LevelDownloadData*)*opcode;
+					FilesystemHelpers::EnsureFolderPresent(std::string("Levels/") + std::string(level->level_name_));
 					std::ofstream out((std::string("Levels/") + std::string(level->level_name_)).c_str());
 					out.write(static_cast<char*>(&level->data_->at(0)), level->data_->size());
 					//std::copy(level->data_->begin(), level->data_->end(), out);
