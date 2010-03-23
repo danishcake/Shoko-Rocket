@@ -57,11 +57,21 @@ namespace
 AnimationFrame* SDLTextureManager::AcquireResource(Vector2i _offset, Vector2i _size, string _filename, float _time, Vector2i _frame_offset)
 {
 	static int sample_count = 0;
-	SDL_Surface* whole_surface = IMG_Load(("Animations/" + _filename).c_str());
-	/* This should ensure the BPP match */
-	SDL_Surface* converted_whole_surface = SDL_DisplayFormatAlpha(whole_surface);
-	SDL_FreeSurface(whole_surface);
-	whole_surface = NULL;
+
+	SDL_Surface* converted_whole_surface;
+	//Finds texture in cache, or adds it in and then returns it
+	if(surface_cache_.find(_filename) != surface_cache_.end())
+	{
+		converted_whole_surface = surface_cache_[_filename];
+	} else
+	{
+		SDL_Surface* whole_surface = IMG_Load(("Animations/" + _filename).c_str());
+		/* This should ensure the BPP match */
+		converted_whole_surface = SDL_DisplayFormatAlpha(whole_surface);
+		SDL_FreeSurface(whole_surface);
+		whole_surface = NULL;
+		surface_cache_[_filename] = converted_whole_surface;
+	}
 
 	SDL_Surface* sampled_area = SDL_CreateRGBSurface(surface_flags_, _size.x, _size.y, depth_, rmask, gmask, bmask, amask);
 	SDL_Surface* converted_sample = SDL_DisplayFormatAlpha(sampled_area);
@@ -79,7 +89,15 @@ AnimationFrame* SDLTextureManager::AcquireResource(Vector2i _offset, Vector2i _s
 	
 	
 	SDL_FreeSurface(sampled_area);
-	SDL_FreeSurface(whole_surface);
 	SDLAnimationFrame* frame = new SDLAnimationFrame((int)(converted_sample), _time, _frame_offset, converted_sample);
 	return frame;
+}
+
+void SDLTextureManager::InternalClearCache()
+{
+	for(std::map<std::string, SDL_Surface*>::iterator it = surface_cache_.begin(); it != surface_cache_.end(); ++it)
+	{
+		SDL_FreeSurface(it->second);
+	}
+	surface_cache_.clear();
 }

@@ -137,3 +137,7 @@ AnimationFrame* TextureManager::AcquireResource(Vector2i /*_offset*/, Vector2i /
 	//Nothing done, override in SDL/OpenGL implementations
 	return new AnimationFrame(-1, _time, _frame_offset);
 }
+void TextureManager::InternalClearCache()
+{
+	//Nothing done, override in SDL/OpenGL implementations
+}

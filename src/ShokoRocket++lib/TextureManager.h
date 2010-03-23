@@ -14,6 +14,13 @@ private:
 	static TextureManager* instance_;
 	static TextureManager* GetInstance();
 	static AnimationSet* AddAnimationSet(std::string _xml_animation_set);
+
+	/* To be overriden in implementing classes (SDL/OpenGL/DirectX) */
+	/* Should return an ID that can be used to find resource */
+	virtual AnimationFrame* AcquireResource(Vector2i _offset, Vector2i _size, std::string _filename, float _time, Vector2i _frame_offset);
+	/* To be overriden in implementing classes (SDL/OpenGL/DirectX) */
+	/* Should clear any cache used while loading, but not invalidate the actual loaded textures */
+	virtual void InternalClearCache();
 public:
 	
 	static AnimationSet* GetAnimationSet(std::string _xml_animation_set);
@@ -21,7 +28,5 @@ public:
 
 	static void SetTextureManager(TextureManager* _instance){instance_ = _instance;}
 	static void Release();
-	/* To be overriden in implementing classes (SDL/OpenGL/DirectX) */
-	/* Should return an ID that can be used to find resource */
-	virtual AnimationFrame* AcquireResource(Vector2i _offset, Vector2i _size, std::string _filename, float _time, Vector2i _frame_offset);
+	static void ReleaseCache(){GetInstance()->InternalClearCache();}
 };

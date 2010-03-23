@@ -214,6 +214,8 @@ namespace StandardTextures
 		}
 
 		//TODO blastoff
+
+//		TextureManager::GetInstance()->ClearCache();
 	}
 
 	void TickAnimations(float _dt)
