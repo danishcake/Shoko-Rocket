@@ -2,6 +2,14 @@
 #include "MPWorld.h"
 #include "Opcodes.h"
 
+namespace ServerGameState
+{
+	enum Enum
+	{
+		WaitingForClients, Running, Scores
+	};
+}
+
 class ServerWorld : public MPWorld
 {
 protected:
@@ -13,11 +21,14 @@ protected:
 
 	int CountArrows(int _player_id);
 	int arrow_limit_;
-
+	int player_count_;
+	int players_ready_;
+	double time_run_;
+	ServerGameState::Enum server_game_state_;
 public:
 	//Constructors
-	ServerWorld();
-	ServerWorld(string _filename);
+	ServerWorld(int _player_count);
+	ServerWorld(string _filename, int _player_count);
 
 	//Update cat & mouse positions
 	virtual WorldState::Enum Tick(float _dt);

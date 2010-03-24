@@ -4,14 +4,24 @@
 #include "Logger.h"
 
 
-ServerWorld::ServerWorld() : MPWorld()
+ServerWorld::ServerWorld(int _player_count) : MPWorld()
 {
 	arrow_limit_ = 3;
+	player_count_ = _player_count;
+	if(player_count_ == 0) //Unit tests are run with zero players
+		server_game_state_ = ServerGameState::Running;
+	else
+		server_game_state_ = ServerGameState::WaitingForClients;
 }
 
-ServerWorld::ServerWorld(string _filename) : MPWorld(_filename)
+ServerWorld::ServerWorld(string _filename, int _player_count) : MPWorld(_filename)
 {
 	arrow_limit_ = 3;
+	player_count_ = _player_count;
+	if(player_count_ == 0)
+		server_game_state_ = ServerGameState::Running;
+	else
+	server_game_state_ = ServerGameState::WaitingForClients;
 }
 
 WorldState::Enum ServerWorld::Tick(float _dt)
@@ -20,63 +30,65 @@ WorldState::Enum ServerWorld::Tick(float _dt)
 	const float max_dt = 0.1f;
 	int full_iterations = floor(_dt/max_dt);
 	float last_iteration = _dt - full_iterations * max_dt;
-
-	for(int i = 0; i < full_iterations + 1; i++)
+	if(server_game_state_ == ServerGameState::Running)
 	{
-		float dt;
-		if(i == full_iterations)
-			dt = last_iteration;
-		else
-			dt = max_dt;
-		if(dt <= 0)
-			continue;
-		if(state_ == WorldState::OK)
+		for(int i = 0; i < full_iterations + 1; i++)
 		{
-			//Walk forward
-			for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
+			float dt;
+			if(i == full_iterations)
+				dt = last_iteration;
+			else
+				dt = max_dt;
+			if(dt <= 0)
+				continue;
+			time_run_ += dt;
+			if(state_ == WorldState::OK)
 			{
-				(*it)->Advance(dt);
-			}
-			for(vector<Walker*>::iterator it = cats_.begin(); it != cats_.end(); ++it)
-			{
-				(*it)->Advance(dt);
-			}
-			//Collide cats and mice
-			for(vector<Walker*>::iterator m_it = mice_.begin(); m_it != mice_.end(); ++m_it)
-			{
-				for(vector<Walker*>::iterator c_it = cats_.begin(); c_it != cats_.end(); ++c_it)
+				//Walk forward
+				for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
 				{
-					if(GetShortestDistance((*m_it)->GetPosition(), (*c_it)->GetPosition(), size_) < 0.3333f)
-					//if(((*m_it)->GetPosition() - (*c_it)->GetPosition()).length() < 0.3333f)
+					(*it)->Advance(dt);
+				}
+				for(vector<Walker*>::iterator it = cats_.begin(); it != cats_.end(); ++it)
+				{
+					(*it)->Advance(dt);
+				}
+				//Collide cats and mice
+				for(vector<Walker*>::iterator m_it = mice_.begin(); m_it != mice_.end(); ++m_it)
+				{
+					for(vector<Walker*>::iterator c_it = cats_.begin(); c_it != cats_.end(); ++c_it)
 					{
-						if(std::find(just_dead_mice_.begin(), just_dead_mice_.end(), *m_it) == just_dead_mice_.end())
+						if(GetShortestDistance((*m_it)->GetPosition(), (*c_it)->GetPosition(), size_) < 0.3333f)
 						{
-							just_dead_mice_.push_back(*m_it);
-							(*m_it)->Kill();
-							(*c_it)->SetProblem(true);
-							state_ = WorldState::Defeat;
+							if(std::find(just_dead_mice_.begin(), just_dead_mice_.end(), *m_it) == just_dead_mice_.end())
+							{
+								just_dead_mice_.push_back(*m_it);
+								(*m_it)->Kill();
+								(*c_it)->SetProblem(true);
+								state_ = WorldState::Defeat;
+							}
 						}
 					}
+				}	
+				//Remove cats and mice that have just died, from holes, rockets and cats etc
+				for(vector<Walker*>::iterator it = just_dead_mice_.begin(); it != just_dead_mice_.end(); ++it)
+				{
+					mice_.erase(std::remove(mice_.begin(), mice_.end(), *it), mice_.end());
+					(*it)->SetProblem(true);
+					dead_mice_.push_back(*it);
 				}
-			}	
-			//Remove cats and mice that have just died, from holes, rockets and cats etc
-			for(vector<Walker*>::iterator it = just_dead_mice_.begin(); it != just_dead_mice_.end(); ++it)
-			{
-				mice_.erase(std::remove(mice_.begin(), mice_.end(), *it), mice_.end());
-				(*it)->SetProblem(true);
-				dead_mice_.push_back(*it);
+				just_dead_mice_.clear();
+				for(vector<Walker*>::iterator it = just_dead_cats_.begin(); it != just_dead_cats_.end(); ++it)
+				{
+					cats_.erase(std::remove(cats_.begin(), cats_.end(), *it), cats_.end());
+					dead_cats_.push_back(*it);
+				}
+				just_dead_cats_.clear();
+				//TODO scoring
 			}
-			just_dead_mice_.clear();
-			for(vector<Walker*>::iterator it = just_dead_cats_.begin(); it != just_dead_cats_.end(); ++it)
-			{
-				cats_.erase(std::remove(cats_.begin(), cats_.end(), *it), cats_.end());
-				dead_cats_.push_back(*it);
-			}
-			just_dead_cats_.clear();
-			//TODO scoring
 		}
+		BaseWorld::Tick(_dt);
 	}
-	BaseWorld::Tick(_dt);
 
 	return state_;
 }
@@ -195,6 +207,13 @@ void ServerWorld::HandleOpcodes(vector<vector<Opcodes::ClientOpcode*> > _opcodes
 				break;
 			case Opcodes::UpdateCursor::OPCODE:
 				break;
+			case Opcodes::LoadComplete::OPCODE:
+				players_ready_++;
+				if(players_ready_ >= player_count_)
+				{
+					server_game_state_ = ServerGameState::Running;
+				}
+				break;
 			}
 			delete *opcode_it;
 		}
@@ -234,12 +253,14 @@ void ServerWorld::GenerateArrowOpcode(int _player_id, Vector2i _position, Direct
 		break;
 	}
 	Opcodes::ArrowSpawn* opcode = new Opcodes::ArrowSpawn(as, _position, d, _player_id);
+	opcode->time_ = static_cast<unsigned int>(time_run_ * 1000);
 	opcodes_to_clients_.push_back(opcode);
 }
 
 void ServerWorld::GenerateWalkerDeath(int _uid, Vector2f _position, bool _death)
 {
 	Opcodes::KillWalker* opcode = new Opcodes::KillWalker(_position, _uid, _death);
+	opcode->time_ = static_cast<unsigned int>(time_run_ * 1000);
 	opcodes_to_clients_.push_back(opcode);
 }
 
@@ -254,106 +275,109 @@ void ServerWorld::HandleInputOpcode(int _player_id, Opcodes::SendInput* _input)
 
 	//If arrow is one of mine then clear if same direction, rotate if different.
 	//Otherwise no action, space taken
-	switch(_input->action_)
+	if(server_game_state_ == ServerGameState::Running)
 	{
-	case Opcodes::SendInput::ACT_NORTH:
-		if(arrow_present)
+		switch(_input->action_)
 		{
-			if(arrow.player_id == _player_id)
+		case Opcodes::SendInput::ACT_NORTH:
+			if(arrow_present)
 			{
-				if(arrow.direction == Direction::North) //Clear
+				if(arrow.player_id == _player_id)
+				{
+					if(arrow.direction == Direction::North) //Clear
+					{
+						SetPlayerArrow(_input->position_, Direction::Stopped, -1, PlayerArrowLevel::Clear);
+						GenerateArrowOpcode(_player_id, _input->position_, Direction::Stopped, PlayerArrowLevel::Clear);
+					}
+					else //Replace
+					{
+						SetPlayerArrow(_input->position_, Direction::North, _player_id, PlayerArrowLevel::FullArrow);
+						GenerateArrowOpcode(_player_id, _input->position_, Direction::North, PlayerArrowLevel::FullArrow);
+					}
+				}
+			} else if(CountArrows(_player_id) < arrow_limit_)
+			{//New arrow
+				SetPlayerArrow(_input->position_, Direction::North, _player_id, PlayerArrowLevel::FullArrow);
+				GenerateArrowOpcode(_player_id, _input->position_, Direction::North, PlayerArrowLevel::FullArrow);
+			}
+			break;
+		case Opcodes::SendInput::ACT_SOUTH:
+			if(arrow_present)
+			{
+				if(arrow.player_id == _player_id)
+				{
+					if(arrow.direction == Direction::South) //Clear
+					{
+						SetPlayerArrow(_input->position_, Direction::Stopped, -1, PlayerArrowLevel::Clear);
+						GenerateArrowOpcode(_player_id, _input->position_, Direction::Stopped, PlayerArrowLevel::Clear);
+					}
+					else //Replace
+					{
+						SetPlayerArrow(_input->position_, Direction::South, _player_id, PlayerArrowLevel::FullArrow);
+						GenerateArrowOpcode(_player_id, _input->position_, Direction::South, PlayerArrowLevel::FullArrow);
+					}
+				}
+			} else if(CountArrows(_player_id) < arrow_limit_)
+			{//New arrow
+				SetPlayerArrow(_input->position_, Direction::South, _player_id, PlayerArrowLevel::FullArrow);
+				GenerateArrowOpcode(_player_id, _input->position_, Direction::South, PlayerArrowLevel::FullArrow);
+			}
+			break;
+		case Opcodes::SendInput::ACT_EAST:
+			if(arrow_present)
+			{
+				if(arrow.player_id == _player_id)
+				{
+					if(arrow.direction == Direction::East) //Clear
+					{
+						SetPlayerArrow(_input->position_, Direction::Stopped, -1, PlayerArrowLevel::Clear);
+						GenerateArrowOpcode(_player_id, _input->position_, Direction::Stopped, PlayerArrowLevel::Clear);
+					}
+					else //Replace
+					{
+						SetPlayerArrow(_input->position_, Direction::East, _player_id, PlayerArrowLevel::FullArrow);
+						GenerateArrowOpcode(_player_id, _input->position_, Direction::East, PlayerArrowLevel::FullArrow);
+					}
+				}
+			} else if(CountArrows(_player_id) < arrow_limit_)
+			{//New arrow
+				SetPlayerArrow(_input->position_, Direction::East, _player_id, PlayerArrowLevel::FullArrow);
+				GenerateArrowOpcode(_player_id, _input->position_, Direction::East, PlayerArrowLevel::FullArrow);
+			}
+			break;
+		case Opcodes::SendInput::ACT_WEST:
+			if(arrow_present)
+			{
+				if(arrow.player_id == _player_id)
+				{
+					if(arrow.direction == Direction::West) //Clear
+					{
+						SetPlayerArrow(_input->position_, Direction::Stopped, -1, PlayerArrowLevel::Clear);
+						GenerateArrowOpcode(_player_id, _input->position_, Direction::Stopped, PlayerArrowLevel::Clear);
+					}
+					else //Replace
+					{
+						SetPlayerArrow(_input->position_, Direction::West, _player_id, PlayerArrowLevel::FullArrow);
+						GenerateArrowOpcode(_player_id, _input->position_, Direction::West, PlayerArrowLevel::FullArrow);
+					}
+				}
+			} else if(CountArrows(_player_id) < arrow_limit_)
+			{//New arrow
+				SetPlayerArrow(_input->position_, Direction::West, _player_id, PlayerArrowLevel::FullArrow);
+				GenerateArrowOpcode(_player_id, _input->position_, Direction::West, PlayerArrowLevel::FullArrow);
+			}
+			break;
+		case Opcodes::SendInput::ACT_CLEAR:
+			if(arrow_present)
+			{
+				if(arrow.player_id == _player_id)
 				{
 					SetPlayerArrow(_input->position_, Direction::Stopped, -1, PlayerArrowLevel::Clear);
 					GenerateArrowOpcode(_player_id, _input->position_, Direction::Stopped, PlayerArrowLevel::Clear);
 				}
-				else //Replace
-				{
-					SetPlayerArrow(_input->position_, Direction::North, _player_id, PlayerArrowLevel::FullArrow);
-					GenerateArrowOpcode(_player_id, _input->position_, Direction::North, PlayerArrowLevel::FullArrow);
-				}
 			}
-		} else if(CountArrows(_player_id) < arrow_limit_)
-		{//New arrow
-			SetPlayerArrow(_input->position_, Direction::North, _player_id, PlayerArrowLevel::FullArrow);
-			GenerateArrowOpcode(_player_id, _input->position_, Direction::North, PlayerArrowLevel::FullArrow);
+			break;
 		}
-		break;
-	case Opcodes::SendInput::ACT_SOUTH:
-		if(arrow_present)
-		{
-			if(arrow.player_id == _player_id)
-			{
-				if(arrow.direction == Direction::South) //Clear
-				{
-					SetPlayerArrow(_input->position_, Direction::Stopped, -1, PlayerArrowLevel::Clear);
-					GenerateArrowOpcode(_player_id, _input->position_, Direction::Stopped, PlayerArrowLevel::Clear);
-				}
-				else //Replace
-				{
-					SetPlayerArrow(_input->position_, Direction::South, _player_id, PlayerArrowLevel::FullArrow);
-					GenerateArrowOpcode(_player_id, _input->position_, Direction::South, PlayerArrowLevel::FullArrow);
-				}
-			}
-		} else if(CountArrows(_player_id) < arrow_limit_)
-		{//New arrow
-			SetPlayerArrow(_input->position_, Direction::South, _player_id, PlayerArrowLevel::FullArrow);
-			GenerateArrowOpcode(_player_id, _input->position_, Direction::South, PlayerArrowLevel::FullArrow);
-		}
-		break;
-	case Opcodes::SendInput::ACT_EAST:
-		if(arrow_present)
-		{
-			if(arrow.player_id == _player_id)
-			{
-				if(arrow.direction == Direction::East) //Clear
-				{
-					SetPlayerArrow(_input->position_, Direction::Stopped, -1, PlayerArrowLevel::Clear);
-					GenerateArrowOpcode(_player_id, _input->position_, Direction::Stopped, PlayerArrowLevel::Clear);
-				}
-				else //Replace
-				{
-					SetPlayerArrow(_input->position_, Direction::East, _player_id, PlayerArrowLevel::FullArrow);
-					GenerateArrowOpcode(_player_id, _input->position_, Direction::East, PlayerArrowLevel::FullArrow);
-				}
-			}
-		} else if(CountArrows(_player_id) < arrow_limit_)
-		{//New arrow
-			SetPlayerArrow(_input->position_, Direction::East, _player_id, PlayerArrowLevel::FullArrow);
-			GenerateArrowOpcode(_player_id, _input->position_, Direction::East, PlayerArrowLevel::FullArrow);
-		}
-		break;
-	case Opcodes::SendInput::ACT_WEST:
-		if(arrow_present)
-		{
-			if(arrow.player_id == _player_id)
-			{
-				if(arrow.direction == Direction::West) //Clear
-				{
-					SetPlayerArrow(_input->position_, Direction::Stopped, -1, PlayerArrowLevel::Clear);
-					GenerateArrowOpcode(_player_id, _input->position_, Direction::Stopped, PlayerArrowLevel::Clear);
-				}
-				else //Replace
-				{
-					SetPlayerArrow(_input->position_, Direction::West, _player_id, PlayerArrowLevel::FullArrow);
-					GenerateArrowOpcode(_player_id, _input->position_, Direction::West, PlayerArrowLevel::FullArrow);
-				}
-			}
-		} else if(CountArrows(_player_id) < arrow_limit_)
-		{//New arrow
-			SetPlayerArrow(_input->position_, Direction::West, _player_id, PlayerArrowLevel::FullArrow);
-			GenerateArrowOpcode(_player_id, _input->position_, Direction::West, PlayerArrowLevel::FullArrow);
-		}
-		break;
-	case Opcodes::SendInput::ACT_CLEAR:
-		if(arrow_present)
-		{
-			if(arrow.player_id == _player_id)
-			{
-				SetPlayerArrow(_input->position_, Direction::Stopped, -1, PlayerArrowLevel::Clear);
-				GenerateArrowOpcode(_player_id, _input->position_, Direction::Stopped, PlayerArrowLevel::Clear);
-			}
-		}
-		break;
 	}
 }
 

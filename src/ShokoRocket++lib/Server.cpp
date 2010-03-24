@@ -314,3 +314,9 @@ void Server::StartGameCallback(boost::system::error_code _error_code)
 		SendOpcodeToAll(new Opcodes::ChatMessage("Starting in " + boost::lexical_cast<string, int>(start_counter_), Opcodes::ChatMessage::SENDER_SERVER));
 	}
 }
+
+
+int Server::GetPlayerCount()
+{
+	return players_count_;
+}

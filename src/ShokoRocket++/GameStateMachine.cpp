@@ -1246,7 +1246,7 @@ void GameStateMachine::ProcessLobby(float _timespan)
 						MPWorld* world = new MPWorld(client_state_transition->level_);
 						if(server_) //Server should always be able to load
 						{
-							server_world_ = new ServerWorld(client_state_transition->level_);
+							server_world_ = new ServerWorld(client_state_transition->level_, server_->GetPlayerCount());
 						}
 						if(!world->GetError())
 						{
@@ -1469,6 +1469,8 @@ void GameStateMachine::LobbyReadyClick(Widget* _widget)
 void GameStateMachine::SetupMultiplayer()
 {
 	CreateRenderArea(mp_level_->GetLevelSize(), Mode::Multiplayer);
+	if(client_)
+		client_->SendOpcode(new Opcodes::LoadComplete());
 }
 
 void GameStateMachine::ProcessMultiplayer(float _timespan)

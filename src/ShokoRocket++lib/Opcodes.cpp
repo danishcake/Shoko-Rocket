@@ -70,6 +70,9 @@ namespace Opcodes
 		case RequestDownload::OPCODE:
 			return sizeof(RequestDownload) - ClientOpcode::HEADERSIZE;
 			break;
+		case LoadComplete::OPCODE:
+			return sizeof(LoadComplete) - ClientOpcode::HEADERSIZE;
+			break;
 		default:
 			//TODO warnings here
 			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
@@ -100,6 +103,9 @@ namespace Opcodes
 			break;
 		case RequestDownload::OPCODE:
 			opcode = new RequestDownload("");
+			break;
+		case LoadComplete::OPCODE:
+			opcode = new LoadComplete();
 			break;
 		default:
 			//TODO warnings here

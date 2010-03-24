@@ -108,14 +108,14 @@ TEST(ClientGetsServerWelcome)
 
 TEST(ServerWorld)
 {
-	ServerWorld* sworld = new ServerWorld();
+	ServerWorld* sworld = new ServerWorld(0);
 
 	delete sworld;
 }
 
 TEST(ServerWorldCollidesMiceAndCatsAndHolesAndRockets)
 {
-	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level");
+	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level", 0);
 	CHECK_EQUAL(false, sworld->GetError());
 	sworld->AddMouse(Vector2i(0, 1), Direction::North); //Hits hole 
 	sworld->AddMouse(Vector2i(4, 2), Direction::South); //Hits rocket
@@ -148,7 +148,7 @@ TEST(ServerWorldCollidesMiceAndCatsAndHolesAndRockets)
 
 TEST(ServerWorldCollidesMiceAndCatsWithArrows)
 {
-	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level");
+	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level", 0);
 	CHECK_EQUAL(false, sworld->GetError());
 
 	sworld->AddMouse(Vector2i(1,0), Direction::East);
@@ -165,7 +165,7 @@ TEST(ServerWorldCollidesMiceAndCatsWithArrows)
 
 TEST(ServerHandlesOpcodeInput)
 {
-	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level");
+	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level", 0);
 	vector<vector<Opcodes::ClientOpcode*> > opcodes;
 	//Place an arrow
 	opcodes.push_back(vector<Opcodes::ClientOpcode*>());
@@ -233,7 +233,7 @@ TEST(ServerHandlesOpcodeInput)
 
 TEST(ServerGeneratesResponseOpcodesToArrowInput)
 {
-	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level");
+	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level", 0);
 	vector<vector<Opcodes::ClientOpcode*> > opcodes;
 	//Place an arrow
 	opcodes.push_back(vector<Opcodes::ClientOpcode*>());
@@ -260,7 +260,7 @@ TEST(ServerGeneratesResponseOpcodesToArrowInput)
 
 TEST(ServerGeneratesResponseOpcodesToCollisions)
 {
-	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level");
+	ServerWorld* sworld = new ServerWorld("ServerWorldCollisions.Level", 0);
 
 	sworld->AddMouse(Vector2i(0, 1), Direction::North); //Hits hole 
 	sworld->AddMouse(Vector2i(4, 2), Direction::South); //Hits rocket

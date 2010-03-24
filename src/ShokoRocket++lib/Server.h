@@ -72,4 +72,5 @@ public:
 	boost::mutex& GetMutex(){return mutex_;}
 
 	vector<vector<Opcodes::ClientOpcode*> > GetOpcodes();
+	int GetPlayerCount();
 };

@@ -410,6 +410,19 @@ namespace Opcodes
 		char level_[256];
 	};
 
+	/* 
+	 * Informs server that loading is complete
+	 */
+	struct LoadComplete : public ClientOpcode
+	{
+		static const unsigned char OPCODE = 7;
+	public:
+		LoadComplete()
+		{
+			opcode_ = OPCODE;
+		}
+	};
+
 	unsigned int GetBodySize(ServerOpcode* _header);
 	unsigned int GetBodySize(ClientOpcode* _header);
 	ServerOpcode* GetServerOpcode(ServerOpcode* _header);
