@@ -50,6 +50,8 @@ protected:
 	static vector<Widget*> pending_all_;
 	static bool event_lock_;
 
+	static Vector2i mouse_position_;
+
 	bool invalidated_;
 	bool rejects_focus_;
 	bool hides_highlight_; //For item browser widget to prevent background turning blue
@@ -66,6 +68,7 @@ protected:
 	static float screen_fade_;
 	static BlittableRect* screen_fade_rect_;
 	static BlittableRect* edit_cursor_rect_;
+	static BlittableRect* mouse_cursor_rect_;
 
 	static double sum_time_;
 	void InsertPending();

@@ -794,6 +794,38 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="Cursors"
+					>
+					<File
+						RelativePath=".\Sprites\GUI\Cursor0.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Cursor1.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Cursor2.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Cursor3.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Cursor4.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Cursor6.png"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\GUI\Cursor7.png"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Arrows"

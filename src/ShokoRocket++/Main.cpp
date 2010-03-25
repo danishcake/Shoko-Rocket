@@ -22,6 +22,7 @@ SDL_Surface* SDL_init()
 	SDL_Init(SDL_INIT_VIDEO);
 	Vector2i resolution = Settings::GetResolution();
 	SDL_Surface* p_surface = SDL_SetVideoMode(resolution.x, resolution.y, 32, SDL_HWSURFACE | SDL_DOUBLEBUF | (Settings::GetFullScreen() ? SDL_FULLSCREEN : 0));
+	SDL_ShowCursor(0);
 	if(!p_surface)
 	{
 		Logger::ErrorOut() << "Unable to create screen surface, aborting\n";

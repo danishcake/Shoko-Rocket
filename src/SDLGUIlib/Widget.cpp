@@ -23,7 +23,10 @@ vector<Widget*> Widget::pending_all_ = vector<Widget*>();
 float Widget::screen_fade_ = 0.0f;
 BlittableRect* Widget::screen_fade_rect_ = NULL;
 BlittableRect* Widget::edit_cursor_rect_ = NULL;
+BlittableRect* Widget::mouse_cursor_rect_ = NULL;
 double Widget::sum_time_ = 0;
+
+Vector2i Widget::mouse_position_ = Vector2i(0, 0);
 
 template <class list_t> 
 class WidgetZSort: public std::binary_function<list_t, list_t, bool> 
@@ -880,6 +883,11 @@ void Widget::RenderRoot(BlittableRect* _screen)
 	{
 		edit_cursor_rect_ = new BlittableRect("TextCursor.png");
 	}
+	if(mouse_cursor_rect_ == NULL)
+	{
+		mouse_cursor_rect_ = new BlittableRect("Cursor0.png");
+	}
+
 	if(widget_with_edit_)
 	{
 		if(fmod(sum_time_, 0.5) < 0.25)
@@ -888,9 +896,8 @@ void Widget::RenderRoot(BlittableRect* _screen)
 			widget_with_edit_->blit_rect_->MeasureText(widget_with_edit_->widget_text_.GetText(), widget_with_edit_->widget_text_.GetAlignment(), top_left, bottom_right);
 			edit_cursor_rect_->Blit(widget_with_edit_->GetGlobalPosition() + Vector2i(bottom_right.x, bottom_right.y), _screen);
 		}
-		
 	}
-
+	mouse_cursor_rect_->Blit(mouse_position_, _screen);
 }
 
 void Widget::DistributeSDLEvents(SDL_Event* event)
@@ -1026,6 +1033,9 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 			e2.event.mouse_event.y -= (*it)->GetGlobalPosition().y;
 			(*it)->HandleEvent(e2);
 		}
+
+		mouse_position_.x = e.event.mouse_event.x;
+		mouse_position_.y = e.event.mouse_event.y;
 	}
 
 
