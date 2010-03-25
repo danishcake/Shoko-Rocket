@@ -78,4 +78,5 @@ public:
 	void CreateCat(unsigned int _id, Vector2f _position, Direction::Enum _direction, unsigned int _time);
 
 	void RemoveWalker(unsigned int _id, bool _kill, Vector2f _position, unsigned int _time);
+	void UpdateWalker(unsigned int _id, Vector2f _position, Direction::Enum _direction, unsigned int _time);
 };

@@ -18,6 +18,7 @@ protected:
 	void GenerateArrowOpcode(int _player_id, Vector2i _position, Direction::Enum _direction, PlayerArrowLevel::Enum _arrow_state);
 	void GenerateWalkerDeath(int _uid, Vector2f _position, bool _death);
 	void GenerateWalkerSpawn(Walker* _walker);
+	void GenerateWalkerUpdate(Walker* _walker);
 	vector<Opcodes::ServerOpcode*> opcodes_to_clients_;
 
 	int CountArrows(int _player_id);

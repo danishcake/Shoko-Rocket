@@ -40,6 +40,9 @@ namespace Opcodes
 		case LevelDownload::OPCODE:
 			return sizeof(LevelDownload) - ServerOpcode::HEADERSIZE;
 			break;
+		case WalkerUpdate::OPCODE:
+			return sizeof(WalkerUpdate) - ServerOpcode::HEADERSIZE;
+			break;
 		default:
 			//TODO warnings here
 			Logger::ErrorOut() << "Unable to find opcode, things about to break\n";
@@ -152,6 +155,9 @@ namespace Opcodes
 			break;
 		case LevelDownload::OPCODE:
 			opcode = new LevelDownload("", 0);
+			break;
+		case WalkerUpdate::OPCODE:
+			opcode = new WalkerUpdate(Vector2<unsigned char>(), WalkerUpdate::DIRECTION_EAST, 0);
 			break;
 		default:
 			//TODO warnings here

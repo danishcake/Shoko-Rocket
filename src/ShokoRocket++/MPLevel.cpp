@@ -66,6 +66,31 @@ void MPLevel::HandleOpcodes(std::vector<Opcodes::ServerOpcode*> _opcodes)
 				world_->RemoveWalker(kill_walker_opcode->uid_, kill_walker_opcode->death_, kill_walker_opcode->position_, kill_walker_opcode->time_);
 			}
 			break;
+		case Opcodes::WalkerUpdate::OPCODE:
+			{
+				Opcodes::WalkerUpdate* walker_update_opcode = (Opcodes::WalkerUpdate*)*opcode;
+				Direction::Enum direction;
+				switch(walker_update_opcode->direction_)
+				{
+				case Opcodes::WalkerUpdate::DIRECTION_NORTH:
+					direction = Direction::North;
+					break;
+				case Opcodes::WalkerUpdate::DIRECTION_SOUTH:
+					direction = Direction::South;
+					break;
+				case Opcodes::WalkerUpdate::DIRECTION_EAST:
+					direction = Direction::East;
+					break;
+				case Opcodes::WalkerUpdate::DIRECTION_WEST:
+				default:
+					direction = Direction::West;
+					break;
+				}
+
+
+				world_->UpdateWalker(walker_update_opcode->uid_, walker_update_opcode->position_, direction, walker_update_opcode->time_);
+			}
+			break;
 		case Opcodes::ArrowSpawn::OPCODE:
 			{
 				Opcodes::ArrowSpawn* arrow_spawn = (Opcodes::ArrowSpawn*)*opcode;

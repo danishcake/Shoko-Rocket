@@ -289,6 +289,31 @@ namespace Opcodes
 	};
 
 
+	/* 
+	 * Instructs a client to update a walker position/orientation
+	 */
+	struct WalkerUpdate : public ServerOpcode
+	{
+		static const unsigned char OPCODE = 12;
+
+		typedef unsigned char Direction;
+		static const Direction DIRECTION_NORTH  = 0;
+		static const Direction DIRECTION_SOUTH  = 1;
+		static const Direction DIRECTION_EAST = 2;
+		static const Direction DIRECTION_WEST = 3;
+	public:
+		WalkerUpdate(Vector2<unsigned char> _position, Direction _direction, unsigned int _uid)
+		{
+			opcode_ = OPCODE;
+			position_ = _position;
+			direction_ = _direction;
+			uid_ = _uid;
+		}
+		Vector2<unsigned char> position_;
+		Direction direction_;
+		unsigned int uid_;
+	};
+
 	/*
 	 * Messages sent from client to server
 	 */

@@ -453,7 +453,7 @@ void MPWorld::RemoveWalker(unsigned int _id, bool _kill, Vector2f _position, uns
 {
 	Walker* walker = NULL;
 	WalkerType::Enum walker_type;
-	//Find mouse by ID
+	//Find walker by ID
 	for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
 	{
 		if((*it)->GetID() == _id)
@@ -506,4 +506,45 @@ void MPWorld::RemoveWalker(unsigned int _id, bool _kill, Vector2f _position, uns
 		break;
 	}
 
+}
+void MPWorld::UpdateWalker(unsigned int _id, Vector2f _position, Direction::Enum _direction, unsigned int _time)
+{
+	Walker* walker = NULL;
+	//Find walker by ID
+	for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
+	{
+		if((*it)->GetID() == _id)
+		{
+			walker = *it;
+			break;
+		}
+	}
+	if(!walker)
+	{
+		for(vector<Walker*>::iterator it = cats_.begin(); it != cats_.end(); ++it)
+		{
+			if((*it)->GetID() == _id)
+			{
+				walker = *it;
+				break;
+			}
+		}
+	}
+	if(!walker)
+	{
+		Logger::DiagnosticOut() << "Probable sync issue, tried to remove walker " << _id << " but could not find\n";
+		return;
+	}
+	//Advance to current time
+	if(time_ < _time)
+	{
+		Logger::DiagnosticOut() << "Received an update from the future, client must be running slow. Flagging for fast forward\n";
+		Logger::DiagnosticOut() << "Local time: " << time_ << " Remote time: " << _time << "\n";
+		//Fast forward to resync to server
+		float dt = static_cast<float>(_time - time_) / 1000.0f;
+		Tick(dt);
+	}
+	//Set position to updated data
+	walker->SetPosition(_position);
+	walker->SetDirection(_direction);
 }

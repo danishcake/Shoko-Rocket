@@ -185,6 +185,7 @@ void ServerWorld::WalkerReachNewSquare(Walker* _walker)
 				}
 			}
 			_walker->EncounterArrow(it->direction);
+			GenerateWalkerUpdate(_walker);
 		}
 	}
 	if(arrow_needs_removing)
@@ -320,6 +321,31 @@ void ServerWorld::GenerateWalkerDeath(int _uid, Vector2f _position, bool _death)
 }
 
 
+void ServerWorld::GenerateWalkerUpdate(Walker* _walker)
+{	
+	Opcodes::WalkerUpdate::Direction direction;
+	switch(_walker->GetDirection())
+	{
+	case Direction::East:
+		direction = Opcodes::WalkerUpdate::DIRECTION_EAST;
+		break;
+	case Direction::West:
+		direction = Opcodes::WalkerUpdate::DIRECTION_WEST;
+		break;
+	case Direction::North:
+		direction = Opcodes::WalkerUpdate::DIRECTION_NORTH;
+		break;
+	case Direction::South:
+		direction = Opcodes::WalkerUpdate::DIRECTION_SOUTH;
+		break;
+	default:
+		assert(false);
+		break;
+	}
+
+	Opcodes::WalkerUpdate* opcode = new Opcodes::WalkerUpdate(_walker->GetPosition(), direction, _walker->GetID());
+	opcodes_to_clients_.push_back(opcode);
+}
 void ServerWorld::HandleInputOpcode(int _player_id, Opcodes::SendInput* _input)
 {
 	PlayerArrow arrow;
