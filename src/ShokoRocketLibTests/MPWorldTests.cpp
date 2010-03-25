@@ -269,7 +269,7 @@ TEST(MPWorldCreateCat)
 	pWorld->Tick(1);
 	CHECK_EQUAL(1500, pWorld->GetTime());
 	pWorld->CreateCat(6, Vector2f(1, 1), Direction::East, 1000);
-	CHECK_CLOSE(1.5, pWorld->GetCats().at(1)->GetPosition().x, 0.05);
+	CHECK_CLOSE(1.333, pWorld->GetCats().at(1)->GetPosition().x, 0.05);
 
 	delete pWorld;
 }

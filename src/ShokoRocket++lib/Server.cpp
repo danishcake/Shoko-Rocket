@@ -17,7 +17,7 @@ Server::Server(void) : io_(), acceptor_(io_, tcp::endpoint(tcp::v4(), 9020)),
 						closing_(false)
 {
 	players_count_ = 0;
-	required_players_ = 2;
+	required_players_ = 1;
 	current_time_ = 0;
 	max_players_ = 8;
 	start_counter_ = 0;
@@ -130,7 +130,7 @@ void Server::ConnectionAccepted(ServerConnection* _connection, boost::system::er
 
 void Server::PeriodicTidyup(boost::system::error_code _error)
 {
-	if(mutex_.timed_lock(boost::posix_time::microseconds(100)))
+	if(mutex_.timed_lock(boost::posix_time::milliseconds(100)))
 	{
 		//TODO use a predicate here
 		vector<ServerConnection*> dead_connections;

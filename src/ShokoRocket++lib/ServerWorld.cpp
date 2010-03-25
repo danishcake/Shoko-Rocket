@@ -2,26 +2,35 @@
 #include <algorithm>
 #include "Walker.h"
 #include "Logger.h"
-
+#include "Random.h"
 
 ServerWorld::ServerWorld(int _player_count) : MPWorld()
 {
 	arrow_limit_ = 3;
 	player_count_ = _player_count;
+	players_ready_ = 0;
 	if(player_count_ == 0) //Unit tests are run with zero players
 		server_game_state_ = ServerGameState::Running;
 	else
 		server_game_state_ = ServerGameState::WaitingForClients;
+
+	spawn_time_ = Random::RandomRange(0.1, 0.4);
+	time_run_ = 0;
+	walker_id_cnt_ = 0;
 }
 
 ServerWorld::ServerWorld(string _filename, int _player_count) : MPWorld(_filename)
 {
 	arrow_limit_ = 3;
 	player_count_ = _player_count;
+	players_ready_ = 0;
 	if(player_count_ == 0)
 		server_game_state_ = ServerGameState::Running;
 	else
-	server_game_state_ = ServerGameState::WaitingForClients;
+		server_game_state_ = ServerGameState::WaitingForClients;
+	spawn_time_ = Random::RandomRange(0.1, 0.4);
+	time_run_ = 0;
+	walker_id_cnt_ = 0;
 }
 
 WorldState::Enum ServerWorld::Tick(float _dt)
@@ -44,6 +53,13 @@ WorldState::Enum ServerWorld::Tick(float _dt)
 			time_run_ += dt;
 			if(state_ == WorldState::OK)
 			{
+				//Spawn
+				if(mice_.size() < 64 && time_run_ >= spawn_time_) //TODO make flexible
+				{
+					SpawnWalkers();
+					spawn_time_ = time_run_ + Random::RandomRange(0.5, 1.5);
+				}
+
 				//Walk forward
 				for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
 				{
@@ -64,8 +80,7 @@ WorldState::Enum ServerWorld::Tick(float _dt)
 							{
 								just_dead_mice_.push_back(*m_it);
 								(*m_it)->Kill();
-								(*c_it)->SetProblem(true);
-								state_ = WorldState::Defeat;
+								GenerateWalkerDeath((*m_it)->GetID(), (*m_it)->GetPosition(), true);
 							}
 						}
 					}
@@ -74,7 +89,6 @@ WorldState::Enum ServerWorld::Tick(float _dt)
 				for(vector<Walker*>::iterator it = just_dead_mice_.begin(); it != just_dead_mice_.end(); ++it)
 				{
 					mice_.erase(std::remove(mice_.begin(), mice_.end(), *it), mice_.end());
-					(*it)->SetProblem(true);
 					dead_mice_.push_back(*it);
 				}
 				just_dead_mice_.clear();
@@ -88,6 +102,8 @@ WorldState::Enum ServerWorld::Tick(float _dt)
 			}
 		}
 		BaseWorld::Tick(_dt);
+
+		//TODO cull totally dead mice
 	}
 
 	return state_;
@@ -221,6 +237,45 @@ void ServerWorld::HandleOpcodes(vector<vector<Opcodes::ClientOpcode*> > _opcodes
 	}
 }
 
+void ServerWorld::GenerateWalkerSpawn(Walker* _walker)
+{
+	Opcodes::WalkerSpawn::WalkerType walker_type;
+	Opcodes::WalkerSpawn::Direction direction;
+	switch(_walker->GetDirection())
+	{
+	case Direction::East:
+		direction = Opcodes::WalkerSpawn::DIRECTION_EAST;
+		break;
+	case Direction::West:
+		direction = Opcodes::WalkerSpawn::DIRECTION_WEST;
+		break;
+	case Direction::North:
+		direction = Opcodes::WalkerSpawn::DIRECTION_NORTH;
+		break;
+	case Direction::South:
+		direction = Opcodes::WalkerSpawn::DIRECTION_SOUTH;
+		break;
+	default:
+		assert(false);
+		break;
+	}
+	switch(_walker->GetWalkerType())
+	{
+	case WalkerType::Mouse:
+		walker_type = Opcodes::WalkerSpawn::WALKER_MOUSE;
+		break;
+	case WalkerType::Cat:
+		walker_type = Opcodes::WalkerSpawn::WALKER_CAT;
+		break;
+	default:
+		assert(false);
+		break;
+	}
+
+	Opcodes::WalkerSpawn* opcode = new Opcodes::WalkerSpawn(walker_type, _walker->GetPosition(), direction, _walker->GetID());
+	opcode->time_ = static_cast<unsigned int>(time_run_ * 1000);
+	opcodes_to_clients_.push_back(opcode);
+}
 void ServerWorld::GenerateArrowOpcode(int _player_id, Vector2i _position, Direction::Enum _direction, PlayerArrowLevel::Enum _arrow_state)
 {
 	Opcodes::ArrowSpawn::Direction d = Opcodes::ArrowSpawn::DIRECTION_EAST;
@@ -393,9 +448,36 @@ vector<Opcodes::ServerOpcode*> ServerWorld::GetOpcodes()
 int ServerWorld::CountArrows(int _player_id)
 {
 	int count = 0;
-	for(std::vector<PlayerArrow>::iterator it = player_arrows_.begin(); it != player_arrows_.end(); ++it)
+	for(vector<PlayerArrow>::iterator it = player_arrows_.begin(); it != player_arrows_.end(); ++it)
 	{
 		if(it->player_id == _player_id) count++;
 	}
 	return count;
+}
+
+void ServerWorld::SpawnWalkers()
+{
+	float mouse_thresh = 200;
+	float cat_thresh = mouse_thresh + 10;
+
+	float total_thresh = cat_thresh;
+
+	for(vector<Spawner>::iterator it = spawners_.begin(); it != spawners_.end(); ++it)
+	{
+		float value = Random::RandomRange(0, total_thresh);
+		Walker* walker = new Walker();
+		walker->SetPosition(it->position);
+		walker->SetDirection(it->direction);
+		walker->SetID(walker_id_cnt_);
+		walker->SetWorld(this);
+		if(value < mouse_thresh)
+		{
+			AddMouse(walker);
+		} else //Else cat
+		{
+			AddCat(walker);
+		}
+		GenerateWalkerSpawn(walker);
+		walker_id_cnt_++;
+	}
 }

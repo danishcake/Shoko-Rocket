@@ -395,6 +395,8 @@ void MPWorld::CreateMouse(unsigned int _id, Vector2f _position, Direction::Enum 
 {
 	Walker* mouse = new Walker();
 	mouse->SetID(_id);
+	mouse->SetWorld(this);
+	mouse->SetWalkerType(WalkerType::Mouse);
 	mice_.push_back(mouse);
 
 	//Advance to current time
@@ -423,6 +425,8 @@ void MPWorld::CreateCat(unsigned int _id, Vector2f _position, Direction::Enum _d
 	Walker* cat = new Walker();
 	cat->SetID(_id);
 	cats_.push_back(cat);
+	cat->SetWalkerType(WalkerType::Cat);
+	cat->SetWorld(this);
 
 	//Advance to current time
 	if(time_ < _time)
@@ -443,4 +447,63 @@ void MPWorld::CreateCat(unsigned int _id, Vector2f _position, Direction::Enum _d
 		float dt = static_cast<float>(time_ - _time) / 1000.0f;
 		cat->Advance(dt);
 	}
+}
+
+void MPWorld::RemoveWalker(unsigned int _id, bool _kill, Vector2f _position, unsigned int _time)
+{
+	Walker* walker = NULL;
+	WalkerType::Enum walker_type;
+	//Find mouse by ID
+	for(vector<Walker*>::iterator it = mice_.begin(); it != mice_.end(); ++it)
+	{
+		if((*it)->GetID() == _id)
+		{
+			walker = *it;
+			walker_type = WalkerType::Mouse;
+			break;
+		}
+	}
+	if(!walker)
+	{
+		for(vector<Walker*>::iterator it = cats_.begin(); it != cats_.end(); ++it)
+		{
+			if((*it)->GetID() == _id)
+			{
+				walker = *it;
+				walker_type = WalkerType::Cat;
+				break;
+			}
+		}
+	}
+	if(!walker)
+	{
+		Logger::DiagnosticOut() << "Probable sync issue, tried to remove walker " << _id << " but could not find\n";
+		return;
+	}
+	//Advance to current time
+	if(time_ < _time)
+	{
+		Logger::DiagnosticOut() << "Received an update from the future, client must be running slow. Flagging for fast forward\n";
+		Logger::DiagnosticOut() << "Local time: " << time_ << " Remote time: " << _time << "\n";
+		//Fast forward to resync to server
+		float dt = static_cast<float>(_time - time_) / 1000.0f;
+		Tick(dt);
+	}
+	//Set position to updated data
+	walker->SetPosition(_position);
+	switch(walker_type)
+	{
+	case WalkerType::Mouse:
+		just_dead_mice_.push_back(walker);
+		if(_kill) 
+			walker->Kill();
+		else
+			walker->Rescue();
+		break;
+	case WalkerType::Cat:
+		just_dead_cats_.push_back(walker);
+		walker->Kill();
+		break;
+	}
+
 }

@@ -1468,6 +1468,11 @@ void GameStateMachine::LobbyReadyClick(Widget* _widget)
 /* Multiplayer */
 void GameStateMachine::SetupMultiplayer()
 {
+	Widget* back = new Widget("Blank128x64.png");
+	back->SetText("Quit", TextAlignment::Centre);
+	back->SetPosition(Vector2i(2, 2));
+	back->OnClick.connect(boost::bind(&GameStateMachine::MultiplayerReturnToBrowser, this, _1));
+
 	CreateRenderArea(mp_level_->GetLevelSize(), Mode::Multiplayer);
 	if(client_)
 		client_->SendOpcode(new Opcodes::LoadComplete());
@@ -1481,7 +1486,7 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 		unsigned char player_id = 0;
 		std::vector<std::vector<Opcodes::ClientOpcode*> > client_opcodes = server_->GetOpcodes();
 		server_world_->HandleOpcodes(client_opcodes);
-		server_world_->Tick(_timespan);
+		server_world_->Tick(_timespan * 5.0);
 		std::vector<Opcodes::ServerOpcode*> response_opcodes = server_world_->GetOpcodes();
 		for(std::vector<Opcodes::ServerOpcode*>::iterator it = response_opcodes.begin(); it != response_opcodes.end(); ++it)
 		{
@@ -1576,6 +1581,11 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 void GameStateMachine::TeardownMultiplayer()
 {
 	Widget::ClearRoot();
+	//This prevents double freeing
+	scroll_left_widget_ = NULL;
+	scroll_right_widget_ = NULL;
+	scroll_up_widget_ = NULL;
+	scroll_down_widget_ = NULL;
 }
 
 
@@ -1585,6 +1595,16 @@ void GameStateMachine::MultiplayerChatAppend(std::string _chat)
 
 }
 /* Multiplayer event handling */
+void GameStateMachine::MultiplayerReturnToBrowser(Widget* _widget)
+{
+	delete server_;
+	server_ = NULL;
+	delete client_;
+	client_ = NULL;
+	pend_mode_ = Mode::ServerBrowser;
+	mode_timer_ = 1.0f;
+	FadeInOut(2.0f);
+}
 
 /* Main methods */
 void GameStateMachine::CreateRenderArea(Vector2i _level_size, Mode::Enum _mode_affected)
@@ -1953,6 +1973,7 @@ void GameStateMachine::ShowMessageBox(std::string _message, const MessageBoxEven
 	message_box_ = new Widget("Blank384x384.png");
 	message_box_->SetPosition(Vector2i((SDL_GetVideoSurface()->w - 384)/2, (SDL_GetVideoSurface()->h - 384) /2));
 	message_box_->SetText(_message, TextAlignment::TopLeft);
+	message_box_->SetRejectsFocus(true);
 
 	Widget* msgbox_OK = new Widget("Blank128x32.png");
 	msgbox_OK->SetPosition(Vector2i(128,340));

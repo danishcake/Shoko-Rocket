@@ -62,6 +62,8 @@ void MPLevel::HandleOpcodes(std::vector<Opcodes::ServerOpcode*> _opcodes)
 			break;
 		case Opcodes::KillWalker::OPCODE:
 			{
+				Opcodes::KillWalker* kill_walker_opcode = (Opcodes::KillWalker*)*opcode;
+				world_->RemoveWalker(kill_walker_opcode->uid_, kill_walker_opcode->death_, kill_walker_opcode->position_, kill_walker_opcode->time_);
 			}
 			break;
 		case Opcodes::ArrowSpawn::OPCODE:

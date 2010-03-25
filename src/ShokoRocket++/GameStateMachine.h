@@ -209,7 +209,7 @@ private:
 
 	void MultiplayerChatAppend(std::string _chat);
 	/* Multiplayer event handling */
-
+	void MultiplayerReturnToBrowser(Widget* _widget);
 	/* Transition times */
 	static const float sub_mode_widget_transition_time;
 

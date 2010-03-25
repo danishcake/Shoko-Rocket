@@ -175,6 +175,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Random.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ServerWorld.cpp"
 				>
 			</File>
@@ -254,6 +258,10 @@
 			</File>
 			<File
 				RelativePath=".\MPWorld.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Random.h"
 				>
 			</File>
 			<File

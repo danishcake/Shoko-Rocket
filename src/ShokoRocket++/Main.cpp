@@ -9,6 +9,7 @@
 #include "GameStateMachine.h"
 #include "StandardTextures.h"
 #include "Widget.h"
+#include <Random.h>
 
 SDL_Surface* p_screen = NULL;
 BlittableRect* p_screen_rect = NULL;
@@ -134,6 +135,8 @@ void Draw()
 
 int _tmain(int /*argc*/, _TCHAR* /*argv*/[])
 {
+	Random::Seed();
+
 	bool bFinished = false;
 	p_screen = SDL_init();
 	ltv_time = clock();

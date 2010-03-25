@@ -17,6 +17,7 @@ protected:
 	void HandleInputOpcode(int _player_id, Opcodes::SendInput* _input);
 	void GenerateArrowOpcode(int _player_id, Vector2i _position, Direction::Enum _direction, PlayerArrowLevel::Enum _arrow_state);
 	void GenerateWalkerDeath(int _uid, Vector2f _position, bool _death);
+	void GenerateWalkerSpawn(Walker* _walker);
 	vector<Opcodes::ServerOpcode*> opcodes_to_clients_;
 
 	int CountArrows(int _player_id);
@@ -24,7 +25,11 @@ protected:
 	int player_count_;
 	int players_ready_;
 	double time_run_;
+	double spawn_time_;
 	ServerGameState::Enum server_game_state_;
+	int walker_id_cnt_;
+
+	void SpawnWalkers();
 public:
 	//Constructors
 	ServerWorld(int _player_count);
