@@ -126,6 +126,7 @@ public:
 	
 	/* Static signals */
 	static KeyEvent OnGlobalKeyUp;
+	static MouseEvent OnGlobalMouseMove;
 
 	DragEvent   OnDragStart; //Allows filling of drag data - drag_type must be non zero
 	DragEvent   OnDragReset;

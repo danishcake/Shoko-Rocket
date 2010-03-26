@@ -123,7 +123,7 @@ WorldState::Enum MPWorld::Tick(float _dt)
 		}
 	}
 
-	BaseWorld::Tick(_dt);
+	BaseWorld::Tick(_dt * 3); //Fast ticks to get rid of dead mice/cats quickly
 	return state_;
 }
 void MPWorld::WalkerReachNewSquare(Walker* _walker)

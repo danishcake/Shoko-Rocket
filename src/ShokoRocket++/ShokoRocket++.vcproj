@@ -825,6 +825,14 @@
 						RelativePath=".\Sprites\GUI\Cursor7.png"
 						>
 					</File>
+					<File
+						RelativePath=".\Sprites\MPCursors.animation"
+						>
+					</File>
+					<File
+						RelativePath=".\Sprites\MPCursors.png"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter

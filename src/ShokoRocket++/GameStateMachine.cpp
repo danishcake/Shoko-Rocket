@@ -18,6 +18,7 @@
 #include "MPLevel.h"
 #include "ServerWorld.h"
 #include <FilesystemHelpers.h>
+#include "StandardTextures.h"
 
 
 /* Consts */
@@ -1476,6 +1477,9 @@ void GameStateMachine::SetupMultiplayer()
 	CreateRenderArea(mp_level_->GetLevelSize(), Mode::Multiplayer);
 	if(client_)
 		client_->SendOpcode(new Opcodes::LoadComplete());
+	
+	mouse_move_connection_ = Widget::OnGlobalMouseMove.connect(boost::bind(&GameStateMachine::MultiplayerMouseMove, this, _1, _2));
+	cursor_positions_.clear();
 }
 
 void GameStateMachine::ProcessMultiplayer(float _timespan)
@@ -1541,8 +1545,6 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 					MultiplayerChatAppend(name + " says " + ((Opcodes::ChatMessage*)*opcode)->message_);
 				}
 				break;
-			case Opcodes::DriveCursor::OPCODE:
-				break;
 			case Opcodes::PlayerName::OPCODE:
 				break;
 			case Opcodes::KickClient::OPCODE:
@@ -1555,6 +1557,12 @@ void GameStateMachine::ProcessMultiplayer(float _timespan)
 					server_ = NULL;
 					Logger::DiagnosticOut() << "Kicked from server, returning to Server Browser\n";
 					ShowMessageBox(std::string("Kicked:\n") + kick_client_opcode->msg_, boost::bind(&GameStateMachine::DisconnectAcknowledgeCallback, this));
+				}
+				break;
+			case Opcodes::DriveCursor::OPCODE:
+				{
+					Opcodes::DriveCursor* drive_cursor_opcode = (Opcodes::DriveCursor*)*opcode;
+					cursor_positions_[drive_cursor_opcode->player_] = drive_cursor_opcode->position_;
 				}
 				break;
 			default:
@@ -1586,6 +1594,7 @@ void GameStateMachine::TeardownMultiplayer()
 	scroll_right_widget_ = NULL;
 	scroll_up_widget_ = NULL;
 	scroll_down_widget_ = NULL;
+	mouse_move_connection_.disconnect();
 }
 
 
@@ -1593,6 +1602,13 @@ void GameStateMachine::TeardownMultiplayer()
 void GameStateMachine::MultiplayerChatAppend(std::string _chat)
 {
 
+}
+void GameStateMachine::MultiplayerMouseMove(Widget* _widget, MouseEventArgs _event)
+{
+	if(client_)
+	{
+		client_->SendOpcode(new Opcodes::UpdateCursor(Vector2<unsigned short>(_event.x, _event.y)));
+	}
 }
 /* Multiplayer event handling */
 void GameStateMachine::MultiplayerReturnToBrowser(Widget* _widget)
@@ -1864,6 +1880,15 @@ void GameStateMachine::Draw(SDL_Surface* _target)
 			ri.frame_->Draw(ri.position_ + Vector2i(16, 378));
 		}
 	}
+	//Draw cursors for other players in multiplayer
+	std::pair<int, Vector2i> cursor_pos;
+	BOOST_FOREACH(cursor_pos, cursor_positions_)
+	{
+		if(cursor_pos.first >= 0 && cursor_pos.first < 8)
+			StandardTextures::mp_cursors[cursor_pos.first]->GetCurrentFrame()->Draw(cursor_pos.second);
+		
+	}
+
 }
 
 void GameStateMachine::FadeInOut(float _total_time)

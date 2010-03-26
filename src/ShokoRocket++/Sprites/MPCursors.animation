@@ -1,0 +1,26 @@
+<AnimationSet>
+  <Animation Name="Cursor0">
+    <Frame Width="25" Height="32" Top="0" Left="0" File="MPCursors.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="Cursor1">
+    <Frame Width="25" Height="32" Top="32" Left="0" File="MPCursors.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="Cursor2">
+    <Frame Width="25" Height="32" Top="64" Left="0" File="MPCursors.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="Cursor3">
+    <Frame Width="25" Height="32" Top="96" Left="0" File="MPCursors.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="Cursor4">
+    <Frame Width="25" Height="32" Top="128" Left="0" File="MPCursors.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="Cursor5">
+    <Frame Width="25" Height="32" Top="160" Left="0" File="MPCursors.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="Cursor6">
+    <Frame Width="25" Height="32" Top="192" Left="0" File="MPCursors.png" Time="0.5"/>
+  </Animation>
+  <Animation Name="Cursor7">
+    <Frame Width="25" Height="32" Top="224" Left="0" File="MPCursors.png" Time="0.5"/>
+  </Animation>
+</AnimationSet>

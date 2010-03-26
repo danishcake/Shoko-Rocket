@@ -31,8 +31,10 @@ namespace StandardTextures
 
 	Animation* mp_arrows[8][5];
 	Animation* mp_half_arrows[8][5];
-	Animation* mp_rockets[8];
+	Animation* mp_rockets[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 	Animation* mp_spawner;
+
+	Animation* mp_cursors[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	void LoadTextures()
 	{
@@ -211,6 +213,20 @@ namespace StandardTextures
 		} else
 		{
 			Logger::ErrorOut() << "Unable to load MPRockets animations\n";
+		}
+
+		AnimationSet* mp_cursor_set = SDLTextureManager::GetAnimationSet("MPCursors.animation");
+		if(mp_cursor_set)
+		{
+			for(int i = 0; i < 8; i++)
+			{
+				mp_cursors[i] = mp_cursor_set->GetAnimation("Cursor" + boost::lexical_cast<std::string, int>(i));
+				if(!mp_cursors[i])
+					Logger::ErrorOut() << "Unable to load MPCursor " << i << "\n";
+			}
+		} else
+		{
+			Logger::ErrorOut() << "Unable to load MPCursors animations\n";
 		}
 
 		//TODO blastoff

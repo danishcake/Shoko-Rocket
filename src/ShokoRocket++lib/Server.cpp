@@ -259,6 +259,19 @@ void Server::HandleOpcode(ServerConnection* _connection, int _player_id, Opcodes
 			_connection->SendLevelToClient(download_req->level_);
 		}
 		break;
+	case Opcodes::UpdateCursor::OPCODE:
+		{
+			Opcodes::UpdateCursor* send_input = (Opcodes::UpdateCursor*)_opcode;
+			Opcodes::DriveCursor drive_cursor(_connection->GetPlayerID(), send_input->position_);
+			for(vector<ServerConnection*>::iterator it = connections_.begin(); it != connections_.end(); ++it)
+			{
+				if((*it)->GetPlayerID() != _connection->GetPlayerID())
+				{
+					(*it)->SendOpcode(&drive_cursor);
+				}
+			}
+		}
+		break;
 	}
 }
 

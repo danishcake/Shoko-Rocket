@@ -202,14 +202,18 @@ private:
 	void LobbyReadyClick(Widget* _widget);
 
 	/* Multiplayer members */
+	boost::signals::connection mouse_move_connection_;
+	std::map<int, Vector2i> cursor_positions_;
 	/* Multiplayer methods */
 	void SetupMultiplayer();
 	void ProcessMultiplayer(float _timespan);
 	void TeardownMultiplayer();
-
 	void MultiplayerChatAppend(std::string _chat);
+	void MultiplayerMouseMove(Widget* _widget, MouseEventArgs _event);
 	/* Multiplayer event handling */
 	void MultiplayerReturnToBrowser(Widget* _widget);
+
+
 	/* Transition times */
 	static const float sub_mode_widget_transition_time;
 

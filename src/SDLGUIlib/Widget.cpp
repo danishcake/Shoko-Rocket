@@ -11,6 +11,7 @@ Widget* Widget::widget_with_modal_ = NULL;
 Widget* Widget::widget_with_edit_ = NULL;
 bool Widget::event_lock_ = false;
 Widget::KeyEvent Widget::OnGlobalKeyUp;
+Widget::MouseEvent Widget::OnGlobalMouseMove;
 
 DragEventArgs Widget::drag_event_args_ = DragEventArgs();
 Vector2i Widget::drag_start_position_ = Vector2i(0, 0);
@@ -1036,6 +1037,7 @@ void Widget::DistributeSDLEvents(SDL_Event* event)
 
 		mouse_position_.x = e.event.mouse_event.x;
 		mouse_position_.y = e.event.mouse_event.y;
+		OnGlobalMouseMove(NULL, e.event.mouse_event);
 	}
 
 

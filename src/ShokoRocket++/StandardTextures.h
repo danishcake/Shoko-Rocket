@@ -26,6 +26,7 @@ namespace StandardTextures
 	extern Animation* mp_half_arrows[8][5];
 	extern Animation* mp_rockets[8];
 	extern Animation* mp_spawner;
+	extern Animation* mp_cursors[8];
 
 
 	void LoadTextures();
