@@ -166,8 +166,8 @@ void ServerWorld::WalkerReachNewSquare(Walker* _walker)
 	
 	//TODO collide with player arrows
 	bool arrow_needs_removing = false;
-	vector<PlayerArrow>::iterator it;
-	for(it = player_arrows_.begin(); it != player_arrows_.end(); ++it)
+	vector<PlayerArrow>::iterator arrow_to_remove;
+	for(vector<PlayerArrow>::iterator it = player_arrows_.begin(); it != player_arrows_.end(); ++it)
 	{
 		if((it->position - position_grid).lengthSq() < 0.1f)
 		{
@@ -178,10 +178,12 @@ void ServerWorld::WalkerReachNewSquare(Walker* _walker)
 				if(it->halved)
 				{
 					arrow_needs_removing = true;
-					break;
+					arrow_to_remove = it;
+					GenerateArrowOpcode(it->player_id, it->position, it->direction, PlayerArrowLevel::Clear);
 				} else
 				{
 					it->halved = true;
+					GenerateArrowOpcode(it->player_id, it->position, it->direction, PlayerArrowLevel::HalfArrow);
 				}
 			}
 			_walker->EncounterArrow(it->direction);
@@ -190,7 +192,7 @@ void ServerWorld::WalkerReachNewSquare(Walker* _walker)
 	}
 	if(arrow_needs_removing)
 	{
-		player_arrows_.erase(it);
+		player_arrows_.erase(arrow_to_remove);
 	}
 }
 
