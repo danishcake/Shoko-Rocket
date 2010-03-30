@@ -93,7 +93,7 @@ TEST(ClientGetsServerWelcome)
 	CHECK_EQUAL(ClientState::Connected, c->GetState());
 
 	vector<Opcodes::ServerOpcode*> opcodes = c->GetOpcodes(); //Returns a vector of collected opcodes
-	CHECK_EQUAL(1, opcodes.size()); //Only one welcome message
+	CHECK(opcodes.size() >= 1); //Was originally 1, but now more
 	if(opcodes.size() > 0)
 	{
 		CHECK_EQUAL(Opcodes::ChatMessage::OPCODE, opcodes[0]->opcode_);
@@ -365,7 +365,7 @@ TEST(RepeatMessagesOK)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 	opcodes = c->GetOpcodes();
 	
-	CHECK_EQUAL(1, opcodes.size());
+	CHECK(opcodes.size() >= 1); //Was originally 1, but implemented more messages, and it's 7 or more!
 
 	delete c;
 	delete s;

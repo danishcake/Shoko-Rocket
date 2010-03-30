@@ -60,6 +60,7 @@ protected:
 	vector<Opcodes::ServerOpcode*> opcodes_;
 	Opcodes::ServerOpcode* server_opcode_;
 
+	bool logging_;
 public:
 	Client(void);
 	~Client(void);

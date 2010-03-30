@@ -29,6 +29,8 @@ protected:
 	bool ready_;
 	Opcodes::ClientOpcode* client_opcode_;
 
+	bool logging_;
+
 public:
 	ServerConnection(io_service& _io_service, Server* _server, int _player_id);
 	~ServerConnection(void);

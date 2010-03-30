@@ -486,26 +486,26 @@ int ServerWorld::CountArrows(int _player_id)
 void ServerWorld::SpawnWalkers()
 {
 	float mouse_thresh = 200;
-	float cat_thresh = mouse_thresh + 10;
+	float cat_thresh = mouse_thresh + 1;
 
 	float total_thresh = cat_thresh;
+	float value = Random::RandomRange(0, total_thresh);
 
-	for(vector<Spawner>::iterator it = spawners_.begin(); it != spawners_.end(); ++it)
+	if(spawners_.size() == 0)
+		return;
+	
+	Spawner& spawner = spawners_[Random::RandomIndex(spawners_.size())];
+	Walker* walker = new Walker();
+	walker->SetPosition(spawner.position);
+	walker->SetDirection(spawner.direction);
+	walker->SetID(walker_id_cnt_);
+	if(value < mouse_thresh)
 	{
-		float value = Random::RandomRange(0, total_thresh);
-		Walker* walker = new Walker();
-		walker->SetPosition(it->position);
-		walker->SetDirection(it->direction);
-		walker->SetID(walker_id_cnt_);
-		walker->SetWorld(this);
-		if(value < mouse_thresh)
-		{
-			AddMouse(walker);
-		} else //Else cat
-		{
-			AddCat(walker);
-		}
-		GenerateWalkerSpawn(walker);
-		walker_id_cnt_++;
+		AddMouse(walker);
+	} else //Else cat
+	{
+		AddCat(walker);
 	}
+	GenerateWalkerSpawn(walker);
+	walker_id_cnt_++;
 }

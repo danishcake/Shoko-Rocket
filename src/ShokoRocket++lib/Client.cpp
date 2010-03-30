@@ -19,18 +19,19 @@ Client::Client(void) : name_("CHU CHU"), io_(boost::asio::io_service()), socket_
 	state_ = ClientState::NotConnected;
 	thread_ = new boost::thread(ClientThread(this));
 	server_opcode_ = NULL;
+	logging_ = false;
 }
 
 Client::~Client(void)
 {
-	Logger::DiagnosticOut() << "Client: Destructor started\n";
+	if(logging_) Logger::DiagnosticOut() << "Client: Destructor started\n";
 	closing_ = true;
 	mutex_.lock();
 	socket_.close();
 	thread_->join();
 	delete thread_;
 	mutex_.unlock(); //Probably not necessary as being destroyed
-	Logger::DiagnosticOut() << "Client: Destructor finished\n";
+	if(logging_) Logger::DiagnosticOut() << "Client: Destructor finished\n";
 }
 
 void Client::Connect(std::string _host, unsigned short _port)
@@ -41,7 +42,7 @@ void Client::Connect(std::string _host, unsigned short _port)
 	endpoints_ = resolver.resolve(query);
 	tcp::endpoint ep = *endpoints_++;
 	socket_.async_connect(ep, boost::bind(&Client::ConnectHandler, this, boost::asio::placeholders::error));
-	Logger::DiagnosticOut() << "Client: Attempting to connect to " << boost::lexical_cast<std::string, tcp::endpoint>(ep) << "\n";
+	if(logging_) Logger::DiagnosticOut() << "Client: Attempting to connect to " << boost::lexical_cast<std::string, tcp::endpoint>(ep) << "\n";
 }
 
 bool Client::Tick()
@@ -65,15 +66,15 @@ void Client::ConnectHandler(const boost::system::error_code& error)
 				boost::system::error_code error;
 				socket_.close();
 				socket_.async_connect(ep, boost::bind(&Client::ConnectHandler, this, boost::asio::placeholders::error));			
-				Logger::DiagnosticOut() << "Client: Attempting to connect to " << boost::lexical_cast<std::string, tcp::endpoint>(ep) << "\n";
+				if(logging_) Logger::DiagnosticOut() << "Client: Attempting to connect to " << boost::lexical_cast<std::string, tcp::endpoint>(ep) << "\n";
 			} else
 			{
-				Logger::DiagnosticOut() << "Client: Unable to connect to any of the endpoints\n";
+				if(logging_) Logger::DiagnosticOut() << "Client: Unable to connect to any of the endpoints\n";
 				state_ = ClientState::NotConnected;
 			}
 		} else
 		{
-			Logger::DiagnosticOut() << "Client: Connected successfully\n";
+			if(logging_) Logger::DiagnosticOut() << "Client: Connected successfully\n";
 			state_ = ClientState::Connected;
 			boost::shared_ptr<Opcodes::ClientOpcode> opcode = boost::shared_ptr<Opcodes::ClientOpcode>(new Opcodes::SetName(name_));
 			socket_.async_send(boost::asio::buffer((char*)opcode.get(), sizeof(Opcodes::SetName)), boost::bind(&Client::WriteFinished, this, boost::asio::placeholders::error, opcode));
@@ -88,7 +89,7 @@ void Client::ConnectHandler(const boost::system::error_code& error)
 			
 		}
 		mutex_.unlock();
-	} else Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
+	} else if(logging_) Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
 }
 
 void Client::ReadHeaderFinished(boost::system::error_code error, CBuffer_ptr _read_buffer)
@@ -96,14 +97,18 @@ void Client::ReadHeaderFinished(boost::system::error_code error, CBuffer_ptr _re
 	if(mutex_.timed_lock(boost::posix_time::milliseconds(100)))
 	{
 		if(error == boost::asio::error::eof)
-			Logger::DiagnosticOut() << "Client: Header read OK, but server DC'd\n";
+		{
+			if(logging_) Logger::DiagnosticOut() << "Client: Header read OK, but server DC'd\n";
+		}
 		else if(error)
-			Logger::DiagnosticOut() << "Client: Error during header read: " << error.message() << "\n";
+		{
+			if(logging_) Logger::DiagnosticOut() << "Client: Error during header read: " << error.message() << "\n";
+		}
 		else
 		{
-			Logger::DiagnosticOut() << "Client: Read header finished\n";
+			if(logging_) Logger::DiagnosticOut() << "Client: Read header finished\n";
 			int body_size = Opcodes::GetBodySize((Opcodes::ServerOpcode*)_read_buffer->c_array());
-			Logger::DiagnosticOut() << "Client: Trying to read body of size " << body_size << "\n";
+			if(logging_) Logger::DiagnosticOut() << "Client: Trying to read body of size " << body_size << "\n";
 			server_opcode_ = Opcodes::GetServerOpcode((Opcodes::ServerOpcode*)_read_buffer->c_array());
 		
 			CBuffer_ptr read_buffer = CBuffer_ptr(new CBuffer());
@@ -121,7 +126,7 @@ void Client::ReadHeaderFinished(boost::system::error_code error, CBuffer_ptr _re
 			state_ = ClientState::NotConnected;
 		}
 		mutex_.unlock();
-	} else Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
+	} else if(logging_) Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
 }
 
 void Client::ReadBodyFinished(boost::system::error_code error, CBuffer_ptr _read_buffer)
@@ -129,9 +134,13 @@ void Client::ReadBodyFinished(boost::system::error_code error, CBuffer_ptr _read
 	if(mutex_.timed_lock(boost::posix_time::milliseconds(100)))
 	{
 		if(error == boost::asio::error::eof)
-			Logger::DiagnosticOut() << "Client: Body read OK, but client DC'd\n";
+		{
+			if(logging_) Logger::DiagnosticOut() << "Client: Body read OK, but client DC'd\n";
+		}
 		else if(error)
-			Logger::DiagnosticOut() << "Client: Error during body read: " << error.message() << "\n";
+		{
+			if(logging_) Logger::DiagnosticOut() << "Client: Error during body read: " << error.message() << "\n";
+		}
 		else
 		{
 			memcpy(((char*)server_opcode_) + Opcodes::ServerOpcode::HEADERSIZE, _read_buffer->c_array(),  Opcodes::GetBodySize(server_opcode_));
@@ -139,7 +148,7 @@ void Client::ReadBodyFinished(boost::system::error_code error, CBuffer_ptr _read
 			{
 				//Start special read of level
 				Opcodes::LevelDownload* level_opcode = (Opcodes::LevelDownload*)server_opcode_;
-				Logger::DiagnosticOut() << "Client: Read body finished, looking for level of size " << level_opcode->level_size_ << " called " << level_opcode->level_name_ << "\n";
+				if(logging_) Logger::DiagnosticOut() << "Client: Read body finished, looking for level of size " << level_opcode->level_size_ << " called " << level_opcode->level_name_ << "\n";
 
 				
 				boost::shared_ptr<std::vector<char> > level_data = boost::shared_ptr<std::vector<char> >(new std::vector<char>(level_opcode->level_size_));
@@ -158,7 +167,7 @@ void Client::ReadBodyFinished(boost::system::error_code error, CBuffer_ptr _read
 				opcodes_.push_back(server_opcode_);
 				server_opcode_ = NULL;
 				CBuffer_ptr read_buffer = CBuffer_ptr(new CBuffer());
-				Logger::DiagnosticOut() << "Client: Read body finished, looking for header again\n";
+				if(logging_) Logger::DiagnosticOut() << "Client: Read body finished, looking for header again\n";
 				boost::asio::async_read(socket_, 
 										boost::asio::buffer(*read_buffer, Opcodes::ServerOpcode::HEADERSIZE),
 										boost::bind(&Client::ReadHeaderFinished,
@@ -174,7 +183,7 @@ void Client::ReadBodyFinished(boost::system::error_code error, CBuffer_ptr _read
 			state_ = ClientState::NotConnected;
 		}
 		mutex_.unlock();
-	} else Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
+	} else if(logging_) Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
 }
 
 void Client::ReadLevelFinished(boost::system::error_code error, boost::shared_ptr<std::vector<char> > _level_data, std::string _filename)
@@ -182,12 +191,16 @@ void Client::ReadLevelFinished(boost::system::error_code error, boost::shared_pt
 	if(mutex_.timed_lock(boost::posix_time::milliseconds(100)))
 	{
 		if(error == boost::asio::error::eof)
-			Logger::DiagnosticOut() << "Client: Level read OK, but client DC'd\n";
+		{
+			if(logging_) Logger::DiagnosticOut() << "Client: Level read OK, but client DC'd\n";
+		}
 		else if(error)
-			Logger::DiagnosticOut() << "Client: Error during level read: " << error.message() << "\n";
+		{
+			if(logging_) Logger::DiagnosticOut() << "Client: Error during level read: " << error.message() << "\n";
+		}
 		else
 		{
-			Logger::DiagnosticOut() << "Client: Finished receiving level, looking for new opcode header\n";
+			if(logging_) Logger::DiagnosticOut() << "Client: Finished receiving level, looking for new opcode header\n";
 
 			Opcodes::LevelDownloadData* level_download = new Opcodes::LevelDownloadData(_filename, _level_data);
 			opcodes_.push_back(level_download);
@@ -201,13 +214,13 @@ void Client::ReadLevelFinished(boost::system::error_code error, boost::shared_pt
 									read_buffer));
 		}
 		mutex_.unlock();
-	} else Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
+	} else if(logging_) Logger::DiagnosticOut() << "Client: Unable to get lock, so must be closing\n";
 }
 
 void Client::WriteFinished(boost::system::error_code error, boost::shared_ptr<Opcodes::ClientOpcode> _data)
 {
 	mutex_.lock();
-	Logger::DiagnosticOut() << "Client: Write complete\n";
+	if(logging_) Logger::DiagnosticOut() << "Client: Write complete\n";
 	//Do nothing, but memory should now be freed
 	mutex_.unlock();
 }
